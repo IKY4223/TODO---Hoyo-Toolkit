@@ -50,14 +50,24 @@ NOT_A_HIT = (
     "Consumption",
     "Inherited",
     "Conversion",
+    "Bond of Life",
+    "Mitigation",
+    # shortcut: Lunar reactions (6.0+) have a damage formula of their own, which the damage
+    # engine does not have yet; their lines stay out until it does.
+    "Lunar",
 )
-# One part of a hit: a percentage parameter, perhaps followed by the stat it is a percent of.
-# Accepts "{param1:F1P}" and "{param2:P} Max HP"; rejects "{param1:F1}s" and "{param1:I}".
-# https://regex101.com/?flavor=python&regex=%5C%7Bparam%28%5Cd%2B%29%3A%28%3F%3AF%5Cd%29%3FP%5C%7D%5Cs*%28ATK%7CMax+HP%7CDEF%7CElemental+Mastery%29%3F&testString=%7Bparam2%3AP%7D+Max+HP
-PART = re.compile(r"\{param(\d+):(?:F\d)?P\}\s*(ATK|Max HP|DEF|Elemental Mastery)?")
 TIMES = "\u00d7"  # the multiplication sign the game writes a repeated hit with
-# A hit repeated: "{param4:F1P}" TIMES "3", "{param1:F1P}*4", "({param1:F1P} ATK+...)" TIMES "2".
-REPEAT = re.compile(rf"\(?(.*?)\)?\s*[{TIMES}*]\s*(\d+)")
+# One part of a hit: a percentage parameter, perhaps followed by the stat it is a percent of,
+# by "each" or "per <piece>" (one piece's damage), and by how many times it is dealt.
+# Accepts "{param1:F1P}", "{param2:P} Max HP", "{param4:F1P}*3" and "{param1:F1P} per Paw";
+# rejects "{param1:F1}s", "{param1:I}" and "{param1:P} Current HP".
+# https://regex101.com/?flavor=python&regex=%5C%7Bparam%28%5Cd%2B%29%3A%28%3F%3AF%5Cd%29%3FP%5C%7D%5Cs*%28ATK%7CMax+HP%7CDEF%7CElemental+Mastery%29%3F%5Cs*%28%3F%3Aeach%7Cper+%5BA-Z%5D%5Cw*%29%3F%5Cs*%28%3F%3A%5B%C3%97*%5D%5Cs*%28%5Cd%2B%29%29%3F&testString=%7Bparam2%3AF2P%7D+Max+HP+%C3%973
+PART = re.compile(
+    r"\{param(\d+):(?:F\d)?P\}\s*(ATK|Max HP|DEF|Elemental Mastery)?"
+    rf"\s*(?:each|per [A-Z]\w*)?\s*(?:[{TIMES}*]\s*(\d+))?"
+)
+# A sum in brackets repeated as a whole: "({param1:F1P} ATK+{param2:F1P} EM)" TIMES "2".
+BRACKETS = re.compile(rf"\((.*)\)\s*[{TIMES}*]\s*(\d+)")
 # The game words a line for each device; the site shows the computer's wording. A leading "#"
 # only marks a line that holds such markup.
 LAYOUT = re.compile(r"#?\{LAYOUT_MOBILE#[^}]*\}\{LAYOUT_PC#([^}]*)\}\{LAYOUT_PS#[^}]*\}")
@@ -95,33 +105,37 @@ def talent_rows(
     """
     if any(word in name_en for word in NOT_A_HIT):
         return []
-    body, hits = fmt.strip(), 1
-    if repeat := REPEAT.fullmatch(body):
-        body, hits = repeat[1], int(repeat[2])
-    parsed: list[list[tuple[int, str | None]]] = []
-    for text in body.split("/"):
-        parts = [PART.fullmatch(part.strip()) for part in text.split("+")]
+    # Each alternative: its parts as (parameter, stat if named, times dealt).
+    parsed: list[list[tuple[int, str | None, int]]] = []
+    for text in fmt.strip().split("/"):
+        body, whole = text.strip(), 1
+        if bracketed := BRACKETS.fullmatch(body):
+            body, whole = bracketed[1], int(bracketed[2])
+        parts = [PART.fullmatch(part.strip()) for part in body.split("+")]
         if not all(parts):
             return []
-        parsed.append([(int(part[1]), part[2]) for part in parts if part])
+        parsed.append([(int(p[1]), p[2], whole * int(p[3] or 1)) for p in parts if p])
     # "{param1:F1P}+{param2:F1P} DEF": a stat named once at the end is every bare part's stat.
     named: str | None = None
     stats: list[str] = []
-    for _, stat in reversed([part for alternative in parsed for part in alternative]):
+    for _, stat, _ in reversed([part for alternative in parsed for part in alternative]):
         named = stat or named
         stats.insert(0, named or "ATK")
-    alternatives: list[list[tuple[int, str]]] = []
+    alternatives: list[list[tuple[int, str, int]]] = []
     for written in parsed:
-        alternatives.append([(param, stats.pop(0)) for param, _ in written])
-    if max(param for alternative in alternatives for param, _ in alternative) > len(levels[0]):
+        alternatives.append([(param, stats.pop(0), hits) for param, _, hits in written])
+    if max(param for alternative in alternatives for param, _, _ in alternative) > len(levels[0]):
         return []
     en, ru = _clean(name_en), _clean(name_ru) or _clean(name_en)
-    suffix = f" {TIMES}{hits}" if hits > 1 else ""
     rows = []
     for number, alternative in enumerate(alternatives, 1):
         which = f" ({number}/{len(alternatives)})" if len(alternatives) > 1 else ""
+        # Named after the repeat when every part of the hit is dealt the same number of times.
+        repeats = {hits for _, _, hits in alternative}
+        each = repeats.pop() if len(repeats) == 1 else 1
+        suffix = f" {TIMES}{each}" if each > 1 else ""
         terms: dict[str, list[float]] = {}
-        for param, part_stat in alternative:
+        for param, part_stat, hits in alternative:
             key = SCALINGS[part_stat]
             values = [hits * level[param - 1] for level in levels]
             before = terms.get(key, [0.0] * len(levels))

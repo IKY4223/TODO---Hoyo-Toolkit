@@ -4,9 +4,9 @@ The game does not publish its damage formula. This is the community one, verifie
 testing: KQM Theorycrafting Library, "Damage Formula",
 https://library.keqingmains.com/combat-mechanics/damage/damage-formula (read November 2026).
 
-shortcut: transformative reactions (Overloaded, Superconduct, Bloom and the rest) deal damage of
-their own, without crits, and are not modelled; nor is a reaction damage bonus such as Crimson
-Witch's or Thundering Fury's. Add each when a feature needs it.
+shortcut: transformative reactions (Overloaded, Superconduct, Bloom and the rest) and Lunar
+reactions deal damage by formulas of their own and are not modelled; nor is a reaction damage
+bonus such as Crimson Witch's or Thundering Fury's. Add each when a feature needs it.
 """
 
 from collections.abc import Mapping

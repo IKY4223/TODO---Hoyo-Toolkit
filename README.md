@@ -128,12 +128,14 @@ Planned, in order:
 2. Genshin, the rest of stage 20 (`STAGE-20.md`, PR B): Capturing Radiance in the wish
    forecast, a comparison of the showcase's artifacts for a chosen hit, the share of 50/50s won.
    Left out of the damage calculator, each with a `shortcut:` comment:
-   - transformative reactions (Overloaded, Superconduct, Bloom and the rest);
+   - transformative reactions (Overloaded, Superconduct, Bloom and the rest) and Lunar reactions
+     (6.0 and later), which follow formulas of their own: their lines stay out of the hit list;
    - reaction damage bonuses (Crimson Witch, Thundering Fury) and set and passive effects;
    - the damage bonus of a Normal Attack by a catalyst or an infused attack (the form guesses
      Physical); talent lines told apart from buffs by words of their English name;
-   - the newest characters (Sandrone, Mitya, two Traveler elements): the game's tables published
-     so far (June 2026) do not hold their talents, so their hits wait for the next sync.
+   - the newest characters (Sandrone, Mitya, Valeriy, Vodyanitsa, Vesna, Alyosha, Odette and two
+     of the Traveler's elements): the game's tables published so far (June 2026) do not hold
+     their talents, so their hits wait for the next sync.
    Luck statistics, the rest: the share of 50/50s won on character banners, for both games. It
    needs to know which 5★ characters are standard, which neither game data source here gives:
    it waits for a source (an open tracker's data file, read and credited).

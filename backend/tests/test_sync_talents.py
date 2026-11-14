@@ -33,6 +33,35 @@ def test_repeated_hits_count_in_the_multiplier_and_the_name(fmt: str) -> None:
     assert rows == [_row(f"4-Hit DMG {TIMES}3", ("atk", [1.5, 3.0]))]
 
 
+def test_a_repeat_belongs_to_the_alternative_it_follows() -> None:
+    # Clorinde's Impale the Night: only the third of three hits is dealt three times.
+    rows = talent_rows(
+        "Impale DMG", "Impale DMG", "{param1:F1P}/{param2:F1P}/{param3:F1P}" + TIMES + "3", LEVELS
+    )
+    assert rows == [
+        _row("Impale DMG (1/3)", ("atk", [0.4, 0.8])),
+        _row("Impale DMG (2/3)", ("atk", [0.5, 1.0])),
+        _row(f"Impale DMG {TIMES}3 (3/3)", ("atk", [1.8, 3.6])),
+    ]
+
+
+def test_each_part_can_repeat_on_its_own() -> None:
+    # Azure Devour: two parts, each dealt twice.
+    fmt = "{param1:F1P}" + TIMES + "2+{param2:F1P}" + TIMES + "2"
+    rows = talent_rows("Azure Devour DMG", "Azure Devour DMG", fmt, LEVELS)
+    assert rows == [_row(f"Azure Devour DMG {TIMES}2", ("atk", [1.8, 3.6]))]
+
+
+@pytest.mark.parametrize(
+    ("fmt", "value"), [("{param1:F1P} per Paw", 0.4), ("{param2:F1P} each", 0.5)]
+)
+def test_a_hit_counted_per_piece_is_one_piece(fmt: str, value: float) -> None:
+    # Diona's Icy Paw DMG per paw, Tighnari's Fatal Blossom DMG each.
+    assert talent_rows("Icy Paw DMG", "Icy Paw DMG", fmt, LEVELS) == [
+        _row("Icy Paw DMG", ("atk", [value, value * 2]))
+    ]
+
+
 def test_parts_of_one_hit_add_up() -> None:
     rows = talent_rows(
         "Charged Attack DMG", "Charged Attack DMG", "{param1:F1P}+{param2:F1P}", LEVELS
@@ -122,7 +151,11 @@ def test_the_computer_wording_replaces_the_layout_choice(name: str, shown: str) 
         ("Redmane's Blood Maximum", "{param1:P} Max HP"),
         ("Soul Companion DMG", "{param1:F1P} Normal Attack DMG"),  # a share of another hit
         ("Shattering Pressure DMG", "{param1:F1P} Cryo + {param2:F1P} Physical"),
-        ("Icy Paw DMG", "{param1:F1P} per Paw"),
+        ("Energy Recharge Bonus", "{param1:P} per Electro Sigil"),
+        ("Bond of Life Gain", "{param1:P} Max HP"),
+        ("Mitigation", "{param1:P} ATK"),
+        # Lunar reactions follow a formula of their own (see app/damage/engine.py).
+        ("Gravity Interference: Lunar-Charged DMG", "{param1:F1P} ATK"),
         ("Gentilhomme Usher HP Consumption", "{param1:F1P} Current HP"),
         ("Inherited HP", "{param1:P}"),
         ("High Nightsoul Points ATK Conversion Rate", "{param1:F1P}"),
