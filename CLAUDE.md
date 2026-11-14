@@ -115,7 +115,8 @@ For a session picking the work up again.
   effects table's rest (Aglaea's Supreme Stance, Robin • Summeretto's Fever, extra turns, later
   kits of Welt and Jingliu by trace ids, base chances). Left: Ultimates by energy (needs a source).
   The owner took the Telegram bot's host and Mini App out of the plan (November 2026); the bot's
-  code stays. Next, by HANDOFF.md: stage 20, Genshin (README plan item 2).
+  code stays. Next: stage 20, Genshin (README plan item 2); its plan, with files and data
+  sources, is `STAGE-20.md`.
 - The start page is the player's desk (`frontend/src/Home.tsx`), not a landing page, by the
   owner's choice: the profile loaded in this visit, each saved history's pity, the tools.
 - The owner writes in Russian and reads replies on a phone. Keep the UI English and Russian.
