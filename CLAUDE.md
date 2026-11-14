@@ -24,7 +24,8 @@ Build optimizer and wish tracker for HoYoverse games. `backend/` is FastAPI mana
   44px touch targets.
 - The site links no other tracker or similar service (paimon.moe, stardb.gg and the like), so
   players stay on it: credit sources in the README and in code comments instead.
-- `backend/app/showcase/gamedata.json`, `backend/app/starrail/gamedata.json` and
+- `backend/app/showcase/gamedata.json`, `backend/app/showcase/talents.json`,
+  `backend/app/damage/levels.json`, `backend/app/starrail/gamedata.json` and
   `backend/app/starrail/texts.json` are generated: run `scripts/sync_gamedata.py` and
   `scripts/sync_starrail_data.py` in `backend/` after each game version, never edit them by hand.
 - Tests never call Enka.Network or HoYoverse. They use the fixtures in `backend/tests/fixtures/`
@@ -115,8 +116,9 @@ For a session picking the work up again.
   effects table's rest (Aglaea's Supreme Stance, Robin • Summeretto's Fever, extra turns, later
   kits of Welt and Jingliu by trace ids, base chances). Left: Ultimates by energy (needs a source).
   The owner took the Telegram bot's host and Mini App out of the plan (November 2026); the bot's
-  code stays. Next: stage 20, Genshin (README plan item 2); its plan, with files and data
-  sources, is `STAGE-20.md`.
+  code stays. Stage 20, Genshin, follows `STAGE-20.md`: PR A (talent multipliers from the game's
+  tables, hits in the damage form, shred, flat damage, Aggravate and Spread) is built; PR B is
+  next.
 - The start page is the player's desk (`frontend/src/Home.tsx`), not a landing page, by the
   owner's choice: the profile loaded in this visit, each saved history's pity, the tools.
 - The owner writes in Russian and reads replies on a phone. Keep the UI English and Russian.

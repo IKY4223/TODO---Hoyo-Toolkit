@@ -408,6 +408,19 @@ label {
   text-decoration: none;
 }
 
+/* Fields most hits leave at zero, folded away inside a form. */
+details.extras {
+  display: grid;
+  gap: 1rem;
+  padding: 0 0.75rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+details.extras > :not(summary) {
+  margin-top: 0.75rem;
+}
+
 .card .texts {
   gap: 1.25rem;
 }

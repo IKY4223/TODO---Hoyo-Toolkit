@@ -23,6 +23,7 @@ LIMITS: dict[str, int | str | list[str] | dict[str, dict[str, int]]] = {
     "HISTORY_PAGE_SIZE": history.PAGE_SIZE,
     "UID_PATTERN": showcase.UID_PATTERN,
     "MAX_MULTIPLIER": damage.MAX_MULTIPLIER,
+    "MAX_FLAT_DAMAGE": damage.MAX_FLAT,
     "MAX_ENEMY_LEVEL": damage.MAX_ENEMY_LEVEL,
     "MIN_RESISTANCE": damage.MIN_RESISTANCE,
     "MAX_RESISTANCE": damage.MAX_RESISTANCE,

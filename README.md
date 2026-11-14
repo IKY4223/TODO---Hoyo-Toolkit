@@ -68,10 +68,14 @@ The app opens on Honkai: Star Rail; Genshin Impact is one tap away.
 - **Genshin builds** — enter a UID and see every character in the player's showcase: final
   stats, talents, weapon and artifacts. Data comes from [Enka.Network](https://enka.network).
   A player's builds can be shared as a link, as in Star Rail.
-- **Damage calculator** — for any imported character: enter a talent multiplier, pick the
-  scaling stat, damage bonus, reaction and enemy, and get average, crit and non-crit damage.
-  Multipliers are typed in by hand; shred, flat additions and transformative reactions are not
-  modelled.
+- **Damage calculator** — for any imported character: pick a hit of the character's talents
+  (its multiplier comes from the game's tables at the character's talent level, a hit scaling
+  with two stats keeps both) or type a multiplier in, then the damage bonus, reaction and enemy,
+  and get average, crit and non-crit damage. Folded under "Team buffs and debuffs": flat damage
+  added to the base (Shenhe, Yun Jin, Zhongli), DEF reduction (counted up to 90%) and DEF
+  ignore, RES reduction. Reactions: Vaporize and Melt, Aggravate and Spread. The damage bonus a
+  hit gets is a guess (Physical for a Normal Attack, the element otherwise) the player can
+  change.
 - **Wish history** — import the whole wish history straight from a phone: on Android, copy the
   text of the error page the game's history shows offline and paste it in. Shows every banner's
   pity and each 5★ with the pulls it took. The steps for Android and iPhone are paimon.moe's
@@ -121,7 +125,15 @@ Planned, in order:
    - Aglaea's Eidolon 4 stack from her own attacks; Pearl's Eidolon 2 advance for the other
      Elation characters; Hanya's Eidolon 1 taken as once each of her turns; Castorice's Ardent
      Will spent on Netherwing's first two turns.
-2. Genshin: talent multipliers from game data and a best-artifact search.
+2. Genshin, the rest of stage 20 (`STAGE-20.md`, PR B): Capturing Radiance in the wish
+   forecast, a comparison of the showcase's artifacts for a chosen hit, the share of 50/50s won.
+   Left out of the damage calculator, each with a `shortcut:` comment:
+   - transformative reactions (Overloaded, Superconduct, Bloom and the rest);
+   - reaction damage bonuses (Crimson Witch, Thundering Fury) and set and passive effects;
+   - the damage bonus of a Normal Attack by a catalyst or an infused attack (the form guesses
+     Physical); talent lines told apart from buffs by words of their English name;
+   - the newest characters (Sandrone, Mitya, two Traveler elements): the game's tables published
+     so far (June 2026) do not hold their talents, so their hits wait for the next sync.
    Luck statistics, the rest: the share of 50/50s won on character banners, for both games. It
    needs to know which 5★ characters are standard, which neither game data source here gives:
    it waits for a source (an open tracker's data file, read and credited).
@@ -281,6 +293,13 @@ licence: that includes the game's icons in `frontend/public/icons`. HoYoverse ha
 way fan tools commonly use game art, and come out if HoYoverse asks.
 
 ## Credits
+
+Talent multipliers, their names in English and Russian, and the level base of Aggravate and
+Spread come from the game's own tables as
+[Dimbreath/AnimeGameData](https://gitlab.com/Dimbreath/AnimeGameData) publishes them
+(`ProudSkillExcelConfigData`, `ElementCoeffExcelConfigData`, the text maps). That repository
+states no licence: the data is the game's and belongs to HoYoverse. The damage formula is the
+[KQM Theorycrafting Library](https://library.keqingmains.com/combat-mechanics/damage/damage-formula)'s.
 
 The tool icons are the games' own: the phone menu signs and the speed stat icon of Honkai: Star
 Rail, taken from [StarRailRes](https://github.com/Mar-7th/StarRailRes) (`icon/sign`,

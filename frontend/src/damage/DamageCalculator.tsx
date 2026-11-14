@@ -1,23 +1,24 @@
-import type { JSX, SubmitEvent } from 'react'
+import { type JSX, type SubmitEvent, useState } from 'react'
 import { isKeyOf } from '../api/http'
-import { MAX_ENEMY_LEVEL, MAX_MULTIPLIER, MAX_RESISTANCE, MIN_RESISTANCE } from '../api/limits'
+import {
+  MAX_ENEMY_LEVEL,
+  MAX_FLAT_DAMAGE,
+  MAX_MULTIPLIER,
+  MAX_RESISTANCE,
+  MIN_RESISTANCE,
+} from '../api/limits'
 import { useRequest } from '../api/useRequest'
-import { type Message, useLocalized, useT, numberFormat } from '../i18n'
-import { type Character, formatStat } from '../showcase/showcase'
+import { type Message, useLanguage, useLocalized, useT, numberFormat } from '../i18n'
+import { type Attack, type Character, formatStat, SCALINGS } from '../showcase/showcase'
 import { type Damage, type DamageRequest, fetchDamage } from './damage'
 
 // `satisfies` makes a choice added to the API a compile error here.
-const SCALINGS = {
-  atk: 'ATK',
-  hp: 'HP',
-  def: 'DEF',
-  elemental_mastery: 'Elemental Mastery',
-} as const satisfies Record<DamageRequest['scaling'], Message>
-
 const REACTIONS = {
   none: 'None',
   weak: 'Vaporize / Melt ×1.5',
   strong: 'Vaporize / Melt ×2',
+  aggravate: 'Aggravate',
+  spread: 'Spread',
 } as const satisfies Record<DamageRequest['reaction'], Message>
 
 const BONUSES = {
@@ -31,19 +32,38 @@ const BONUSES = {
   dendro_dmg: true,
 } as const satisfies Record<NonNullable<DamageRequest['bonus']>, true>
 
+const TALENTS: readonly Message[] = ['Normal Attack', 'Elemental Skill', 'Elemental Burst']
+
 const RESULTS = [
   { label: 'Average', key: 'average' },
   { label: 'Crit', key: 'crit' },
   { label: 'Non-crit', key: 'non_crit' },
 ] as const satisfies readonly { label: Message; key: keyof Damage }[]
 
+// The second part of a hit that scales with two stats, such as ATK and Elemental Mastery.
+const PART_LABELS = [
+  { multiplier: 'Talent multiplier, %', scaling: 'Scales with' },
+  { multiplier: 'Second part, %', scaling: 'Second part scales with' },
+] as const satisfies readonly { multiplier: Message; scaling: Message }[]
+
 const DEFAULT_MULTIPLIER_PERCENT = 100
 const DEFAULT_ENEMY_LEVEL = 90
 const DEFAULT_RESISTANCE_PERCENT = 10
 const PERCENT = 100
 const NO_BONUS = ''
+const OWN_MULTIPLIER = ''
+// A multiplier from the tables is shown to two decimals of a percent, as the game prints it.
+const SHOWN_DECIMALS = 100
+
+type Stat = keyof typeof SCALINGS
+
+interface Part {
+  readonly stat: Stat
+  readonly percent: string
+}
 
 const whole = numberFormat({ maximumFractionDigits: 0 })
+const OWN_PART: readonly Part[] = [{ stat: 'atk', percent: String(DEFAULT_MULTIPLIER_PERCENT) }]
 
 /** The key a <select> holds, or an error if the page was tampered into an impossible choice. */
 function choice<TTable extends object>(table: TTable, value: unknown): keyof TTable {
@@ -51,62 +71,165 @@ function choice<TTable extends object>(table: TTable, value: unknown): keyof TTa
   return value
 }
 
-function readRequest(data: FormData, character: Character): DamageRequest {
+// No hit in the game's tables scales with more than two stats.
+const partsOf = (attack: Attack): Part[] =>
+  attack.scalings
+    .filter((scaling) => isKeyOf(SCALINGS, scaling.stat))
+    .slice(0, PART_LABELS.length)
+    .map((scaling) => ({
+      stat: choice(SCALINGS, scaling.stat),
+      percent: String(Math.round(scaling.multiplier * PERCENT * SHOWN_DECIMALS) / SHOWN_DECIMALS),
+    }))
+
+// shortcut: a Normal Attack is taken as Physical and a skill or burst as the character's element,
+// which is wrong for catalysts and infused attacks; the player can change it in the form.
+function likelyBonus(attack: Attack, character: Character, offered: readonly string[]): string {
+  const physical = attack.talent === 0 || !character.element
+  const bonus = physical ? 'physical_dmg' : `${character.element}_dmg`
+  return offered.includes(bonus) ? bonus : NO_BONUS
+}
+
+function readRequest(data: FormData, character: Character, parts: readonly Part[]): DamageRequest {
   const bonus = data.get('bonus')
+  const fraction = (name: string): number => Number(data.get(name)) / PERCENT
   return {
     level: character.level,
     stats: character.stats,
-    scaling: choice(SCALINGS, data.get('scaling')),
-    multiplier: Number(data.get('multiplier')) / PERCENT,
+    scalings: parts.map(({ stat, percent }) => ({ stat, multiplier: Number(percent) / PERCENT })),
     bonus: bonus === NO_BONUS ? null : choice(BONUSES, bonus),
     reaction: choice(REACTIONS, data.get('reaction')),
+    flat: Number(data.get('flat')),
     enemy_level: Number(data.get('enemy_level')),
-    enemy_resistance: Number(data.get('enemy_resistance')) / PERCENT,
+    enemy_resistance: fraction('enemy_resistance'),
+    def_reduction: fraction('def_reduction'),
+    def_ignore: fraction('def_ignore'),
+    res_reduction: fraction('res_reduction'),
   }
+}
+
+/** A percentage the team takes off the enemy, from 0 up to `max`. */
+function Reduction(props: {
+  readonly name: string
+  readonly label: Message
+  readonly max: number
+}): JSX.Element {
+  const t = useT()
+  return (
+    <label>
+      {t(props.label)}
+      <input
+        name={props.name}
+        type="number"
+        inputMode="decimal"
+        min={0}
+        max={props.max}
+        step="any"
+        defaultValue={0}
+        required
+      />
+    </label>
+  )
 }
 
 export function DamageCalculator({ character }: { readonly character: Character }): JSX.Element {
   const [state, run] = useRequest<Damage>()
   const t = useT()
+  const language = useLanguage()
   const localized = useLocalized()
   const bonuses = character.stats.filter((stat) => isKeyOf(BONUSES, stat.key))
+  const [hit, setHit] = useState(OWN_MULTIPLIER)
+  const [parts, setParts] = useState<readonly Part[]>(OWN_PART)
+  const [bonus, setBonus] = useState<string>(bonuses[0]?.key ?? NO_BONUS)
+
+  const choose = (value: string): void => {
+    setHit(value)
+    const attack = character.attacks[Number(value)]
+    if (value === OWN_MULTIPLIER || !attack) {
+      setParts(OWN_PART)
+      return
+    }
+    setParts(partsOf(attack))
+    setBonus(likelyBonus(attack, character, bonuses.map((stat) => stat.key)))
+  }
+
+  const change = (index: number, part: Partial<Part>): void => {
+    setParts(parts.map((old, at) => (at === index ? { ...old, ...part } : old)))
+  }
 
   const submit = (event: SubmitEvent<HTMLFormElement>): void => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
-    void run(async () => fetchDamage(readRequest(data, character)))
+    void run(async () => fetchDamage(readRequest(data, character, parts)))
   }
 
   return (
     <details>
       <summary>{t('Damage')}</summary>
       <form onSubmit={submit}>
-        <label>
-          {t('Talent multiplier, %')}
-          <input
-            name="multiplier"
-            type="number"
-            inputMode="decimal"
-            min={0.1}
-            max={MAX_MULTIPLIER * PERCENT}
-            step="any"
-            defaultValue={DEFAULT_MULTIPLIER_PERCENT}
-            required
-          />
-        </label>
-        <label>
-          {t('Scales with')}
-          <select name="scaling">
-            {Object.entries(SCALINGS).map(([scaling, label]) => (
-              <option key={scaling} value={scaling}>
-                {t(label)}
-              </option>
-            ))}
-          </select>
-        </label>
+        {character.attacks.length ? (
+          <label>
+            {t('Hit')}
+            <select value={hit} onChange={(event) => choose(event.target.value)}>
+              <option value={OWN_MULTIPLIER}>{t('Own multiplier')}</option>
+              {TALENTS.map((talent, index) => (
+                <optgroup key={talent} label={t(talent)}>
+                  {character.attacks.map((attack, at) =>
+                    attack.talent === index ? (
+                      <option key={`${attack.talent}:${attack.name}:${attack.name_ru}`} value={at}>
+                        {language === 'ru' ? attack.name_ru : attack.name}
+                      </option>
+                    ) : null,
+                  )}
+                </optgroup>
+              ))}
+            </select>
+          </label>
+        ) : null}
+        {parts.map((part, index) => {
+          const labels = PART_LABELS[index] ?? PART_LABELS[1]
+          return (
+            <div key={labels.multiplier} className="pair">
+              <label>
+                {t(labels.multiplier)}
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min={0.1}
+                  max={MAX_MULTIPLIER * PERCENT}
+                  step="any"
+                  value={part.percent}
+                  onChange={(event) => change(index, { percent: event.target.value })}
+                  required
+                />
+              </label>
+              <label>
+                {t(labels.scaling)}
+                <select
+                  value={part.stat}
+                  onChange={(event) =>
+                    change(index, { stat: choice(SCALINGS, event.target.value) })
+                  }
+                >
+                  {Object.entries(SCALINGS).map(([scaling, label]) => (
+                    <option key={scaling} value={scaling}>
+                      {t(label)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          )
+        })}
+        {character.attacks.length ? (
+          <p className="hint">
+            {t(
+              "Multipliers from the game's tables at the character's talent levels, repeated hits added up. Check the damage bonus: it is a guess.",
+            )}
+          </p>
+        ) : null}
         <label>
           {t('Damage bonus')}
-          <select name="bonus" defaultValue={bonuses[0]?.key ?? NO_BONUS}>
+          <select name="bonus" value={bonus} onChange={(event) => setBonus(event.target.value)}>
             <option value={NO_BONUS}>{t('None')}</option>
             {bonuses.map((stat) => (
               <option key={stat.key} value={stat.key}>
@@ -150,6 +273,33 @@ export function DamageCalculator({ character }: { readonly character: Character 
             required
           />
         </label>
+        <details className="extras">
+          <summary>{t('Team buffs and debuffs')}</summary>
+          <label>
+            {t('Flat damage added')}
+            <input
+              name="flat"
+              type="number"
+              inputMode="decimal"
+              min={0}
+              max={MAX_FLAT_DAMAGE}
+              step="any"
+              defaultValue={0}
+              required
+            />
+          </label>
+          <p className="hint">
+            {t("Added to the hit's base: Shenhe's quills, Yun Jin's burst, Zhongli's passive.")}
+          </p>
+          <Reduction name="def_reduction" label="Enemy DEF reduction, %" max={PERCENT} />
+          <Reduction name="def_ignore" label="Enemy DEF ignored, %" max={PERCENT} />
+          <Reduction
+            name="res_reduction"
+            label="Enemy RES reduction, %"
+            max={MAX_RESISTANCE * PERCENT}
+          />
+          <p className="hint">{t('DEF reduction counts up to 90%, as in the game.')}</p>
+        </details>
         <button type="submit" disabled={state.status === 'loading'}>
           {t('Calculate damage')}
         </button>

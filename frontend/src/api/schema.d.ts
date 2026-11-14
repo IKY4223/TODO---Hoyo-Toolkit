@@ -193,6 +193,17 @@ export interface components {
             /** Icon */
             icon: string | null;
         };
+        /** Attack */
+        Attack: {
+            /** Talent */
+            talent: number;
+            /** Name */
+            name: string;
+            /** Name Ru */
+            name_ru: string;
+            /** Scalings */
+            scalings: components["schemas"]["Scaling"][];
+        };
         /** Character */
         Character: {
             /** Id */
@@ -213,6 +224,8 @@ export interface components {
             artifacts: components["schemas"]["Artifact"][];
             /** Icon */
             icon: string | null;
+            /** Attacks */
+            attacks: components["schemas"]["Attack"][];
         };
         /** CharacterGuide */
         CharacterGuide: {
@@ -251,23 +264,20 @@ export interface components {
              * @description The character's final stats
              */
             stats: components["schemas"]["StatValue"][];
-            /**
-             * Scaling
-             * @description The stat the talent multiplies
-             * @enum {string}
-             */
-            scaling: "atk" | "hp" | "def" | "elemental_mastery";
-            /**
-             * Multiplier
-             * @description Talent multiplier: 3.92 is 392%
-             */
-            multiplier: number;
+            /** Scalings */
+            scalings: components["schemas"]["TalentScaling"][];
             /**
              * Bonus
              * @description The damage bonus that applies to the hit
              */
             bonus: ("physical_dmg" | "pyro_dmg" | "hydro_dmg" | "electro_dmg" | "cryo_dmg" | "anemo_dmg" | "geo_dmg" | "dendro_dmg") | null;
             reaction: components["schemas"]["Reaction"];
+            /**
+             * Flat
+             * @description Damage added to the base
+             * @default 0
+             */
+            flat: number;
             /** Enemy Level */
             enemy_level: number;
             /**
@@ -275,6 +285,21 @@ export interface components {
              * @description 0.1 is 10%
              */
             enemy_resistance: number;
+            /**
+             * Def Reduction
+             * @default 0
+             */
+            def_reduction: number;
+            /**
+             * Def Ignore
+             * @default 0
+             */
+            def_ignore: number;
+            /**
+             * Res Reduction
+             * @default 0
+             */
+            res_reduction: number;
         };
         /** EidolonText */
         EidolonText: {
@@ -393,7 +418,7 @@ export interface components {
          * Reaction
          * @enum {string}
          */
-        Reaction: "none" | "weak" | "strong";
+        Reaction: "none" | "weak" | "strong" | "aggravate" | "spread";
         /** Relic */
         Relic: {
             slot: components["schemas"]["StarRailSlot"];
@@ -468,6 +493,12 @@ export interface components {
              * @description As the game shows it: 5.8 for 5.8%
              */
             value?: number | null;
+        };
+        /** Scaling */
+        Scaling: {
+            stat: components["schemas"]["StatKey"];
+            /** Multiplier */
+            multiplier: number;
         };
         /** Showcase */
         Showcase: {
@@ -603,6 +634,20 @@ export interface components {
             rolls: number;
             /** Score */
             score: number;
+        };
+        /** TalentScaling */
+        TalentScaling: {
+            /**
+             * Stat
+             * @description The stat the talent multiplies
+             * @enum {string}
+             */
+            stat: "atk" | "hp" | "def" | "elemental_mastery";
+            /**
+             * Multiplier
+             * @description Talent multiplier: 3.92 is 392%
+             */
+            multiplier: number;
         };
         /** Trace */
         Trace: {

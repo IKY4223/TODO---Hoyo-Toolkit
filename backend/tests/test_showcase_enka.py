@@ -9,7 +9,8 @@ import pytest
 
 from app.showcase import enka
 from app.showcase.enka import EnkaError, UpstreamDataError, parse
-from app.showcase.models import Artifact, Element, Showcase, Slot, Stat, StatKey
+from app.showcase.gamedata import TALENTS
+from app.showcase.models import Artifact, Element, Scaling, Showcase, Slot, Stat, StatKey
 
 FIXTURE = (Path(__file__).parent / "fixtures" / "enka_showcase.json").read_bytes()
 UID = "700000001"
@@ -53,6 +54,26 @@ def test_talents_include_constellation_boosts(showcase: Showcase) -> None:
     amber, ganyu = showcase.characters
     assert amber.talents == (10, 13, 13)  # C3 and C5 add 3 levels each
     assert ganyu.talents == (9, 9, 9)
+
+
+def test_hits_come_from_the_talent_tables_at_each_talent_level(showcase: Showcase) -> None:
+    amber = showcase.characters[0]
+    attacks = {(attack.talent, attack.name) for attack in amber.attacks}
+    assert (0, "1-Hit DMG") in attacks
+    assert {attack.talent for attack in amber.attacks} == {0, 1, 2}
+    first = amber.attacks[0]
+    # Amber's Normal Attack is at level 10: the multiplier is the table's tenth value.
+    table = TALENTS["2131"][0]
+    assert first.name_ru == table.name.ru
+    assert first.scalings == (Scaling(StatKey.ATK, table.terms[0].values[9]),)
+
+
+def test_a_talent_level_past_the_table_gives_no_hits() -> None:
+    def boost(data: dict[str, Any]) -> None:
+        data["avatarInfoList"][0]["skillLevelMap"]["10041"] = 20  # her Normal Attack
+
+    amber = parse(UID, altered(boost))[0].characters[0]
+    assert {attack.talent for attack in amber.attacks} == {1, 2}
 
 
 def test_final_stats(showcase: Showcase) -> None:
@@ -154,6 +175,7 @@ def test_character_newer_than_the_game_data_is_still_listed() -> None:
     newcomer = parse(UID, altered(rename))[0].characters[0]
     assert (newcomer.name, newcomer.element, newcomer.talents) == ("Unknown character", None, ())
     assert newcomer.icon is None
+    assert newcomer.attacks == ()
     assert newcomer.id == 19999999
     assert newcomer.level == 90
     assert newcomer.weapon.name == "Skyward Harp"

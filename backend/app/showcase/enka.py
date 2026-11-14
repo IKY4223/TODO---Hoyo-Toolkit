@@ -7,8 +7,18 @@ from urllib.request import Request, urlopen
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
-from app.showcase.gamedata import GAMEDATA
-from app.showcase.models import Artifact, Character, Showcase, Slot, Stat, StatKey, Weapon
+from app.showcase.gamedata import GAMEDATA, TALENTS
+from app.showcase.models import (
+    Artifact,
+    Attack,
+    Character,
+    Scaling,
+    Showcase,
+    Slot,
+    Stat,
+    StatKey,
+    Weapon,
+)
 
 ENKA_URL = "https://enka.network/api/uid/{uid}"
 ICON_URL = "https://enka.network/ui/{name}.png"
@@ -224,6 +234,21 @@ def _stats(fight: dict[str, float]) -> tuple[Stat, ...]:
     return (*totals, *bonuses)
 
 
+def _attacks(talents: list[tuple[int, int]], levels: tuple[int, ...]) -> tuple[Attack, ...]:
+    """Each hit of each talent, at its level; a level past the game's table gives none."""
+    return tuple(
+        Attack(
+            talent=index,
+            name=hit.name.en,
+            name_ru=hit.name.ru,
+            scalings=tuple(Scaling(term.stat, term.values[level - 1]) for term in hit.terms),
+        )
+        for index, ((_, group), level) in enumerate(zip(talents, levels, strict=True))
+        for hit in TALENTS.get(str(group), [])
+        if 1 <= level <= len(hit.terms[0].values)
+    )
+
+
 def _character(avatar: _Avatar) -> Character:
     # The Traveler has one entry per element, told apart by skill depot.
     data = GAMEDATA.characters.get(
@@ -232,23 +257,25 @@ def _character(avatar: _Avatar) -> Character:
     weapons = [item for item in avatar.equip_list if isinstance(item, _Weapon)]
     if not weapons:
         raise ValueError(f"character {avatar.avatar_id} has no weapon")
+    talents = data.talents if data else []
+    levels = tuple(
+        avatar.skill_level_map[str(talent)] + avatar.proud_skill_extra_level_map.get(str(boost), 0)
+        for talent, boost in talents
+    )
     return Character(
         id=avatar.avatar_id,
         name=data.name if data else UNKNOWN_CHARACTER,
         element=data.element if data else None,
         level=int(avatar.prop_map[LEVEL_PROP].val),
         constellation=len(avatar.talent_id_list),
-        talents=tuple(
-            avatar.skill_level_map[str(talent)]
-            + avatar.proud_skill_extra_level_map.get(str(boost), 0)
-            for talent, boost in (data.talents if data else [])
-        ),
+        talents=levels,
         stats=_stats(avatar.fight_prop_map),
         weapon=_weapon(weapons[0]),
         artifacts=tuple(
             _artifact(item) for item in avatar.equip_list if isinstance(item, _Artifact)
         ),
         icon=_icon(data.icon) if data else None,
+        attacks=_attacks(talents, levels),
     )
 
 

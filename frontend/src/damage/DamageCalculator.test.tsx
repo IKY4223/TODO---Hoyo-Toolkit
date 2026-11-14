@@ -20,6 +20,29 @@ const AMBER: Character = {
   weapon: { name: 'Skyward Harp', rarity: 5, level: 90, refinement: 2, icon: null },
   artifacts: [],
   icon: null,
+  attacks: [
+    {
+      talent: 0,
+      name: '1-Hit DMG',
+      name_ru: 'Урон атаки 1',
+      scalings: [{ stat: 'atk', multiplier: 0.722 }],
+    },
+    {
+      talent: 1,
+      name: 'Tri-Karma DMG',
+      name_ru: 'Урон Трёх карм',
+      scalings: [
+        { stat: 'atk', multiplier: 1.032 },
+        { stat: 'elemental_mastery', multiplier: 2.064 },
+      ],
+    },
+    {
+      talent: 2,
+      name: 'Fiery Rain DMG',
+      name_ru: 'Урон огненного дождя',
+      scalings: [{ stat: 'atk', multiplier: 0.505 }],
+    },
+  ],
 }
 const DAMAGE = { non_crit: 9000.4, crit: 18000.8, average: 13500.6 }
 
@@ -65,13 +88,86 @@ test('sends the character and the hit, with percents as fractions', async () => 
   expect(sentBody(fetchMock)).toEqual({
     level: 90,
     stats: AMBER.stats,
-    scaling: 'atk',
-    multiplier: 3.92,
+    scalings: [{ stat: 'atk', multiplier: 3.92 }],
     bonus: 'pyro_dmg',
     reaction: 'strong',
+    flat: 0,
     enemy_level: 100,
     enemy_resistance: 0.1,
+    def_reduction: 0,
+    def_ignore: 0,
+    res_reduction: 0,
   })
+})
+
+test('a hit from the talent tables fills in its multiplier and a likely bonus', async () => {
+  const fetchMock = open(AMBER, async () => Response.json(DAMAGE))
+  const hits = screen.getByLabelText<HTMLSelectElement>('Hit')
+  expect([...hits.querySelectorAll('optgroup')].map((group) => group.label)).toEqual([
+    'Normal Attack',
+    'Elemental Skill',
+    'Elemental Burst',
+  ])
+  change('Hit', '2')
+  expect(screen.getByLabelText<HTMLInputElement>('Talent multiplier, %').value).toBe('50.5')
+  expect(screen.getByLabelText<HTMLSelectElement>('Damage bonus').value).toBe('pyro_dmg')
+  change('Hit', '0') // a Normal Attack is taken as Physical
+  expect(screen.getByLabelText<HTMLSelectElement>('Damage bonus').value).toBe('physical_dmg')
+  change('Talent multiplier, %', '80') // the number can still be changed by hand
+  calculate()
+  await screen.findByText('13,501')
+  expect(sentBody(fetchMock)).toMatchObject({ scalings: [{ stat: 'atk', multiplier: 0.8 }] })
+})
+
+test('a hit that scales with two stats sends both', async () => {
+  const fetchMock = open(AMBER, async () => Response.json(DAMAGE))
+  change('Hit', '1')
+  expect(screen.getByLabelText<HTMLInputElement>('Second part, %').value).toBe('206.4')
+  expect(screen.getByLabelText<HTMLSelectElement>('Second part scales with').value).toBe(
+    'elemental_mastery',
+  )
+  calculate()
+  await screen.findByText('13,501')
+  expect(sentBody(fetchMock)).toMatchObject({
+    scalings: [
+      { stat: 'atk', multiplier: 1.032 },
+      { stat: 'elemental_mastery', multiplier: 2.064 },
+    ],
+  })
+  change('Hit', '') // back to a multiplier of one's own: one part
+  expect(screen.queryByLabelText('Second part, %')).toBeNull()
+})
+
+test("the team's help goes in as fractions", async () => {
+  const fetchMock = open(AMBER, async () => Response.json(DAMAGE))
+  change('Flat damage added', '1500')
+  change('Enemy DEF reduction, %', '30')
+  change('Enemy DEF ignored, %', '60')
+  change('Enemy RES reduction, %', '40')
+  change('Reaction', 'aggravate')
+  calculate()
+  await screen.findByText('13,501')
+  expect(sentBody(fetchMock)).toMatchObject({
+    flat: 1500,
+    def_reduction: 0.3,
+    def_ignore: 0.6,
+    res_reduction: 0.4,
+    reaction: 'aggravate',
+  })
+})
+
+test('hit names follow the language', async () => {
+  const { setLanguage } = await import('../i18n')
+  setLanguage('ru')
+  try {
+    open(AMBER, async () => Response.json(DAMAGE))
+    const names = [...screen.getByLabelText<HTMLSelectElement>('Удар').options].map(
+      (option) => option.textContent,
+    )
+    expect(names).toContain('Урон огненного дождя')
+  } finally {
+    setLanguage('en')
+  }
 })
 
 test('shows average, crit and non-crit damage', async () => {

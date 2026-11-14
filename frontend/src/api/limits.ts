@@ -5,6 +5,7 @@ export const MAX_LINK_LENGTH = 5000
 export const HISTORY_PAGE_SIZE = 20
 export const UID_PATTERN = "^\\d{9,10}$"
 export const MAX_MULTIPLIER = 100
+export const MAX_FLAT_DAMAGE = 1000000
 export const MAX_ENEMY_LEVEL = 200
 export const MIN_RESISTANCE = -1
 export const MAX_RESISTANCE = 10

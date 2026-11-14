@@ -1,7 +1,8 @@
 import pytest
 
 from app.damage.engine import Enemy, Hit, Reaction, damage
-from app.showcase.models import StatKey
+from app.damage.levels import LEVEL_MULTIPLIERS
+from app.showcase.models import Scaling, StatKey
 
 # A character whose numbers make every factor easy to follow by hand.
 STATS = {
@@ -15,7 +16,7 @@ STATS = {
 }
 LEVEL = 90
 ENEMY = Enemy(level=90, resistance=0.1)  # defense halves the hit, resistance leaves 90%
-PLAIN = Hit(scaling=StatKey.ATK, multiplier=1.0, bonus=None, reaction=Reaction.NONE)
+PLAIN = Hit(scalings=(Scaling(StatKey.ATK, 1.0),), bonus=None, reaction=Reaction.NONE)
 
 
 def test_plain_hit() -> None:
@@ -27,7 +28,7 @@ def test_plain_hit() -> None:
 
 
 def test_talent_multiplier_scales_the_hit() -> None:
-    hit = Hit(scaling=StatKey.ATK, multiplier=3.92, bonus=None, reaction=Reaction.NONE)
+    hit = Hit(scalings=(Scaling(StatKey.ATK, 3.92),), bonus=None, reaction=Reaction.NONE)
     assert damage(LEVEL, STATS, hit, ENEMY).non_crit == pytest.approx(900 * 3.92)
 
 
@@ -36,17 +37,17 @@ def test_talent_multiplier_scales_the_hit() -> None:
     [(StatKey.HP, 9000), (StatKey.DEF, 450), (StatKey.ELEMENTAL_MASTERY, 90)],
 )
 def test_hit_can_scale_with_another_stat(scaling: StatKey, non_crit: float) -> None:
-    hit = Hit(scaling=scaling, multiplier=1.0, bonus=None, reaction=Reaction.NONE)
+    hit = Hit(scalings=(Scaling(scaling, 1.0),), bonus=None, reaction=Reaction.NONE)
     assert damage(LEVEL, STATS, hit, ENEMY).non_crit == pytest.approx(non_crit)
 
 
 def test_damage_bonus_applies_only_when_chosen() -> None:
-    hit = Hit(scaling=StatKey.ATK, multiplier=1.0, bonus=StatKey.PYRO_DMG, reaction=Reaction.NONE)
+    hit = Hit(scalings=(Scaling(StatKey.ATK, 1.0),), bonus=StatKey.PYRO_DMG, reaction=Reaction.NONE)
     assert damage(LEVEL, STATS, hit, ENEMY).non_crit == pytest.approx(900 * 1.466)
 
 
 def test_bonus_the_character_lacks_adds_nothing() -> None:
-    hit = Hit(scaling=StatKey.ATK, multiplier=1.0, bonus=StatKey.CRYO_DMG, reaction=Reaction.NONE)
+    hit = Hit(scalings=(Scaling(StatKey.ATK, 1.0),), bonus=StatKey.CRYO_DMG, reaction=Reaction.NONE)
     assert damage(LEVEL, STATS, hit, ENEMY).non_crit == pytest.approx(900)
 
 
@@ -58,7 +59,7 @@ def test_bonus_the_character_lacks_adds_nothing() -> None:
 def test_amplifying_reaction_grows_with_elemental_mastery(
     reaction: Reaction, factor: float
 ) -> None:
-    hit = Hit(scaling=StatKey.ATK, multiplier=1.0, bonus=None, reaction=reaction)
+    hit = Hit(scalings=(Scaling(StatKey.ATK, 1.0),), bonus=None, reaction=reaction)
     assert damage(LEVEL, STATS, hit, ENEMY).non_crit == pytest.approx(900 * factor)
 
 
@@ -100,3 +101,61 @@ def test_defense_depends_on_both_levels(level: int, enemy_level: int, factor: fl
 def test_missing_stats_count_as_zero() -> None:
     result = damage(LEVEL, {StatKey.ATK: 2000.0}, PLAIN, ENEMY)
     assert (result.non_crit, result.crit, result.average) == pytest.approx((900, 900, 900))
+
+
+def test_a_hit_can_scale_with_two_stats_at_once() -> None:
+    # Nahida's Tri-Karma Purification: a share of ATK and a share of Elemental Mastery.
+    hit = Hit(
+        scalings=(Scaling(StatKey.ATK, 1.0), Scaling(StatKey.ELEMENTAL_MASTERY, 2.0)),
+        bonus=None,
+        reaction=Reaction.NONE,
+    )
+    assert damage(LEVEL, STATS, hit, ENEMY).non_crit == pytest.approx((2000 + 400) * 0.45)
+
+
+def test_flat_damage_is_added_before_the_damage_bonus() -> None:
+    # Shenhe's quills or Yun Jin's burst add to the base, so the Pyro bonus grows them too.
+    hit = Hit(
+        scalings=(Scaling(StatKey.ATK, 1.0),),
+        bonus=StatKey.PYRO_DMG,
+        reaction=Reaction.NONE,
+        flat=1000.0,
+    )
+    assert damage(LEVEL, STATS, hit, ENEMY).non_crit == pytest.approx(3000 * 1.466 * 0.45)
+
+
+@pytest.mark.parametrize(
+    ("enemy", "factor"),
+    [
+        (Enemy(level=90, resistance=0.0, def_reduction=0.3), 190 / (190 + 190 * 0.7)),
+        (Enemy(level=90, resistance=0.0, def_ignore=0.6), 190 / (190 + 190 * 0.4)),
+        (
+            Enemy(level=90, resistance=0.0, def_reduction=0.5, def_ignore=0.5),
+            190 / (190 + 190 * 0.25),
+        ),
+        # Reduction stops at 90%, ignore does not.
+        (Enemy(level=90, resistance=0.0, def_reduction=1.0), 190 / (190 + 19)),
+        (Enemy(level=90, resistance=0.0, def_ignore=1.0), 1.0),
+    ],
+)
+def test_defense_reduction_and_ignore(enemy: Enemy, factor: float) -> None:
+    assert damage(LEVEL, STATS, PLAIN, enemy).non_crit == pytest.approx(2000 * factor)
+
+
+@pytest.mark.parametrize(
+    ("reduction", "factor"),
+    [(0.1, 1.0), (0.4, 1.15), (0.0, 0.9)],
+)
+def test_resistance_reduction_comes_off_before_the_regimes(reduction: float, factor: float) -> None:
+    enemy = Enemy(level=90, resistance=0.1, res_reduction=reduction)
+    assert damage(LEVEL, STATS, PLAIN, enemy).non_crit == pytest.approx(2000 * 0.5 * factor)
+
+
+@pytest.mark.parametrize(
+    ("reaction", "base"), [(Reaction.AGGRAVATE, 1.15), (Reaction.SPREAD, 1.25)]
+)
+def test_aggravate_and_spread_add_to_the_base(reaction: Reaction, base: float) -> None:
+    # 200 EM adds 5 x 200 / 1400 to the reaction; the sum is added to the hit's base damage.
+    added = base * LEVEL_MULTIPLIERS[LEVEL] * (1 + 5 * 200 / 1400)
+    hit = Hit(scalings=(Scaling(StatKey.ATK, 1.0),), bonus=None, reaction=reaction)
+    assert damage(LEVEL, STATS, hit, ENEMY).non_crit == pytest.approx((2000 + added) * 0.45)

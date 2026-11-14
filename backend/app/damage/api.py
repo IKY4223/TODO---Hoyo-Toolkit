@@ -5,9 +5,9 @@ from pydantic import BaseModel, Field
 
 from app.damage.engine import Damage, Enemy, Hit, Reaction, damage
 from app.ratelimit import RateLimiter, limited
-from app.showcase.models import StatKey
+from app.showcase.models import Scaling, StatKey
 
-Scaling = Literal[StatKey.ATK, StatKey.HP, StatKey.DEF, StatKey.ELEMENTAL_MASTERY]
+ScalingStat = Literal[StatKey.ATK, StatKey.HP, StatKey.DEF, StatKey.ELEMENTAL_MASTERY]
 DamageBonus = Literal[
     StatKey.PHYSICAL_DMG,
     StatKey.PYRO_DMG,
@@ -25,8 +25,10 @@ MAX_ENEMY_LEVEL = 200
 MAX_STAT = 1_000_000
 MAX_STATS = 30
 MAX_MULTIPLIER = 100  # 10 000%
+MAX_SCALINGS = 4  # a hit scales with at most two stats in the game's tables
 MIN_RESISTANCE = -1
 MAX_RESISTANCE = 10
+MAX_FLAT = 1_000_000
 
 limiter = RateLimiter(limit=60, window=60)
 
@@ -39,19 +41,30 @@ class StatValue(BaseModel):
     value: float = Field(ge=-MAX_STAT, le=MAX_STAT, allow_inf_nan=False)
 
 
-class DamageRequest(BaseModel):
-    level: int = Field(ge=1, le=MAX_LEVEL, description="Character level")
-    stats: list[StatValue] = Field(max_length=MAX_STATS, description="The character's final stats")
-    scaling: Scaling = Field(description="The stat the talent multiplies")
+class TalentScaling(BaseModel):
+    stat: ScalingStat = Field(description="The stat the talent multiplies")
     multiplier: float = Field(
         gt=0, le=MAX_MULTIPLIER, allow_inf_nan=False, description="Talent multiplier: 3.92 is 392%"
     )
+
+
+class DamageRequest(BaseModel):
+    level: int = Field(ge=1, le=MAX_LEVEL, description="Character level")
+    stats: list[StatValue] = Field(max_length=MAX_STATS, description="The character's final stats")
+    scalings: list[TalentScaling] = Field(min_length=1, max_length=MAX_SCALINGS)
     bonus: DamageBonus | None = Field(description="The damage bonus that applies to the hit")
     reaction: Reaction
+    flat: float = Field(
+        default=0, ge=0, le=MAX_FLAT, allow_inf_nan=False, description="Damage added to the base"
+    )
     enemy_level: int = Field(ge=1, le=MAX_ENEMY_LEVEL)
     enemy_resistance: float = Field(
         ge=MIN_RESISTANCE, le=MAX_RESISTANCE, allow_inf_nan=False, description="0.1 is 10%"
     )
+    # Above 90% the engine counts 90%: the team's sources may add up past the cap.
+    def_reduction: float = Field(default=0, ge=0, le=1, allow_inf_nan=False)
+    def_ignore: float = Field(default=0, ge=0, le=1, allow_inf_nan=False)
+    res_reduction: float = Field(default=0, ge=0, le=MAX_RESISTANCE, allow_inf_nan=False)
 
 
 @router.post("")
@@ -59,6 +72,17 @@ def calculate_damage(request: DamageRequest) -> Damage:
     return damage(
         request.level,
         {stat.key: stat.value for stat in request.stats},
-        Hit(request.scaling, request.multiplier, request.bonus, request.reaction),
-        Enemy(request.enemy_level, request.enemy_resistance),
+        Hit(
+            scalings=tuple(Scaling(item.stat, item.multiplier) for item in request.scalings),
+            bonus=request.bonus,
+            reaction=request.reaction,
+            flat=request.flat,
+        ),
+        Enemy(
+            level=request.enemy_level,
+            resistance=request.enemy_resistance,
+            def_reduction=request.def_reduction,
+            def_ignore=request.def_ignore,
+            res_reduction=request.res_reduction,
+        ),
     )

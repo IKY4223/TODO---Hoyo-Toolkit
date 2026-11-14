@@ -86,6 +86,21 @@ test('calculates damage for an imported character', async ({ page }) => {
 
   // 2249 ATK x 392% x 1.466 Cryo bonus x 0.5 defense x 0.9 resistance, 48.2% / 209.7% crit.
   await expect(ganyu.getByRole('definition')).toContainText(['11,689', '18,011', '5,816'])
+
+  // A hit from the game's tables: her Frostflake Arrow at Normal Attack level 9 is 217.6% ATK.
+  await ganyu.getByLabel('Hit').selectOption({ label: 'Frostflake Arrow DMG' })
+  await expect(ganyu.getByLabel('Talent multiplier, %')).toHaveValue('217.6')
+  await ganyu.getByLabel('Damage bonus').selectOption('cryo_dmg')
+  await ganyu.getByRole('button', { name: 'Calculate damage' }).click()
+  await expect(ganyu.getByRole('definition')).toContainText(['6,489', '9,998', '3,229'])
+
+  // The team's help: 30% DEF reduction from, say, a Lisa in the team.
+  await ganyu.getByText('Team buffs and debuffs').click()
+  await ganyu.getByLabel('Enemy DEF reduction, %').fill('30')
+  await ganyu.getByRole('button', { name: 'Calculate damage' }).click()
+  await expect(ganyu.getByRole('definition').first()).not.toHaveText('6,489')
+  expect((await measureLayout(page)).overflows).toBe(false)
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
   expect(problems).toEqual([])
 })
 
