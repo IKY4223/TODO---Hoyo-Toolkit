@@ -149,7 +149,14 @@ Planned, in order:
    was found; the warp history gives each warp's `gacha_id`, so the game's own banner table
    (featured characters by banner id) could serve once a source for it is read and credited.
    Of the forecast: Capturing Radiance is an average; a streak of lost 50/50s is not modelled.
-3. Zenless Zone Zero: undecided.
+3. Donations (Buy Me a Coffee or crypto), asked for by the owner in November 2026: waiting for
+   HoYoverse's permission. Its Honkai: Star Rail Fan Creations Guide v2.0 (read November 2026)
+   allows fan works that use the game's pictures and texts for non-commercial personal use only,
+   and for videos it allows partner programmes of video sites and "any other profit-making
+   methods" not. A site that shows the game's images is such a work, so a donation button waits
+   until HoYoverse says yes in writing (the guide names hsrcs_en@hoyoverse.com for
+   authorisation) or the site stops using game material. Genshin's own guide was not found.
+4. Zenless Zone Zero: undecided.
 
 The Telegram bot is out of the plan, by the owner's choice (November 2026): no host, no Mini
 App. Its code stays as it is; see "Telegram bot" below.

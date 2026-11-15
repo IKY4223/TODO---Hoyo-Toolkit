@@ -50,6 +50,13 @@ const GAMES = {
 type Game = keyof typeof GAMES
 
 const DEFAULT_GAME: Game = 'starrail'
+// The legal statement HoYoverse's fan creation guide asks fan works that use game material to
+// carry (Honkai: Star Rail Fan Creations Guide v2.0, part III, Q1, read November 2026), with
+// Genshin Impact named beside Star Rail since the site uses both.
+const LEGAL_STATEMENT =
+  '© All rights reserved by miHoYo. Other properties and any right, title, and interest ' +
+  'thereof and therein (intellectual property rights included) not derived from Honkai: Star ' +
+  'Rail or Genshin Impact belong to their respective owners.'
 const SEPARATOR = '/'
 
 const isGame = (value: string): value is Game => Object.hasOwn(GAMES, value)
@@ -263,7 +270,14 @@ function App(): JSX.Element {
         )}
         {/* Mounted on each visit, so it shows the histories as they are saved now. */}
         {home ? <Home /> : null}
-        <footer>{t('Fan project. Not affiliated with HoYoverse.')}</footer>
+        <footer>
+          <p>
+            {t('Fan project. Not affiliated with HoYoverse.')}{' '}
+            <a href="/notices.txt">{t('Licences')}</a>
+          </p>
+          {/* HoYoverse's fan creation guide asks for these words, so they stay in English. */}
+          <p lang="en">{LEGAL_STATEMENT}</p>
+        </footer>
       </main>
     </>
   )

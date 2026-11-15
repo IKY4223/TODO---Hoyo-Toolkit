@@ -35,9 +35,9 @@ def enka() -> Iterator[Callable[[Respond], list[str]]]:
     cache.clear()
 
 
-def fail_with(status: int | None) -> Respond:
+def fail_with(status: int | None, code: str | None = None) -> Respond:
     def respond() -> bytes:
-        raise EnkaError(status)
+        raise EnkaError(status, code)
 
     return respond
 
@@ -72,7 +72,16 @@ def test_malformed_uid_never_reaches_enka(enka: Callable[[Respond], list[str]], 
 
 @pytest.mark.parametrize(
     ("enka_status", "status"),
-    [(400, 400), (404, 404), (424, 503), (429, 503), (500, 502), (503, 502), (None, 502)],
+    [
+        (400, 400),
+        (404, 404),
+        (424, 503),
+        (429, 503),
+        (500, 502),
+        (503, 502),
+        (504, 503),
+        (None, 502),
+    ],
 )
 def test_enka_failure_becomes_a_readable_error(
     enka: Callable[[Respond], list[str]], enka_status: int | None, status: int
@@ -81,6 +90,25 @@ def test_enka_failure_becomes_a_readable_error(
     response = client.get(URL)
     assert response.status_code == status
     assert isinstance(response.json()["detail"], str)
+
+
+def test_a_hidden_profile_is_not_called_a_missing_player(
+    enka: Callable[[Respond], list[str]],
+) -> None:
+    enka(fail_with(404, "profile_unavailable"))
+    response = client.get(URL)
+    assert response.status_code == 404
+    assert response.json()["detail"] == (
+        "The game does not share this player's profile. Put characters on display in the game,"
+        " or try again later."
+    )
+
+
+def test_game_timeout_asks_to_try_again(enka: Callable[[Respond], list[str]]) -> None:
+    enka(fail_with(504))
+    assert client.get(URL).json()["detail"] == (
+        "The game servers did not answer in time. Try again later."
+    )
 
 
 def test_failure_is_not_cached(enka: Callable[[Respond], list[str]]) -> None:

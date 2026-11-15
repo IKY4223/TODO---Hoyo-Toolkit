@@ -64,11 +64,15 @@ The app is private until these are done. Do not deploy it publicly or share the 
 and remind the owner when a change moves toward a public launch. None of this is legal advice:
 have a lawyer read the texts before launch.
 
-- Licence: MIT, chosen by the owner (`LICENSE`). Still to do: list the licences of dependencies,
-  and of data the bundle ships: `frontend/src/wishes/genshin-banners.ts` and the history steps
-  come from paimon.moe (MIT, copyright (c) 2021 Made Baruna): its full notice must ship too.
-- Disclaimer: "Fan project, not affiliated with HoYoverse" stays visible. Read HoYoverse's current
-  fan content policy; no ads, payments or donations until it is confirmed allowed. Game images
+- Licence: MIT, chosen by the owner (`LICENSE`). The bundle's libraries are listed by the build
+  (`licenses.txt`, Vite's `build.license`); `frontend/public/notices.txt` holds the rest:
+  paimon.moe's full MIT notice, the Geist font's OFL, the data sources and HoYoverse's legal
+  statement. Keep it current when a source or a font changes. Open: StarRailRes, the source of
+  the Star Rail data and icons, is under AGPL-3.0; a lawyer should say what that asks of the site.
+- Disclaimer: "Fan project, not affiliated with HoYoverse" stays visible, with the legal
+  statement HoYoverse's Honkai: Star Rail Fan Creations Guide v2.0 asks for (read November 2026;
+  Genshin's guide was not found). That guide allows game material for non-commercial personal
+  use only: no ads, payments or donations until HoYoverse allows them in writing (README plan). Game images
   come from Enka.Network and belong to HoYoverse. The tool icons and the site's icon are game
   art kept in the repository (`frontend/public/icons`), used without HoYoverse's
   permission, as fan tools commonly do: decide before launch whether to keep them, and take them
@@ -84,7 +88,8 @@ have a lawyer read the texts before launch.
 - Enka.Network: its API rules (github.com/EnkaNetwork/API-docs, api.md) were read in November
   2026: a custom User-Agent (done: `hoyo-toolkit`; add the site's address once it has one), cache
   each UID until its `ttl` (done), no UID enumeration or mass queries (none), handle 400, 404, 424,
-  429, 500 and 503 (done). They state no credit, commercial-use or image terms; the Star Rail
+  429, 500, 503 and 504, and a 404 whose `code` is `profile_unavailable` (done; reread November
+  2026). They state no credit, commercial-use or image terms; the Star Rail
   endpoint is not documented there. Read them again before launch.
 - Security: install the `usestrix/strix` plugin and run it against the deployed site, along with
   the `claude-security` scan of the code. Fix what they find before launch.

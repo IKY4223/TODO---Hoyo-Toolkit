@@ -22,7 +22,15 @@ FAILURES: dict[int | None, tuple[int, str]] = {
     404: (404, "Player not found. Check the UID."),
     424: (503, "The game is under maintenance. Try again later."),
     429: (503, "Too many requests to Enka.Network. Try again in a minute."),
+    504: (503, "The game servers did not answer in time. Try again later."),
 }
+# A 404 also means a player who exists but whose profile the game does not return
+# (Enka's API rules, github.com/EnkaNetwork/API-docs, api.md, read November 2026).
+PROFILE_UNAVAILABLE = (
+    404,
+    "The game does not share this player's profile. Put characters on display in the game,"
+    " or try again later.",
+)
 
 # Every uncached request spends this app's Enka quota, so one client gets few of them.
 # Shared by every game's showcase: the quota is one.
@@ -55,7 +63,10 @@ def serve[TShowcase](
         result, ttl = parse(uid, download())
     except enka.EnkaError as error:
         logger.warning("Enka request for %s failed: %s", uid, error.status)
-        status, detail = FAILURES.get(error.status, UNAVAILABLE)
+        if error.code == "profile_unavailable":
+            status, detail = PROFILE_UNAVAILABLE
+        else:
+            status, detail = FAILURES.get(error.status, UNAVAILABLE)
         raise HTTPException(status, detail) from error
     except enka.UpstreamDataError as error:
         # With the cause: an unreadable response usually means Enka changed its format.

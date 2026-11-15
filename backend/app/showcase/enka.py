@@ -1,5 +1,6 @@
 """Enka.Network client: fetches a player's showcase and converts it to this app's model."""
 
+import json
 import re
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -25,6 +26,7 @@ ICON_URL = "https://enka.network/ui/{name}.png"
 USER_AGENT = "hoyo-toolkit"  # Enka asks every client to identify itself
 TIMEOUT_SECONDS = 10
 MAX_RESPONSE_BYTES = 2_000_000  # a full showcase is about 100 kB
+MAX_ERROR_BYTES = 10_000  # an error body is one short JSON object
 DEFAULT_TTL_SECONDS = 60
 
 UNKNOWN_CHARACTER = "Unknown character"
@@ -91,11 +93,25 @@ SLOTS = {
 
 
 class EnkaError(Exception):
-    """Enka.Network refused the request (`status`) or did not answer (`status` is None)."""
+    """Enka.Network refused the request (`status`) or did not answer (`status` is None).
 
-    def __init__(self, status: int | None) -> None:
-        super().__init__(f"Enka.Network request failed: {status or 'no response'}")
+    `code` is the reason Enka names in its error body, such as "profile_unavailable", if any.
+    """
+
+    def __init__(self, status: int | None, code: str | None = None) -> None:
+        super().__init__(f"Enka.Network request failed: {status or 'no response'} {code or ''}")
         self.status = status
+        self.code = code
+
+
+def _error_code(error: HTTPError) -> str | None:
+    """The `code` of Enka's JSON error body; a rate limit may come with no body at all."""
+    try:
+        body = json.loads(error.read(MAX_ERROR_BYTES))
+    except (OSError, ValueError):
+        return None
+    code = body.get("code") if isinstance(body, dict) else None
+    return code if isinstance(code, str) else None
 
 
 class UpstreamDataError(Exception):
@@ -189,7 +205,7 @@ def fetch(uid: str, url: str = ENKA_URL) -> bytes:
         with urlopen(request, timeout=TIMEOUT_SECONDS) as response:  # noqa: S310
             body: bytes = response.read(MAX_RESPONSE_BYTES + 1)
     except HTTPError as error:
-        raise EnkaError(error.code) from error
+        raise EnkaError(error.code, _error_code(error)) from error
     except OSError as error:  # no connection, DNS failure, timeout
         raise EnkaError(None) from error
     if len(body) > MAX_RESPONSE_BYTES:

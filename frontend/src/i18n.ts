@@ -18,6 +18,7 @@ const RU = {
   Wishes: 'Молитвы',
   History: 'История',
   'Fan project. Not affiliated with HoYoverse.': 'Фанатский проект. Не связан с HoYoverse.',
+  Licences: 'Лицензии',
   'Something went wrong here.': 'Здесь что-то пошло не так.',
   Reload: 'Перезагрузить',
   // Requests
@@ -385,6 +386,9 @@ const RU = {
     'У реликвии не бывает двух одинаковых доп. статов.',
   'A substat cannot be the same as the main stat.': 'Доп. стат не может совпадать с главным.',
   'Enka.Network does not accept this UID.': 'Enka.Network не принимает этот UID.',
+  'The game servers did not answer in time. Try again later.': 'Игровые серверы не ответили вовремя. Попробуйте позже.',
+  "The game does not share this player's profile. Put characters on display in the game, or try again later.":
+    'Игра не отдаёт профиль этого игрока. Поставьте персонажей на витрину в игре или попробуйте позже.',
   'Enka.Network is not responding. Try again later.': 'Enka.Network не отвечает. Попробуйте позже.',
   'Enka.Network sent data this app cannot read.':
     'Enka.Network прислал данные, которые приложение не может прочитать.',
