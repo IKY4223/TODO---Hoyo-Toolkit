@@ -24,9 +24,12 @@ Build optimizer and wish tracker for HoYoverse games. `backend/` is FastAPI mana
   44px touch targets.
 - The site links no other tracker or similar service (paimon.moe, stardb.gg and the like), so
   players stay on it: credit sources in the README and in code comments instead.
-- `backend/app/showcase/gamedata.json`, `backend/app/starrail/gamedata.json` and
-  `backend/app/starrail/texts.json` are generated: run `scripts/sync_gamedata.py` and
-  `scripts/sync_starrail_data.py` in `backend/` after each game version, never edit them by hand.
+- `backend/app/showcase/gamedata.json`, `backend/app/showcase/talents.json`,
+  `backend/app/damage/levels.json`, `backend/app/starrail/gamedata.json`,
+  `backend/app/starrail/texts.json` and `frontend/src/wishes/genshin-banners.ts` are generated:
+  run `scripts/sync_gamedata.py`, `scripts/sync_starrail_data.py` and `scripts/sync_banners.py`
+  in `backend/` after each game version (the banners after each banner phase), never edit them
+  by hand.
 - Tests never call Enka.Network or HoYoverse. They use the fixtures in `backend/tests/fixtures/`
   and `backend/tests/gacha_fixture.py`. Fixtures from real accounts are anonymized.
 - A wish history link is a secret: never log it, store it or put it in a URL the app requests.
@@ -61,7 +64,9 @@ The app is private until these are done. Do not deploy it publicly or share the 
 and remind the owner when a change moves toward a public launch. None of this is legal advice:
 have a lawyer read the texts before launch.
 
-- Licence: MIT, chosen by the owner (`LICENSE`). Still to do: list the licences of dependencies.
+- Licence: MIT, chosen by the owner (`LICENSE`). Still to do: list the licences of dependencies,
+  and of data the bundle ships: `frontend/src/wishes/genshin-banners.ts` and the history steps
+  come from paimon.moe (MIT, copyright (c) 2021 Made Baruna): its full notice must ship too.
 - Disclaimer: "Fan project, not affiliated with HoYoverse" stays visible. Read HoYoverse's current
   fan content policy; no ads, payments or donations until it is confirmed allowed. Game images
   come from Enka.Network and belong to HoYoverse. The tool icons and the site's icon are game
@@ -115,8 +120,10 @@ For a session picking the work up again.
   effects table's rest (Aglaea's Supreme Stance, Robin • Summeretto's Fever, extra turns, later
   kits of Welt and Jingliu by trace ids, base chances). Left: Ultimates by energy (needs a source).
   The owner took the Telegram bot's host and Mini App out of the plan (November 2026); the bot's
-  code stays. Next: stage 20, Genshin (README plan item 2); its plan, with files and data
-  sources, is `STAGE-20.md`.
+  code stays. Stage 20, Genshin, follows `STAGE-20.md`: PR A (talent multipliers from the game's
+  tables, hits in the damage form, shred, flat damage, Aggravate and Spread) and PR B (Capturing
+  Radiance as the published average, the artifact trial, the 50/50 share) are built. Next by
+  HANDOFF.md: stage 21, getting ready for a public launch.
 - The start page is the player's desk (`frontend/src/Home.tsx`), not a landing page, by the
   owner's choice: the profile loaded in this visit, each saved history's pity, the tools.
 - The owner writes in Russian and reads replies on a phone. Keep the UI English and Russian.

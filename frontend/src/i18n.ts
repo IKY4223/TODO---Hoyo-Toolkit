@@ -104,6 +104,31 @@ const RU = {
   'Elemental Mastery': 'Мастерство стихий',
   'Vaporize / Melt ×1.5': 'Пар / Таяние ×1.5',
   'Vaporize / Melt ×2': 'Пар / Таяние ×2',
+  // The game's own Russian names (its text maps), as the damage form shows them.
+  Aggravate: 'Обострение',
+  Spread: 'Разрастание',
+  'Normal Attack': 'Обычная атака',
+  'Elemental Skill': 'Элементальный навык',
+  'Elemental Burst': 'Взрыв стихии',
+  Hit: 'Удар',
+  'Own multiplier': 'Свой множитель',
+  'Second part, %': 'Вторая часть, %',
+  'Second part scales with': 'Вторая часть зависит от',
+  "Multipliers from the game's tables at the character's talent levels, repeated hits added up. Check the damage bonus: it is a guess.":
+    'Множители из таблиц игры на уровнях талантов персонажа, повторные удары сложены. Проверьте бонус урона: он подобран наугад.',
+  'Team buffs and debuffs': 'Усиления от команды',
+  'Flat damage added': 'Плоская прибавка к урону',
+  "Added to the hit's base: Shenhe's quills, Yun Jin's burst, Zhongli's passive.":
+    'Прибавляется к базе удара: перья Шэнь Хэ, взрыв стихии Юнь Цзинь, пассивный талант Чжун Ли.',
+  'Enemy DEF reduction, %': 'Снижение защиты врага, %',
+  'Enemy DEF ignored, %': 'Игнорирование защиты врага, %',
+  'Enemy RES reduction, %': 'Снижение сопротивления врага, %',
+  'Try artifacts from the showcase': 'Примерить артефакты с витрины',
+  "For the hit above: each slot's best artifact among those the showcase's other characters wear. Set bonuses are not recounted.":
+    'Для удара выше: лучший артефакт каждого слота из тех, что носят другие персонажи витрины. Бонусы наборов не пересчитываются.',
+  'no artifact here does better': 'лучше нынешнего нет',
+  'DEF reduction counts up to 90%, as in the game.':
+    'Снижение защиты учитывается до 90%, как в игре.',
   'Wish forecast': 'Прогноз молитв',
   'Honkai: Star Rail · limited warps': 'Honkai: Star Rail · лимитированные прыжки',
   Banner: 'Баннер',
@@ -313,6 +338,9 @@ const RU = {
     'По ссылке любой может читать вашу историю молитв примерно сутки. Приложение использует её для импорта и не хранит.',
   'Import history': 'Импортировать историю',
   'Delete saved history': 'Удалить сохранённую историю',
+  '50/50 won: {won} of {count}': 'Выиграно 50/50: {won} из {count}',
+  '{count} 5★ not counted: the history starts mid-way, or the banner or the name is not known':
+    'не учтено 5★: {count} (история начинается с середины, баннер или имя неизвестны)',
   'Delete the saved wish history from this device? Pulls older than a year cannot be imported again.':
     'Удалить сохранённую историю молитв с этого устройства? Молитвы старше года нельзя импортировать заново.',
   ' This browser does not keep site data, so the history lasts until this page closes.':

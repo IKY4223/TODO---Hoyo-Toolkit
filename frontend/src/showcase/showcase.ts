@@ -8,6 +8,8 @@ export type Character = Schemas['Character']
 export type Artifact = Schemas['Artifact']
 export type Stat = Schemas['Stat']
 type Weapon = Schemas['Weapon']
+export type Attack = Schemas['Attack']
+type Scaling = Schemas['Scaling']
 
 interface StatInfo {
   readonly label: Message
@@ -37,6 +39,14 @@ export const STATS = {
   geo_dmg: { label: 'Geo DMG', percent: true },
   dendro_dmg: { label: 'Dendro DMG', percent: true },
 } as const satisfies Record<Schemas['StatKey'], StatInfo>
+
+/** The stats a talent's hit scales with, as the damage form names them. */
+export const SCALINGS = {
+  atk: 'ATK',
+  hp: 'HP',
+  def: 'DEF',
+  elemental_mastery: 'Elemental Mastery',
+} as const satisfies Record<Schemas['TalentScaling']['stat'], Message>
 
 export const SLOTS = {
   flower: 'Flower',
@@ -90,6 +100,16 @@ const isArtifact = (value: unknown): value is Artifact =>
   isArrayOf(value.subs, isStat) &&
   isIcon(value.icon)
 
+const isScaling = (value: unknown): value is Scaling =>
+  isRecord(value) && isKeyOf(SCALINGS, value.stat) && isNumber(value.multiplier)
+
+const isAttack = (value: unknown): value is Attack =>
+  isRecord(value) &&
+  isNumber(value.talent) &&
+  isString(value.name) &&
+  isString(value.name_ru) &&
+  isArrayOf(value.scalings, isScaling)
+
 const isCharacter = (value: unknown): value is Character =>
   isRecord(value) &&
   isNumber(value.id) &&
@@ -99,9 +119,11 @@ const isCharacter = (value: unknown): value is Character =>
   isNumber(value.constellation) &&
   isArrayOf(value.talents, isNumber) &&
   isArrayOf(value.stats, isStat) &&
+  isArrayOf(value.base_stats, isStat) &&
   isWeapon(value.weapon) &&
   isArrayOf(value.artifacts, isArtifact) &&
-  isIcon(value.icon)
+  isIcon(value.icon) &&
+  isArrayOf(value.attacks, isAttack)
 
 const isShowcase = (value: unknown): value is Showcase =>
   isRecord(value) &&

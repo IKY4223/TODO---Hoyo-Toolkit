@@ -23,6 +23,11 @@ const SHOWCASE: Showcase = {
         { key: 'crit_rate', value: 0.5194 },
         { key: 'physical_dmg', value: 1.083 },
       ],
+      base_stats: [
+        { key: 'hp', value: 9461 },
+        { key: 'atk', value: 897 },
+        { key: 'def', value: 601 },
+      ],
       weapon: {
         name: 'Skyward Harp',
         rarity: 5,
@@ -47,6 +52,14 @@ const SHOWCASE: Showcase = {
         },
       ],
       icon: `${ICONS}UI_AvatarIcon_Ambor.png`,
+      attacks: [
+        {
+          talent: 0,
+          name: '1-Hit DMG',
+          name_ru: 'Урон атаки 1',
+          scalings: [{ stat: 'atk', multiplier: 0.72 }],
+        },
+      ],
     },
   ],
 }
@@ -161,6 +174,26 @@ test.each([
       Response.json({
         ...SHOWCASE,
         characters: [{ ...SHOWCASE.characters[0], stats: [{ key: 'luck', value: 1 }] }],
+      }),
+  },
+  {
+    name: 'hit with an unknown stat',
+    respond: async () =>
+      Response.json({
+        ...SHOWCASE,
+        characters: [
+          {
+            ...SHOWCASE.characters[0],
+            attacks: [
+              {
+                talent: 0,
+                name: 'Hit',
+                name_ru: 'Удар',
+                scalings: [{ stat: 'luck', multiplier: 1 }],
+              },
+            ],
+          },
+        ],
       }),
   },
 ])('$name shows an error and allows a retry', async ({ respond }) => {

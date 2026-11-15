@@ -71,6 +71,20 @@ class Artifact:
 
 
 @dataclass(frozen=True)
+class Scaling:
+    stat: StatKey  # ATK, HP, DEF or Elemental Mastery
+    multiplier: float  # 0.457 is 45.7% of the stat
+
+
+@dataclass(frozen=True)
+class Attack:
+    talent: int  # 0 Normal Attack, 1 Elemental Skill, 2 Elemental Burst
+    name: str
+    name_ru: str
+    scalings: tuple[Scaling, ...]  # at the character's talent level, repeated hits included
+
+
+@dataclass(frozen=True)
 class Character:
     id: int  # the game's own id, stable across renames and languages
     name: str
@@ -79,9 +93,11 @@ class Character:
     constellation: int
     talents: tuple[int, ...]  # normal attack, skill, burst, with constellation boosts
     stats: tuple[Stat, ...]  # final values as shown in game
+    base_stats: tuple[Stat, ...]  # HP, ATK and DEF before any bonus: character and weapon
     weapon: Weapon
     artifacts: tuple[Artifact, ...]
     icon: str | None
+    attacks: tuple[Attack, ...]  # each hit of the three talents the game's tables list
 
 
 @dataclass(frozen=True)

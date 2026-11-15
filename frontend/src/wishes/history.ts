@@ -2,6 +2,7 @@ import { ApiError, isArrayOf, isNumber, isRecord, isString, postJson } from '../
 import { HISTORY_PAGE_SIZE } from '../api/limits'
 import type { components } from '../api/schema'
 import type { Message } from '../i18n'
+import { type FiftyFifty, fiftyFifty } from './fiftyFifty'
 import type { HistoryFileFormat } from './uigf'
 
 type Schemas = components['schemas']
@@ -42,6 +43,8 @@ export interface BannerSummary {
   readonly averagePity: number | null
   /** The most pulls in a row without a 5★, the current run included. */
   readonly longestDry: number
+  /** Genshin's character event wishes only: the 50/50s won and lost. */
+  readonly fiftyFifty?: FiftyFifty
 }
 
 interface ImportResult {
@@ -76,6 +79,7 @@ const BANNERS = {
 
 // Pulls on the second character banner (400) arrive with it and share its pity.
 const SAME_POOL: Readonly<Record<string, Banner>> = { '400': '301' }
+const CHARACTER_EVENT: Banner = '301'
 
 const HISTORY_URL = '/api/wishes/history'
 const STORAGE_KEY = 'hoyo-toolkit:wish-history'
@@ -226,8 +230,6 @@ function summarizeBanner(banner: string, label: Message, pulls: readonly Pull[])
   const pity5 = pulls.length - 1 - (fives.at(-1) ?? -1)
   // shortcut: the history reaches back about a year, so the first 5★'s pity counts only the pulls
   // since then: the average and the longest run can read low for an older account.
-  // shortcut: the share of 50/50s won is left out: it needs to know which 5★ are standard, which
-  // neither game data source here gives (README plan, item 3).
   const pities = fiveStars.map(({ pity }) => pity)
   return {
     banner,
@@ -279,9 +281,21 @@ export const GENSHIN_FILE: HistoryFileFormat = {
 /** Genshin's wish history. */
 export const WISHES: HistorySource<Banner> = { url: HISTORY_URL, banners, labels: BANNERS }
 
-/** Per Genshin banner with any pulls: its pity counters and its 5★ pulls. `pulls` oldest first. */
-export const summarize = (pulls: readonly Pull[]): BannerSummary[] =>
-  summarizeBanners(pulls, banners, BANNERS, SAME_POOL)
+/**
+ * Per Genshin banner with any pulls: its pity counters, its 5★ pulls and, for the character
+ * event wishes, the 50/50s. `pulls` oldest first; `offset` is the server's UTC offset in hours.
+ */
+export function summarize(pulls: readonly Pull[], offset: number): BannerSummary[] {
+  const summaries = summarizeBanners(pulls, banners, BANNERS, SAME_POOL)
+  const at = summaries.findIndex((summary) => summary.banner === CHARACTER_EVENT)
+  const character = summaries[at]
+  if (!character) return summaries
+  const fives = pulls.filter(
+    (pull) =>
+      pull.rank === FIVE_STAR && (SAME_POOL[pull.banner] ?? pull.banner) === CHARACTER_EVENT,
+  )
+  return summaries.with(at, { ...character, fiftyFifty: fiftyFifty(fives, offset) })
+}
 
 const isSavedHistory = (value: unknown): value is SavedHistory & { readonly version: number } =>
   isRecord(value) &&

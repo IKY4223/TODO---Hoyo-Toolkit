@@ -172,6 +172,10 @@ const UID_TAIL = 8 // a UID is its server's one or two digits, then eight more
 /** The UTC offset of the server a UID plays on, in hours. */
 export const serverOffset = (uid: string): number => OFFSETS[uid.slice(0, -UID_TAIL)] ?? ASIA_OFFSET
 
+/** The offset of the shown account's server: as its history gave it, or else by its UID. */
+export const currentOffset = (saved: SavedHistory): number =>
+  saved.current ? (saved.timezones?.[saved.current] ?? serverOffset(saved.current)) : ASIA_OFFSET
+
 const EXPORT_APP = 'HoYo Toolkit'
 // Raised when what an export writes changes.
 const EXPORT_APP_VERSION = '1.0'

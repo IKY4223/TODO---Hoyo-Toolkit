@@ -9,6 +9,7 @@ import {
   summarize,
   WISHES,
 } from './history'
+import { fiftyFifty } from './fiftyFifty'
 
 const UID = '700000001'
 const LINK = 'https://webstatic-sea.hoyoverse.com/index.html?authkey=a%2Bb#/log'
@@ -168,7 +169,7 @@ describe('importHistory', () => {
 
 describe('summarize', () => {
   test('counts pity per banner, both character banners together', () => {
-    const [character, standard] = summarize(SERVER['200'].concat(SERVER['301']))
+    const [character, standard] = summarize(SERVER['200'].concat(SERVER['301']), 8)
     expect(character).toMatchObject({ label: 'Character Event', total: 25, pity5: 15, pity4: 15 })
     expect(character?.fiveStars).toEqual([
       { id: id(10), name: 'Furina', pity: 10, time: '2026-10-01 12:00:00' },
@@ -187,7 +188,7 @@ describe('summarize', () => {
 
   test('lists 5★ pulls newest first with the pity each took', () => {
     const pulls = [pull(1, 3), pull(2, 5, 'Furina'), pull(3, 3), pull(4, 3), pull(5, 5, 'Nahida')]
-    const [character] = summarize(pulls)
+    const [character] = summarize(pulls, 8)
     expect(character?.fiveStars.map((five) => [five.name, five.pity])).toEqual([
       ['Nahida', 3],
       ['Furina', 2],
@@ -197,7 +198,76 @@ describe('summarize', () => {
   })
 
   test('leaves out banners without pulls', () => {
-    expect(summarize([])).toEqual([])
+    expect(summarize([], 8)).toEqual([])
+  })
+})
+
+const five = (name: string, time = '2026-01-10 12:00:00'): Pull => ({ ...pull(0, 5, name), time })
+
+describe('fiftyFifty', () => {
+  // One banner, its start at the version update (Asia time), its end in each server's own time.
+  const BANNERS = [
+    {
+      start: '2026-01-01 06:00:00',
+      end: '2026-01-20 17:59:59',
+      startAsia: true,
+      endAsia: false,
+      featured: ['Furina'],
+    },
+  ]
+  const NAMES = new Set(['Furina', 'Diluc'])
+  const ASIA = 8
+  const count = (fives: Pull[], offset = ASIA): ReturnType<typeof fiftyFifty> =>
+    fiftyFifty(fives, offset, BANNERS, NAMES)
+
+  test('a loss makes the next 5★ a guarantee, which is no 50/50', () => {
+    // The first win may have been guaranteed by a loss before the history starts.
+    const fives = [five('Furina'), five('Diluc'), five('Furina'), five('Furina')]
+    expect(count(fives)).toEqual({ won: 1, lost: 1, uncounted: 1 })
+  })
+
+  test('a first 5★ that lost was a 50/50 for certain', () => {
+    expect(count([five('Diluc')])).toEqual({ won: 0, lost: 1, uncounted: 0 })
+  })
+
+  test('a 5★ outside every known banner, or by a name not known, is not counted', () => {
+    expect(count([five('Furina', '2019-01-10 12:00:00'), five('Furina')])).toEqual({
+      won: 0,
+      lost: 0,
+      uncounted: 2,
+    })
+    expect(count([five('Фурина')])).toEqual({ won: 0, lost: 0, uncounted: 1 })
+  })
+
+  test("a start in Asia time is moved to the player's server", () => {
+    // 06:00 at UTC+8 is 17:00 the day before at UTC-5, on the America server.
+    const early = five('Diluc', '2025-12-31 18:00:00')
+    expect(count([early], -5)).toEqual({ won: 0, lost: 1, uncounted: 0 })
+    expect(count([early], ASIA)).toEqual({ won: 0, lost: 0, uncounted: 1 })
+  })
+
+  test("an end in Asia time is moved to the player's server too", () => {
+    const ending = [{ ...BANNERS[0], end: '2026-01-20 15:00:00', endAsia: true }]
+    // 15:00 at UTC+8 is 08:00 at UTC+1, on the Europe server.
+    const late = five('Diluc', '2026-01-20 09:00:00')
+    expect(fiftyFifty([late], 1, ending, NAMES)).toEqual({ won: 0, lost: 0, uncounted: 1 })
+    expect(fiftyFifty([late], ASIA, ending, NAMES)).toEqual({ won: 0, lost: 1, uncounted: 0 })
+  })
+
+  test('the game data names the featured characters of past banners', () => {
+    // Ballad in Goblets, Venti's first banner, autumn 2020.
+    const fives = [five('Diluc', '2020-10-01 12:00:00'), five('Venti', '2020-10-02 12:00:00')]
+    expect(fiftyFifty(fives, ASIA)).toEqual({ won: 0, lost: 1, uncounted: 0 })
+  })
+
+  test("the character banner's summary carries it, both wishes together", () => {
+    const pulls = [
+      { ...five('Diluc', '2020-10-01 12:00:00'), id: id(1) },
+      { ...five('Venti', '2020-10-02 12:00:00'), id: id(2), banner: '400' },
+      { ...five('Venti', '2020-10-03 12:00:00'), id: id(3) },
+    ]
+    const [character] = summarize(pulls, ASIA)
+    expect(character?.fiftyFifty).toEqual({ won: 1, lost: 1, uncounted: 0 })
   })
 })
 

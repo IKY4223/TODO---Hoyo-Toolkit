@@ -1,0 +1,124 @@
+"""Trying another artifact in a slot: the stats it would give and the damage they deal."""
+
+from pathlib import Path
+from typing import Any
+
+import pytest
+from fastapi.testclient import TestClient
+
+from app.damage.artifacts import swap
+from app.main import app
+from app.showcase.enka import parse
+from app.showcase.models import Stat, StatKey
+
+client = TestClient(app)
+SHOWCASE = parse("700000001", (Path(__file__).parent / "fixtures/enka_showcase.json").read_bytes())[
+    0
+]
+GANYU = SHOWCASE.characters[1]
+STATS = {stat.key: stat.value for stat in GANYU.stats}
+BASE = {stat.key: stat.value for stat in GANYU.base_stats}
+
+
+def _stats(artifact_slot: str) -> list[Stat]:
+    artifact = next(item for item in GANYU.artifacts if item.slot == artifact_slot)
+    return [artifact.main, *artifact.subs]
+
+
+def test_base_stats_come_from_the_showcase() -> None:
+    # Ganyu's base ATK (her own and Amos' Bow's) is 942.9; 2249 is after every bonus.
+    assert BASE[StatKey.ATK] == pytest.approx(942.92, abs=0.01)
+    assert BASE[StatKey.HP] == pytest.approx(9796.73, abs=0.01)
+    assert BASE[StatKey.DEF] == pytest.approx(630.21, abs=0.01)
+
+
+def test_putting_the_same_artifact_back_changes_nothing() -> None:
+    sands = _stats("sands")
+    assert swap(STATS, BASE, sands, sands) == pytest.approx(STATS)
+
+
+def test_percent_stats_grow_from_the_base_and_others_add_up() -> None:
+    sands = _stats("sands")  # ATK 46.6%, with DEF 39, HP 239, CRIT DMG 21.8%, CRIT Rate 7%
+    other = [Stat(StatKey.ELEMENTAL_MASTERY, 187), Stat(StatKey.CRIT_RATE, 0.1)]
+    result = swap(STATS, BASE, sands, other)
+    assert result[StatKey.ATK] == pytest.approx(STATS[StatKey.ATK] - 0.466 * BASE[StatKey.ATK])
+    assert result[StatKey.DEF] == pytest.approx(STATS[StatKey.DEF] - 39)
+    assert result[StatKey.HP] == pytest.approx(STATS[StatKey.HP] - 239)
+    assert result[StatKey.ELEMENTAL_MASTERY] == pytest.approx(
+        STATS[StatKey.ELEMENTAL_MASTERY] + 187
+    )
+    assert result[StatKey.CRIT_RATE] == pytest.approx(STATS[StatKey.CRIT_RATE] - 0.07 + 0.1)
+    assert result[StatKey.CRIT_DMG] == pytest.approx(STATS[StatKey.CRIT_DMG] - 0.218)
+
+
+def test_a_goblet_of_another_element_moves_the_bonus() -> None:
+    result = swap(STATS, BASE, _stats("goblet"), [Stat(StatKey.PYRO_DMG, 0.466)])
+    assert result[StatKey.CRYO_DMG] == pytest.approx(0, abs=1e-6)  # Enka sends float32
+    assert result[StatKey.PYRO_DMG] == pytest.approx(0.466)
+
+
+def _artifact(item: Any) -> dict[str, Any]:
+    return {
+        "slot": item.slot,
+        "main": {"key": item.main.key, "value": item.main.value},
+        "subs": [{"key": sub.key, "value": sub.value} for sub in item.subs],
+    }
+
+
+REQUEST: dict[str, Any] = {
+    "level": GANYU.level,
+    "stats": [{"key": stat.key, "value": stat.value} for stat in GANYU.stats],
+    "scalings": [{"stat": "atk", "multiplier": 2.176}],
+    "bonus": "cryo_dmg",
+    "reaction": "none",
+    "enemy_level": 90,
+    "enemy_resistance": 0.1,
+    "base_stats": [{"key": stat.key, "value": stat.value} for stat in GANYU.base_stats],
+    "equipped": [_artifact(item) for item in GANYU.artifacts],
+    "candidates": [_artifact(item) for item in SHOWCASE.characters[0].artifacts],
+}
+
+
+def test_answers_the_damage_now_and_with_each_candidate() -> None:
+    response = client.post("/api/damage/artifacts", json=REQUEST)
+    assert response.status_code == 200
+    body = response.json()
+    now = client.post("/api/damage", json=REQUEST).json()
+    assert body["current"] == pytest.approx(now)
+    assert len(body["candidates"]) == len(REQUEST["candidates"])
+    # Her own goblet swapped for itself would deal what she deals now.
+    same = client.post(
+        "/api/damage/artifacts", json={**REQUEST, "candidates": [REQUEST["equipped"][3]]}
+    ).json()
+    assert same["candidates"][0] == pytest.approx(now)
+
+
+@pytest.mark.parametrize(
+    "override",
+    [
+        {"candidates": []},
+        {"candidates": [REQUEST["equipped"][0]] * 61},
+        {"equipped": [REQUEST["equipped"][0]] * 6},
+        {"base_stats": [{"key": "atk", "value": 1}] * 4},
+        {"base_stats": [{"key": "atk", "value": -1}]},
+        {"base_stats": [{"key": "crit_rate", "value": 1}]},
+        {"base_stats": []},
+        {"base_stats": [{"key": "atk", "value": 900}] * 3},
+        {"candidates": [{**REQUEST["equipped"][0], "subs": [REQUEST["equipped"][0]["main"]] * 5}]},
+        {"candidates": [{**REQUEST["equipped"][0], "slot": "hat"}]},
+    ],
+    ids=[
+        "no candidates",
+        "too many",
+        "six equipped",
+        "four bases",
+        "negative base",
+        "base crit",
+        "no bases",
+        "one base thrice",
+        "five subs",
+        "slot",
+    ],
+)
+def test_rejects_requests_no_showcase_can_make(override: dict[str, Any]) -> None:
+    assert client.post("/api/damage/artifacts", json={**REQUEST, **override}).status_code == 422

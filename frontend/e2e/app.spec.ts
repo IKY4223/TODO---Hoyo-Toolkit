@@ -86,6 +86,29 @@ test('calculates damage for an imported character', async ({ page }) => {
 
   // 2249 ATK x 392% x 1.466 Cryo bonus x 0.5 defense x 0.9 resistance, 48.2% / 209.7% crit.
   await expect(ganyu.getByRole('definition')).toContainText(['11,689', '18,011', '5,816'])
+
+  // A hit from the game's tables: her Frostflake Arrow at Normal Attack level 9 is 217.6% ATK.
+  await ganyu.getByLabel('Hit').selectOption({ label: 'Frostflake Arrow DMG' })
+  await expect(ganyu.getByLabel('Talent multiplier, %')).toHaveValue('217.6')
+  await ganyu.getByLabel('Damage bonus').selectOption('cryo_dmg')
+  await ganyu.getByRole('button', { name: 'Calculate damage' }).click()
+  await expect(ganyu.getByRole('definition')).toContainText(['6,489', '9,998', '3,229'])
+
+  // The team's help: 30% DEF reduction from, say, a Lisa in the team.
+  await ganyu.getByText('Team buffs and debuffs').click()
+  await ganyu.getByLabel('Enemy DEF reduction, %').fill('30')
+  await ganyu.getByRole('button', { name: 'Calculate damage' }).click()
+  await expect(ganyu.getByRole('definition').first()).not.toHaveText('6,489')
+
+  // Amber's artifacts tried on Ganyu for that hit: her Noblesse sands (ATK 46.6% with better
+  // substats) and her flower would add damage; nothing else of hers would.
+  await ganyu.getByRole('button', { name: 'Try artifacts from the showcase' }).click()
+  const trials = ganyu.locator('.trials')
+  await expect(trials).toContainText('Amber · Noblesse Oblige · ATK 46.6% — 8,141 (+6.6%)')
+  await expect(trials).toContainText('Amber · Bloodstained Chivalry · HP 4,780 — 7,731 (+1.3%)')
+  await expect(trials.getByText('no artifact here does better')).toHaveCount(3)
+  expect((await measureLayout(page)).overflows).toBe(false)
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
   expect(problems).toEqual([])
 })
 
@@ -99,7 +122,8 @@ test('forecasts wishes', async ({ page }) => {
   await shown(page).getByLabel('Pulls since last 5★').fill('10')
   await shown(page).getByLabel('Pulls available').fill('80')
   await shown(page).getByRole('button', { name: 'Calculate', exact: true }).click()
-  await expect(page.getByText('56.9%')).toBeVisible()
+  // 60.8% with Capturing Radiance's average 50/50; a plain 50/50 gave 56.9%.
+  await expect(page.getByText('60.8%')).toBeVisible()
   await expect(page.getByRole('row', { name: '100% 170' })).toBeVisible()
   expect(problems).toEqual([])
 })
@@ -689,6 +713,8 @@ test('imports Genshin wishes from a UIGF file, saves them to one and reads that 
   await expect(
     character.getByText('2 pulls per 5★ on average · at most 1 in a row without one'),
   ).toBeVisible()
+  // Furina was not featured on New Year's Day 2025 (Mavuika and Citlali were): a lost 50/50.
+  await expect(character.getByText('50/50 won: 0 of 1')).toBeVisible()
 
   const file = await exported(page)
   expect(file.name).toMatch(/^hoyo-toolkit-genshin-\d{4}-\d{2}-\d{2}\.json$/)
