@@ -264,6 +264,7 @@ def test_failures_are_explained_in_russian_too() -> None:
 
     reasons = [detail for _, detail in showcase_api.FAILURES.values()]
     reasons += [showcase_api.UNAVAILABLE[1], showcase_api.UNREADABLE[1], entry.BUSY]
+    reasons.append(showcase_api.PROFILE_UNAVAILABLE[1])
     for reason in reasons:
         assert answer(UID, "en", failing(reason)).text == reason
         russian = answer(UID, "ru", failing(reason)).text

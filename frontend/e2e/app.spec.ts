@@ -256,7 +256,7 @@ interface Layout {
 /** What a phone user would trip over: sideways scrolling, tiny controls, zooming inputs. */
 async function measureLayout(page: Page): Promise<Layout> {
   return page.evaluate((minHeight) => {
-    const selector = 'input:not([type=checkbox]), select, textarea, button, summary, nav a, a.more'
+    const selector = 'input:not([type=checkbox]), select, textarea, button, summary, nav a, a.more, footer a'
     // The other tool stays mounted but hidden, so only what is on screen counts.
     const controls = [...document.querySelectorAll(selector)].filter((control) =>
       control.checkVisibility(),
@@ -632,6 +632,29 @@ test("the tools' signs and the site's icon are served as images", async ({ page 
   ])
   const middle = (box: typeof button): number => (box?.x ?? 0) + (box?.width ?? 0) / 2
   expect(Math.abs(middle(button) - middle(icon))).toBeLessThan(1)
+})
+
+test('credits HoYoverse and links the licences of what the site ships', async ({ page }) => {
+  await page.goto('/')
+  const footer = page.locator('footer')
+  await expect(footer).toContainText('© All rights reserved by miHoYo.')
+  await expect(footer).toContainText('not derived from Honkai: Star Rail or Genshin Impact')
+  const link = footer.getByRole('link', { name: 'Licences' })
+  const notices = await page.request.get((await link.getAttribute('href')) ?? '')
+  expect(notices.headers()['content-type']).toBe('text/plain; charset=utf-8')
+  const text = await notices.text()
+  // paimon.moe's notice must ship with the banners taken from it, and the font's licence with it.
+  expect(text).toContain('Copyright (c) 2021 Made Baruna')
+  expect(text).toContain('SIL OPEN FONT LICENSE Version 1.1')
+  // The libraries' licences come from the build, which lists each bundled package.
+  const libraries = await page.request.get('/licenses.txt')
+  expect(libraries.headers()['content-type']).toBe('text/plain; charset=utf-8')
+  expect(await libraries.text()).toContain('## react - ')
+  // The statement is HoYoverse's own wording, so it stays in English on the Russian page too.
+  await page.getByLabel('Language').selectOption('ru')
+  await expect(footer.getByRole('link', { name: 'Лицензии' })).toBeVisible()
+  await expect(footer).toContainText('© All rights reserved by miHoYo.')
+  expect((await measureLayout(page)).overflows).toBe(false)
 })
 
 const warp = (id: string, rank_type: string, name: string) => ({

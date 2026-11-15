@@ -4,6 +4,8 @@ import { defineConfig } from 'vitest/config'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  // The licences of every library in the bundle, served beside it; notices.txt links to it.
+  build: { license: { fileName: 'licenses.txt' } },
   server: {
     proxy: { '/api': 'http://localhost:8000' },
   },

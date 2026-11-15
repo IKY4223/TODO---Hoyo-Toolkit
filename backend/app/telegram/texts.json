@@ -24,6 +24,8 @@
     "Player not found. Check the UID.": "Игрок не найден. Проверьте UID.",
     "The game is under maintenance. Try again later.": "В игре техработы. Попробуйте позже.",
     "Too many requests to Enka.Network. Try again in a minute.": "Слишком много запросов к Enka.Network. Попробуйте через минуту.",
+    "The game servers did not answer in time. Try again later.": "Игровые серверы не ответили вовремя. Попробуйте позже.",
+    "The game does not share this player's profile. Put characters on display in the game, or try again later.": "Игра не отдаёт профиль этого игрока. Поставьте персонажей на витрину в игре или попробуйте позже.",
     "Enka.Network is not responding. Try again later.": "Enka.Network не отвечает. Попробуйте позже.",
     "Enka.Network sent data this app cannot read.": "Enka.Network прислал данные, которые бот не может прочитать.",
     "The bot is looking up many players right now: try in a minute.": "Бот сейчас ищет много игроков: попробуйте через минуту."

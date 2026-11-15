@@ -874,6 +874,12 @@ footer {
   text-align: center;
 }
 
+footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
 /* A share button sits under what it shares; what happened appears right below it. */
 .share {
   display: grid;

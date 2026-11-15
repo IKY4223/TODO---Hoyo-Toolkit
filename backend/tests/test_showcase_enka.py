@@ -1,5 +1,7 @@
 import json
 from email.message import Message
+from http.client import IncompleteRead
+from io import BytesIO
 from pathlib import Path
 from typing import Any, cast
 from urllib.error import HTTPError, URLError
@@ -240,8 +242,9 @@ def test_fetch_identifies_itself_to_enka(monkeypatch: pytest.MonkeyPatch) -> Non
         (HTTPError("https://enka.network", 429, "Too Many Requests", Message(), None), 429),
         (URLError("name resolution failed"), None),
         (TimeoutError(), None),
+        (IncompleteRead(b"partial"), None),
     ],
-    ids=["not-found", "rate-limited", "unreachable", "timeout"],
+    ids=["not-found", "rate-limited", "unreachable", "timeout", "cut-off"],
 )
 def test_fetch_reports_every_failure_as_an_enka_error(
     monkeypatch: pytest.MonkeyPatch, failure: Exception, status: int | None
@@ -253,6 +256,43 @@ def test_fetch_reports_every_failure_as_an_enka_error(
     with pytest.raises(EnkaError) as raised:
         enka.fetch(UID)
     assert raised.value.status == status
+
+
+@pytest.mark.parametrize(
+    ("body", "code"),
+    [
+        (b'{"code": "profile_unavailable", "message": "..."}', "profile_unavailable"),
+        (b'{"code": "not_found", "message": "Player not found."}', "not_found"),
+        (b"", None),  # a rate limit may come without a body
+        (b"<html>busy</html>", None),
+        (b'["not", "an", "object"]', None),
+    ],
+    ids=["profile-unavailable", "not-found", "empty", "html", "not-an-object"],
+)
+def test_fetch_keeps_the_reason_enka_gives(
+    monkeypatch: pytest.MonkeyPatch, body: bytes, code: str | None
+) -> None:
+    def urlopen(request: Request, timeout: float) -> Reply:
+        raise HTTPError("https://enka.network", 404, "Not Found", Message(), BytesIO(body))
+
+    monkeypatch.setattr(enka, "urlopen", urlopen)
+    with pytest.raises(EnkaError) as raised:
+        enka.fetch(UID)
+    assert (raised.value.status, raised.value.code) == (404, code)
+
+
+def test_fetch_ignores_an_error_body_cut_off(monkeypatch: pytest.MonkeyPatch) -> None:
+    class CutOff(BytesIO):
+        def read(self, *_: object) -> bytes:
+            raise IncompleteRead(b"{")
+
+    def urlopen(request: Request, timeout: float) -> Reply:
+        raise HTTPError("https://enka.network", 404, "Not Found", Message(), CutOff())
+
+    monkeypatch.setattr(enka, "urlopen", urlopen)
+    with pytest.raises(EnkaError) as raised:
+        enka.fetch(UID)
+    assert (raised.value.status, raised.value.code) == (404, None)
 
 
 def test_fetch_refuses_a_response_too_large_to_be_a_showcase(
