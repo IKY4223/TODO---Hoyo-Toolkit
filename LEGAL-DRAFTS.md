@@ -23,23 +23,26 @@ or to have it deleted.
 ### What the site handles, and for how long
 
 **Your UID.** When you load a profile, your browser sends the UID to this site's server, which
-asks Enka.Network for that player's public showcase. The server keeps the showcase in memory for
-the few minutes Enka.Network asks it to, then forgets it. The UID is part of the address your
+asks Enka.Network for that player's public showcase. The server keeps the showcase in memory,
+never on disk, and reuses it for as long as Enka.Network asks (a minute or more); it is gone once
+newer lookups need the room or the server restarts. The UID is part of the address your
 browser requests, so it is written in the server's logs, which [HOST] keeps for [LOG DAYS] days.
 A failed lookup writes the UID in those logs too.
 
-**Your IP address.** The server counts requests per IP address to stop abuse. Each count lasts a
-minute; the address stays in the server's memory, never on disk, until the server restarts or
+**Your IP address.** The server counts requests per IP address to stop abuse (an IPv6 address
+counts with the rest of its /64 block; behind the host's proxy, it is the address the proxy passes
+on). Each count lasts a minute; the address stays in the server's memory, never on disk, until the server restarts or
 needs the room. The IP address is also written in the server's logs, kept for [LOG DAYS] days.
 
 **Your wish or warp history link.** The link lets anyone who has it read your history for about
-a day. The site sends it once to HoYoverse to fetch your history, and never stores it or writes it
-in a log. Your clipboard may keep it after you copy it: on Windows, delete it from the clipboard
+a day. Your browser sends it to this site's server with each page of history it asks for, and
+the server passes it to HoYoverse to fetch that page: several times in one import. The server never
+stores it or writes it in a log. Your clipboard may keep it after you copy it: on Windows, delete it from the clipboard
 history (Win+V) once the import is done.
 
 **Your pulls.** Your imported history stays in your browser's local storage, on your device. It
-is not sent to this site's server. So do your theme and language, and the relic stats you mark as
-wanted. "Delete saved history" removes the history; clearing the site's data in your browser
+is not sent to this site's server. So do your theme and language, and the list of relic stats you
+mark as wanted. "Delete saved history" removes the history; clearing the site's data in your browser
 removes everything. A history file you open is read in your browser and is not uploaded.
 
 **Shared links.** A link to a build carries the player's UID. Whoever has the link sees that
@@ -55,12 +58,17 @@ showcase and can tell who shared it. A UID is public in the game, but the link s
 - **HoYoverse** receives your history link from this site's server, when you import.
 - **[HOST]** runs the server and keeps its logs.
 
+The calculators (damage, relic odds, wish forecasts) send the numbers you enter, such as a
+character's stats, the relic stats you want or your pity, to this site's server. It computes the
+answer and keeps nothing.
+
 ### The Telegram bot
 
 If you use the bot, Telegram passes this site your Telegram user id, your chat id and your
 messages. The bot uses them to answer and does not keep them. A UID you send it reaches
-Enka.Network. If you choose a language with /lang, the bot keeps your chat id and the language
-until you ask for them to be deleted.
+Enka.Network. If you choose a language with /lang, the bot remembers your chat id and the
+language; where the bot is set to keep a state file, they are written to disk. Write to [EMAIL]
+to have them deleted.
 
 ### Your rights
 

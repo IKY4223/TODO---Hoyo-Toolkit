@@ -2,6 +2,7 @@
 
 import json
 import re
+from http.client import HTTPException
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -108,7 +109,7 @@ def _error_code(error: HTTPError) -> str | None:
     """The `code` of Enka's JSON error body; a rate limit may come with no body at all."""
     try:
         body = json.loads(error.read(MAX_ERROR_BYTES))
-    except (OSError, ValueError):
+    except (OSError, ValueError, HTTPException):  # unreadable, not JSON, or cut off
         return None
     code = body.get("code") if isinstance(body, dict) else None
     return code if isinstance(code, str) else None
@@ -206,7 +207,7 @@ def fetch(uid: str, url: str = ENKA_URL) -> bytes:
             body: bytes = response.read(MAX_RESPONSE_BYTES + 1)
     except HTTPError as error:
         raise EnkaError(error.code, _error_code(error)) from error
-    except OSError as error:  # no connection, DNS failure, timeout
+    except (OSError, HTTPException) as error:  # no connection, DNS failure, timeout, cut off
         raise EnkaError(None) from error
     if len(body) > MAX_RESPONSE_BYTES:
         raise UpstreamDataError(f"Enka response for {uid} is larger than a showcase can be")

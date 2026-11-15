@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 UID_PATTERN = r"^\d{9,10}$"
 UNAVAILABLE = (502, "Enka.Network is not responding. Try again later.")
 UNREADABLE = (502, "Enka.Network sent data this app cannot read.")
-# Enka's status -> the status and message this API answers with.
+# Enka's status -> the status and message this API answers with. Enka's API rules
+# (github.com/EnkaNetwork/API-docs, api.md, read November 2026) list them.
 FAILURES: dict[int | None, tuple[int, str]] = {
     400: (400, "Enka.Network does not accept this UID."),
     404: (404, "Player not found. Check the UID."),
@@ -24,8 +25,8 @@ FAILURES: dict[int | None, tuple[int, str]] = {
     429: (503, "Too many requests to Enka.Network. Try again in a minute."),
     504: (503, "The game servers did not answer in time. Try again later."),
 }
-# A 404 also means a player who exists but whose profile the game does not return
-# (Enka's API rules, github.com/EnkaNetwork/API-docs, api.md, read November 2026).
+# A 404 also means a player who exists but whose profile the game does not return. The rules
+# describe Genshin's endpoint; Star Rail's is taken to answer the same way.
 PROFILE_UNAVAILABLE = (
     404,
     "The game does not share this player's profile. Put characters on display in the game,"
