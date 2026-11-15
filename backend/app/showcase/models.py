@@ -93,6 +93,7 @@ class Character:
     constellation: int
     talents: tuple[int, ...]  # normal attack, skill, burst, with constellation boosts
     stats: tuple[Stat, ...]  # final values as shown in game
+    base_stats: tuple[Stat, ...]  # HP, ATK and DEF before any bonus: character and weapon
     weapon: Weapon
     artifacts: tuple[Artifact, ...]
     icon: str | None

@@ -140,6 +140,18 @@
 
 ## PR B. Артефакты и удача
 
+**Сделано (ноябрь 2026).** Отличия от плана:
+- B1: правило Capturing Radiance игра не публикует, но публикует итог: 1.103% на
+  персонажа баннера «с учётом гаранта и Capturing Radiance» (текстовая карта игры). Средний
+  шанс 50/50 54.47% воспроизводит его на нашей модели мягкого гаранта; серия поражений не
+  моделируется (`shortcut:` в `backend/app/wishes/engine.py`).
+- B2: маршрут `POST /api/damage/artifacts`, расчёт замены в `backend/app/damage/artifacts.py`,
+  базовые HP, ATK, DEF — поле `base_stats` персонажа (Enka, `fightPropMap` 1, 4, 7).
+- B3: список баннеров — `frontend/src/wishes/genshin-banners.ts` из скрипта
+  `backend/scripts/sync_banners.py`; расчёт — `frontend/src/wishes/fiftyFifty.ts`. Первый
+  выигрыш в истории не считается (мог быть гарантом), как и 5★ с неизвестным именем или вне
+  известных баннеров. Star Rail — в плане README.
+
 ### B1. Capturing Radiance в прогнозе молитв
 
 - Файл `backend/app/wishes/engine.py`, комментарий `shortcut: Capturing Radiance` на строке

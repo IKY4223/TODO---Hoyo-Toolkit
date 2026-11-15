@@ -6,6 +6,7 @@ import { loadWarps, summarizeWarps } from './starrail/warps'
 import { Icon } from './ui/Icon'
 import { ToolIcon, type ToolIconName } from './ui/ToolIcon'
 import { type BannerSummary, loadHistory, type SavedHistory, summarize } from './wishes/history'
+import { currentOffset } from './wishes/uigf'
 
 // The start page is the player's own desk, not an advertisement: the profile loaded in this
 // visit, the pity each saved history stands at, and the way into every tool.
@@ -136,7 +137,10 @@ export function Home(): JSX.Element {
   const [uid, setUid] = useState('')
   // Read when the page opens: App mounts it afresh on every visit, after any import.
   const [warps] = useState(() => summarizeWarps(pullsOf(loadWarps())))
-  const [wishes] = useState(() => summarize(pullsOf(loadHistory())))
+  const [wishes] = useState(() => {
+    const saved = loadHistory()
+    return summarize(pullsOf(saved), currentOffset(saved))
+  })
 
   const start = (event: SubmitEvent<HTMLFormElement>): void => {
     event.preventDefault()

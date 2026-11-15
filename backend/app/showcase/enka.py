@@ -69,6 +69,8 @@ TOTALS = {
     "22": StatKey.CRIT_DMG,
     "23": StatKey.ENERGY_RECHARGE,
 }
+# Base HP, ATK (the character's and the weapon's) and DEF, which percent bonuses multiply.
+BASES = {"1": StatKey.HP, "4": StatKey.ATK, "7": StatKey.DEF}
 DMG_BONUSES = {
     "30": StatKey.PHYSICAL_DMG,
     "40": StatKey.PYRO_DMG,
@@ -270,6 +272,9 @@ def _character(avatar: _Avatar) -> Character:
         constellation=len(avatar.talent_id_list),
         talents=levels,
         stats=_stats(avatar.fight_prop_map),
+        base_stats=tuple(
+            Stat(key, avatar.fight_prop_map.get(prop, 0.0)) for prop, key in BASES.items()
+        ),
         weapon=_weapon(weapons[0]),
         artifacts=tuple(
             _artifact(item) for item in avatar.equip_list if isinstance(item, _Artifact)

@@ -25,9 +25,11 @@ Build optimizer and wish tracker for HoYoverse games. `backend/` is FastAPI mana
 - The site links no other tracker or similar service (paimon.moe, stardb.gg and the like), so
   players stay on it: credit sources in the README and in code comments instead.
 - `backend/app/showcase/gamedata.json`, `backend/app/showcase/talents.json`,
-  `backend/app/damage/levels.json`, `backend/app/starrail/gamedata.json` and
-  `backend/app/starrail/texts.json` are generated: run `scripts/sync_gamedata.py` and
-  `scripts/sync_starrail_data.py` in `backend/` after each game version, never edit them by hand.
+  `backend/app/damage/levels.json`, `backend/app/starrail/gamedata.json`,
+  `backend/app/starrail/texts.json` and `frontend/src/wishes/genshin-banners.ts` are generated:
+  run `scripts/sync_gamedata.py`, `scripts/sync_starrail_data.py` and `scripts/sync_banners.py`
+  in `backend/` after each game version (the banners after each banner phase), never edit them
+  by hand.
 - Tests never call Enka.Network or HoYoverse. They use the fixtures in `backend/tests/fixtures/`
   and `backend/tests/gacha_fixture.py`. Fixtures from real accounts are anonymized.
 - A wish history link is a secret: never log it, store it or put it in a URL the app requests.
@@ -117,8 +119,9 @@ For a session picking the work up again.
   kits of Welt and Jingliu by trace ids, base chances). Left: Ultimates by energy (needs a source).
   The owner took the Telegram bot's host and Mini App out of the plan (November 2026); the bot's
   code stays. Stage 20, Genshin, follows `STAGE-20.md`: PR A (talent multipliers from the game's
-  tables, hits in the damage form, shred, flat damage, Aggravate and Spread) is built; PR B is
-  next.
+  tables, hits in the damage form, shred, flat damage, Aggravate and Spread) and PR B (Capturing
+  Radiance as the published average, the artifact trial, the 50/50 share) are built. Next by
+  HANDOFF.md: stage 21, getting ready for a public launch.
 - The start page is the player's desk (`frontend/src/Home.tsx`), not a landing page, by the
   owner's choice: the profile loaded in this visit, each saved history's pity, the tools.
 - The owner writes in Russian and reads replies on a phone. Keep the UI English and Russian.

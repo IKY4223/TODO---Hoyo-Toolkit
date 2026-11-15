@@ -55,6 +55,15 @@ def test_model_reproduces_the_official_consolidated_five_star_rate() -> None:
     assert 1 / average_pulls == pytest.approx(0.016, abs=1e-4)
 
 
+def test_featured_rate_reproduces_the_published_rate_with_capturing_radiance() -> None:
+    # The game's wish details (5.0 and later): "The consolidated probability of obtaining the
+    # current event wish's 5-star promotional character(s) (including wish guarantees and
+    # Capturing Radiance) is 1.103%". Before it, a 50/50 gave 1.067%.
+    chances = pull_distribution(BANNER, pity=0, guaranteed=False, copies=1)
+    pulls_per_featured = sum(pulls * chance for pulls, chance in enumerate(chances))
+    assert 1 / pulls_per_featured == pytest.approx(0.01103, abs=5e-6)
+
+
 @pytest.mark.parametrize(
     ("pity", "guaranteed", "copies"),
     [(0, False, 1), (0, True, 1), (40, False, 2), (75, True, 3), (89, False, 1), (89, True, 2)],
@@ -69,7 +78,7 @@ def test_distribution_matches_pull_by_pull_walk(pity: int, guaranteed: bool, cop
 
 @pytest.mark.parametrize(
     ("guaranteed", "probability"),
-    [(True, 0.006), (False, 0.003)],
+    [(True, 0.006), (False, 0.006 * BANNER.featured_rate)],
 )
 def test_single_pull_probability(guaranteed: bool, probability: float) -> None:
     result = forecast(BANNER, pity=0, guaranteed=guaranteed, copies=1, pulls=1)

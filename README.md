@@ -75,10 +75,15 @@ The app opens on Honkai: Star Rail; Genshin Impact is one tap away.
   added to the base (Shenhe, Yun Jin, Zhongli), DEF reduction (counted up to 90%) and DEF
   ignore, RES reduction. Reactions: Vaporize and Melt, Aggravate and Spread. The damage bonus a
   hit gets is a guess (Physical for a Normal Attack, the element otherwise) the player can
-  change.
+  change. "Try artifacts from the showcase" puts each artifact the showcase's other characters
+  wear in its slot and shows, per slot, the one that would add most to that hit and by how much
+  (set bonuses are not recounted).
 - **Wish history** — import the whole wish history straight from a phone: on Android, copy the
   text of the error page the game's history shows offline and paste it in. Shows every banner's
-  pity and each 5★ with the pulls it took. The steps for Android and iPhone are paimon.moe's
+  pity and each 5★ with the pulls it took, and on the character event wishes the 50/50s won and
+  lost: a 5★ counts as won when it was featured on the banner running at its time (paimon.moe's
+  banner list, see Credits); one after a lost 50/50 was guaranteed and does not count, nor does a
+  first win the history cannot tell from a guarantee. The steps for Android and iPhone are paimon.moe's
   own (see Credits), and both histories quote what HoYoverse's privacy policy says about asking for a copy
   of one's data. A UIGF file (v4, or the older v2 and v3) another tracker exported can be read
   instead, on the device. Pulls are saved only on the device; the link, which
@@ -103,7 +108,9 @@ The app opens on Honkai: Star Rail; Genshin Impact is one tap away.
   servers only.
 - **Wish forecast** — chance to pull a featured 5★ character with the pulls you have, and how
   many pulls 50%, 90%, 99% and 100% take. Exact math, not a simulation. Capturing Radiance is
-  not modelled, so real odds are slightly better.
+  counted as the average chance of a 50/50 that reproduces the game's published rate (1.103%
+  for the featured character): 54.47%. The game does not publish how a streak of lost 50/50s
+  raises it, so a player's own odds may differ from that average.
 - **Warp forecast** — the same exact odds for Star Rail's character and light cone event warps.
 - **Telegram bot** — a Star Rail showcase and warp odds in Telegram; see below to run it.
 
@@ -125,9 +132,8 @@ Planned, in order:
    - Aglaea's Eidolon 4 stack from her own attacks; Pearl's Eidolon 2 advance for the other
      Elation characters; Hanya's Eidolon 1 taken as once each of her turns; Castorice's Ardent
      Will spent on Netherwing's first two turns.
-2. Genshin, the rest of stage 20 (`STAGE-20.md`, PR B): Capturing Radiance in the wish
-   forecast, a comparison of the showcase's artifacts for a chosen hit, the share of 50/50s won.
-   Left out of the damage calculator, each with a `shortcut:` comment:
+2. Genshin, what stage 20 left out. Of the damage calculator and the artifact trial, each with
+   a `shortcut:` comment:
    - transformative reactions (Overloaded, Superconduct, Bloom and the rest) and Lunar reactions
      (6.0 and later), which follow formulas of their own: their lines stay out of the hit list;
    - reaction damage bonuses (Crimson Witch, Thundering Fury) and set and passive effects;
@@ -135,10 +141,13 @@ Planned, in order:
      Physical); talent lines told apart from buffs by words of their English name;
    - the newest characters (Sandrone, Mitya, Valeriy, Vodyanitsa, Vesna, Alyosha, Odette and two
      of the Traveler's elements): the game's tables published so far (June 2026) do not hold
-     their talents, so their hits wait for the next sync.
-   Luck statistics, the rest: the share of 50/50s won on character banners, for both games. It
-   needs to know which 5★ characters are standard, which neither game data source here gives:
-   it waits for a source (an open tracker's data file, read and credited).
+     their talents, so their hits wait for the next sync;
+   - artifact set bonuses in the trial, and artifacts not worn by a showcased character (Enka
+     does not give the inventory).
+   Of the wish history: the share of 50/50s won in Star Rail. No open list of Star Rail banners
+   was found; the warp history gives each warp's `gacha_id`, so the game's own banner table
+   (featured characters by banner id) could serve once a source for it is read and credited.
+   Of the forecast: Capturing Radiance is an average; a streak of lost 50/50s is not modelled.
 3. Zenless Zone Zero: undecided.
 
 The Telegram bot is out of the plan, by the owner's choice (November 2026): no host, no Mini
@@ -310,8 +319,10 @@ Wish, Adventurer Handbook), from the files the
 [Genshin Impact Wiki](https://genshin-impact.fandom.com/wiki/Paimon_Menu) on Fandom keeps,
 turned into white marks. All of them belong to HoYoverse.
 
-The Genshin wish history steps for Android and iPhone are paimon.moe's, word for word in English
-and Russian: [paimon-moe](https://github.com/MadeBaruna/paimon-moe), MIT licence, copyright (c)
+The Genshin wish history steps for Android and iPhone, and the list of character event banners
+the 50/50 count reads (`src/data/banners.js`, turned into `frontend/src/wishes/genshin-banners.ts`
+by `backend/scripts/sync_banners.py`), are paimon.moe's, the steps word for word in English and
+Russian: [paimon-moe](https://github.com/MadeBaruna/paimon-moe), MIT licence, copyright (c)
 2021 Made Baruna. The site itself links no other tracker, so players stay on it.
 
 History files follow the [UIGF standard](https://uigf.org/en/standards/uigf.html) (v4.2, and the

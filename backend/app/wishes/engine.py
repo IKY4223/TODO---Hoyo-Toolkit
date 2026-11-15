@@ -34,10 +34,20 @@ class Forecast:
     milestones: tuple[Milestone, ...]
 
 
-# shortcut: Capturing Radiance (5.0+) is not modelled, so real odds are slightly better;
-# model it once its trigger rule is confirmed.
+# Capturing Radiance (5.0 and later) can turn a lost 50/50 into the featured character. The game
+# publishes only the result: the featured 5-star's consolidated rate "including wish guarantees
+# and Capturing Radiance" is 1.103% (wish details, read from the game's text map in November
+# 2026). With this ramp, a flat featured rate of 54.47% reproduces it.
+# shortcut: the trigger itself is not published (community guesses say it grows with each 50/50
+# lost in a row), so every 50/50 here gets the average chance; model the streak if HoYoverse or
+# a large data set confirms the rule.
 GENSHIN_CHARACTER = Banner(
-    base_rate=0.006, soft_pity=74, rate_step=0.06, hard_pity=90, featured_rate=0.5, max_copies=7
+    base_rate=0.006,
+    soft_pity=74,
+    rate_step=0.06,
+    hard_pity=90,
+    featured_rate=0.5447,
+    max_copies=7,
 )
 # Published: 0.6% base, 1.6% consolidated, a 5-star within 90, 50% featured. The same ramp
 # as Genshin's reproduces it.

@@ -1,6 +1,7 @@
-import { type JSX, type SubmitEvent, useState } from 'react'
+import { type JSX, type SubmitEvent, useRef, useState } from 'react'
 import { isKeyOf } from '../api/http'
 import {
+  MAX_ARTIFACT_CANDIDATES,
   MAX_ENEMY_LEVEL,
   MAX_FLAT_DAMAGE,
   MAX_MULTIPLIER,
@@ -9,8 +10,24 @@ import {
 } from '../api/limits'
 import { useRequest } from '../api/useRequest'
 import { type Message, useLanguage, useLocalized, useT, numberFormat } from '../i18n'
-import { type Attack, type Character, formatStat, SCALINGS } from '../showcase/showcase'
-import { type Damage, type DamageRequest, fetchDamage } from './damage'
+import {
+  type Artifact,
+  type Attack,
+  type Character,
+  formatStat,
+  SCALINGS,
+  SLOTS,
+} from '../showcase/showcase'
+import {
+  type ArtifactComparison,
+  type ArtifactRequest,
+  type Candidate,
+  type Damage,
+  type DamageRequest,
+  fetchComparison,
+  fetchDamage,
+  isBaseStat,
+} from './damage'
 
 // `satisfies` makes a choice added to the API a compile error here.
 const REACTIONS = {
@@ -63,6 +80,11 @@ interface Part {
 }
 
 const whole = numberFormat({ maximumFractionDigits: 0 })
+const relative = numberFormat({
+  style: 'percent',
+  signDisplay: 'exceptZero',
+  maximumFractionDigits: 1,
+})
 const OWN_PART: readonly Part[] = [{ stat: 'atk', percent: String(DEFAULT_MULTIPLIER_PERCENT) }]
 
 /** The key a <select> holds, or an error if the page was tampered into an impossible choice. */
@@ -131,8 +153,62 @@ function Reduction(props: {
   )
 }
 
-export function DamageCalculator({ character }: { readonly character: Character }): JSX.Element {
+const statsOf = ({ slot, main, subs }: Artifact): ArtifactRequest['equipped'][number] => ({
+  slot,
+  main,
+  subs,
+})
+
+/** The best artifact of each slot others in the showcase wear, against the one worn now. */
+function Trials(props: {
+  readonly comparison: ArtifactComparison
+  readonly tried: readonly Candidate[]
+}): JSX.Element {
+  const { comparison, tried } = props
+  const t = useT()
+  const now = comparison.current.average
+  const slots = Object.entries(SLOTS).flatMap(([slot, label]) => {
+    const own = tried.flatMap((candidate, at) => {
+      const damage = comparison.candidates[at]
+      return candidate.artifact.slot === slot && damage ? [{ ...candidate, damage }] : []
+    })
+    const best = own.reduce<(typeof own)[number] | null>(
+      (top, next) => (top && top.damage.average >= next.damage.average ? top : next),
+      null,
+    )
+    return best ? [{ slot, label, best }] : []
+  })
+  return (
+    <ul className="trials">
+      {slots.map(({ slot, label, best }) => (
+        <li key={slot}>
+          <strong>{t(label)}</strong>{' '}
+          <span>
+            {best.damage.average > now
+              ? [
+                  best.owner,
+                  best.artifact.set_name,
+                  `${formatStat(best.artifact.main, t)} — ${whole.format(best.damage.average)}`,
+                ].join(' · ') + ` (${relative.format(best.damage.average / now - 1)})`
+              : t('no artifact here does better')}
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+export function DamageCalculator(props: {
+  readonly character: Character
+  /** Artifacts the other characters in the showcase wear. */
+  readonly others?: readonly Candidate[]
+}): JSX.Element {
+  const { character, others = [] } = props
   const [state, run] = useRequest<Damage>()
+  const [trial, runTrial] = useRequest<ArtifactComparison>()
+  const form = useRef<HTMLFormElement>(null)
+  // A full showcase has fewer artifacts than the API takes; the cap only guards a changed game.
+  const tried = others.slice(0, MAX_ARTIFACT_CANDIDATES)
   const t = useT()
   const language = useLanguage()
   const localized = useLocalized()
@@ -162,10 +238,23 @@ export function DamageCalculator({ character }: { readonly character: Character 
     void run(async () => fetchDamage(readRequest(data, character, parts)))
   }
 
+  const tryArtifacts = (): void => {
+    if (!form.current?.reportValidity()) return
+    const request = readRequest(new FormData(form.current), character, parts)
+    void runTrial(async () =>
+      fetchComparison({
+        ...request,
+        base_stats: character.base_stats.filter(isBaseStat),
+        equipped: character.artifacts.map(statsOf),
+        candidates: tried.map(({ artifact }) => statsOf(artifact)),
+      }),
+    )
+  }
+
   return (
     <details>
       <summary>{t('Damage')}</summary>
-      <form onSubmit={submit}>
+      <form ref={form} onSubmit={submit}>
         {character.attacks.length ? (
           <label>
             {t('Hit')}
@@ -317,6 +406,27 @@ export function DamageCalculator({ character }: { readonly character: Character 
           </dl>
         )}
       </div>
+      {tried.length ? (
+        <>
+          <button
+            type="button"
+            className="secondary"
+            disabled={trial.status === 'loading'}
+            onClick={tryArtifacts}
+          >
+            {t('Try artifacts from the showcase')}
+          </button>
+          <p className="hint">
+            {t(
+              "For the hit above: each slot's best artifact among those the showcase's other characters wear. Set bonuses are not recounted.",
+            )}
+          </p>
+          {'message' in trial && <p role="alert">{localized(trial.message)}</p>}
+          <div aria-live="polite">
+            {'data' in trial && <Trials comparison={trial.data} tried={tried} />}
+          </div>
+        </>
+      ) : null}
     </details>
   )
 }

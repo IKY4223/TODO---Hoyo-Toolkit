@@ -5,7 +5,7 @@ import { type Message, numberFormat, useLocalized, useT } from '../i18n'
 import { DataRequest } from './DataRequest'
 import { ExportButton } from './HistoryFiles'
 import { PcScript } from './PcScript'
-import { readHistoryFile } from './uigf'
+import { currentOffset, readHistoryFile } from './uigf'
 import {
   type BannerSummary,
   EMPTY_HISTORY,
@@ -23,6 +23,8 @@ const DELETE_QUESTION =
 export const NOT_SAVED =
   ' This browser does not keep site data, so the history lasts until this page closes.'
 const average = numberFormat({ maximumFractionDigits: 1 })
+const UNCOUNTED: Message =
+  '{count} 5★ not counted: the history starts mid-way, or the banner or the name is not known'
 
 export function BannerCard(props: {
   readonly summary: BannerSummary
@@ -30,6 +32,7 @@ export function BannerCard(props: {
   readonly warps?: boolean
 }): JSX.Element {
   const { summary, warps = false } = props
+  const { fiftyFifty } = summary
   const t = useT()
   return (
     <article className="card">
@@ -64,6 +67,15 @@ export function BannerCard(props: {
               { average: average.format(summary.averagePity), longest: summary.longestDry },
             )}
       </p>
+      {fiftyFifty && fiftyFifty.won + fiftyFifty.lost + fiftyFifty.uncounted ? (
+        <p className="hint">
+          {t('50/50 won: {won} of {count}', {
+            won: fiftyFifty.won,
+            count: fiftyFifty.won + fiftyFifty.lost,
+          })}
+          {fiftyFifty.uncounted ? ` · ${t(UNCOUNTED, { count: fiftyFifty.uncounted })}` : ''}
+        </p>
+      ) : null}
       {summary.fiveStars.length ? (
         <table>
           <caption>{t('5★ pulls, newest first')}</caption>
@@ -248,7 +260,7 @@ export function WishHistory(): JSX.Element {
             <>
               <p>UID {saved.current}</p>
               <ul className="cards">
-                {summarize(pulls).map((summary) => (
+                {summarize(pulls, currentOffset(saved)).map((summary) => (
                   <li key={summary.banner}>
                     <BannerCard summary={summary} />
                   </li>

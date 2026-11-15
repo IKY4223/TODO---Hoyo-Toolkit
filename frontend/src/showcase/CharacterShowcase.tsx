@@ -5,6 +5,7 @@ import { useRequest } from '../api/useRequest'
 import { useLocalized, useT } from '../i18n'
 import { Icon } from '../ui/Icon'
 import { ShareButton } from '../ui/ShareButton'
+import type { Candidate } from '../damage/damage'
 import { DamageCalculator } from '../damage/DamageCalculator'
 import {
   type Artifact,
@@ -49,7 +50,11 @@ function ArtifactItem({ artifact }: { readonly artifact: Artifact }): JSX.Elemen
   )
 }
 
-function CharacterCard({ character }: { readonly character: Character }): JSX.Element {
+function CharacterCard(props: {
+  readonly character: Character
+  readonly others: readonly Candidate[]
+}): JSX.Element {
+  const { character, others } = props
   const { element, talents, weapon, artifacts } = character
   const t = useT()
   const summary = [
@@ -89,7 +94,7 @@ function CharacterCard({ character }: { readonly character: Character }): JSX.El
           ))}
         </ul>
       </details>
-      <DamageCalculator character={character} />
+      <DamageCalculator character={character} others={others} />
     </article>
   )
 }
@@ -106,7 +111,14 @@ function ShowcaseResult({ showcase }: { readonly showcase: Showcase }): JSX.Elem
         <ul className="cards">
           {showcase.characters.map((character) => (
             <li key={character.id}>
-              <CharacterCard character={character} />
+              <CharacterCard
+                character={character}
+                others={showcase.characters
+                  .filter((other) => other.id !== character.id)
+                  .flatMap((other) =>
+                    other.artifacts.map((artifact) => ({ owner: other.name, artifact })),
+                  )}
+              />
             </li>
           ))}
         </ul>

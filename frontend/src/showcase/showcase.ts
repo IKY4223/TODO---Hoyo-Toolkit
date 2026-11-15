@@ -119,6 +119,7 @@ const isCharacter = (value: unknown): value is Character =>
   isNumber(value.constellation) &&
   isArrayOf(value.talents, isNumber) &&
   isArrayOf(value.stats, isStat) &&
+  isArrayOf(value.base_stats, isStat) &&
   isWeapon(value.weapon) &&
   isArrayOf(value.artifacts, isArtifact) &&
   isIcon(value.icon) &&

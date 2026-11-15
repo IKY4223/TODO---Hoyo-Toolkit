@@ -23,6 +23,11 @@ const SHOWCASE: Showcase = {
         { key: 'crit_rate', value: 0.5194 },
         { key: 'physical_dmg', value: 1.083 },
       ],
+      base_stats: [
+        { key: 'hp', value: 9461 },
+        { key: 'atk', value: 897 },
+        { key: 'def', value: 601 },
+      ],
       weapon: {
         name: 'Skyward Harp',
         rarity: 5,

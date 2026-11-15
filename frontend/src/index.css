@@ -408,6 +408,14 @@ label {
   text-decoration: none;
 }
 
+/* The best artifact of each slot, one line each. */
+.trials {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 0;
+  list-style: none;
+}
+
 /* Fields most hits leave at zero, folded away inside a form. */
 details.extras {
   display: grid;

@@ -21,6 +21,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/damage/artifacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Compare Artifacts
+         * @description The hit's damage now, and with each candidate in place of the artifact in its slot.
+         */
+        post: operations["compare_artifacts_api_damage_artifacts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/showcase/{uid}": {
         parameters: {
             query?: never;
@@ -193,6 +213,77 @@ export interface components {
             /** Icon */
             icon: string | null;
         };
+        /** ArtifactComparison */
+        ArtifactComparison: {
+            current: components["schemas"]["Damage"];
+            /** Candidates */
+            candidates: components["schemas"]["Damage"][];
+        };
+        /** ArtifactRequest */
+        ArtifactRequest: {
+            /**
+             * Level
+             * @description Character level
+             */
+            level: number;
+            /**
+             * Stats
+             * @description The character's final stats
+             */
+            stats: components["schemas"]["StatValue"][];
+            /** Scalings */
+            scalings: components["schemas"]["TalentScaling"][];
+            /**
+             * Bonus
+             * @description The damage bonus that applies to the hit
+             */
+            bonus: ("physical_dmg" | "pyro_dmg" | "hydro_dmg" | "electro_dmg" | "cryo_dmg" | "anemo_dmg" | "geo_dmg" | "dendro_dmg") | null;
+            reaction: components["schemas"]["Reaction"];
+            /**
+             * Flat
+             * @description Damage added to the base
+             * @default 0
+             */
+            flat: number;
+            /** Enemy Level */
+            enemy_level: number;
+            /**
+             * Enemy Resistance
+             * @description 0.1 is 10%
+             */
+            enemy_resistance: number;
+            /**
+             * Def Reduction
+             * @default 0
+             */
+            def_reduction: number;
+            /**
+             * Def Ignore
+             * @default 0
+             */
+            def_ignore: number;
+            /**
+             * Res Reduction
+             * @default 0
+             */
+            res_reduction: number;
+            /**
+             * Base Stats
+             * @description HP, ATK and DEF before any bonus, as the showcase gives them
+             */
+            base_stats: components["schemas"]["BaseStat"][];
+            /** Equipped */
+            equipped: components["schemas"]["ArtifactStats"][];
+            /** Candidates */
+            candidates: components["schemas"]["ArtifactStats"][];
+        };
+        /** ArtifactStats */
+        ArtifactStats: {
+            slot: components["schemas"]["Slot"];
+            main: components["schemas"]["StatValue"];
+            /** Subs */
+            subs: components["schemas"]["StatValue"][];
+        };
         /** Attack */
         Attack: {
             /** Talent */
@@ -203,6 +294,16 @@ export interface components {
             name_ru: string;
             /** Scalings */
             scalings: components["schemas"]["Scaling"][];
+        };
+        /** BaseStat */
+        BaseStat: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "hp" | "atk" | "def";
+            /** Value */
+            value: number;
         };
         /** Character */
         Character: {
@@ -219,6 +320,8 @@ export interface components {
             talents: number[];
             /** Stats */
             stats: components["schemas"]["Stat"][];
+            /** Base Stats */
+            base_stats: components["schemas"]["Stat"][];
             weapon: components["schemas"]["Weapon"];
             /** Artifacts */
             artifacts: components["schemas"]["Artifact"][];
@@ -749,6 +852,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Damage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    compare_artifacts_api_damage_artifacts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ArtifactRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ArtifactComparison"];
                 };
             };
             /** @description Validation Error */

@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, expect, test, vi } from 'vitest'
-import type { Character } from '../showcase/showcase'
+import type { Artifact, Character } from '../showcase/showcase'
 import { DamageCalculator } from './DamageCalculator'
 
 const AMBER: Character = {
@@ -16,6 +16,11 @@ const AMBER: Character = {
     { key: 'crit_dmg', value: 1 },
     { key: 'pyro_dmg', value: 0.466 },
     { key: 'physical_dmg', value: 0.25 },
+  ],
+  base_stats: [
+    { key: 'hp', value: 9461 },
+    { key: 'atk', value: 897 },
+    { key: 'def', value: 601 },
   ],
   weapon: { name: 'Skyward Harp', rarity: 5, level: 90, refinement: 2, icon: null },
   artifacts: [],
@@ -168,6 +173,59 @@ test('hit names follow the language', async () => {
   } finally {
     setLanguage('en')
   }
+})
+
+const sands = (name: string, share: number): Artifact => ({
+  slot: 'sands',
+  set_name: name,
+  rarity: 5,
+  level: 20,
+  main: { key: 'atk_percent', value: share },
+  subs: [{ key: 'crit_rate', value: 0.039 }],
+  icon: null,
+})
+const CANDIDATES = [
+  { owner: 'Ganyu', artifact: sands('Blizzard Strayer', 0.466) },
+  { owner: 'Bennett', artifact: sands('Noblesse Oblige', 0.3) },
+  { owner: 'Xiangling', artifact: { ...sands('Emblem of Severed Fate', 0.518), slot: 'plume' } },
+] as const
+
+test('tries the artifacts others in the showcase wear, in place of the own one', async () => {
+  const amber = { ...AMBER, artifacts: [sands('Gladiator', 0.4)] }
+  const comparison = {
+    current: DAMAGE,
+    candidates: [
+      { ...DAMAGE, average: 14850.66 },
+      { ...DAMAGE, average: 12000 },
+      { ...DAMAGE, average: 13000 },
+    ],
+  }
+  const fetchMock = vi.fn(async () => Response.json(comparison))
+  vi.stubGlobal('fetch', fetchMock)
+  render(<DamageCalculator character={amber} others={CANDIDATES} />)
+  fireEvent.click(screen.getByRole('button', { name: 'Try artifacts from the showcase' }))
+  // The best of each slot, against what the character deals now.
+  expect(await screen.findByText(/Ganyu · Blizzard Strayer/)).toBeDefined()
+  expect(screen.getByText(/14,851 \(\+10%\)/)).toBeDefined()
+  expect(screen.getByText(/no artifact here does better/)).toBeDefined()
+  expect(screen.queryByText(/Bennett/)).toBeNull()
+  const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit]
+  expect(url).toBe('/api/damage/artifacts')
+  expect(JSON.parse(String(init.body))).toMatchObject({
+    base_stats: amber.base_stats,
+    equipped: [{ slot: 'sands', main: { key: 'atk_percent', value: 0.4 } }],
+    candidates: CANDIDATES.map(({ artifact }) => ({
+      slot: artifact.slot,
+      main: artifact.main,
+      subs: artifact.subs,
+    })),
+    scalings: [{ stat: 'atk', multiplier: 1 }],
+  })
+})
+
+test('offers no comparison without other artifacts in the showcase', () => {
+  open(AMBER, async () => Response.json(DAMAGE))
+  expect(screen.queryByRole('button', { name: 'Try artifacts from the showcase' })).toBeNull()
 })
 
 test('shows average, crit and non-crit damage', async () => {
