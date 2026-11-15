@@ -58,7 +58,7 @@ def test_model_reproduces_the_official_consolidated_five_star_rate() -> None:
 def test_featured_rate_reproduces_the_published_rate_with_capturing_radiance() -> None:
     # The game's wish details (5.0 and later): "The consolidated probability of obtaining the
     # current event wish's 5-star promotional character(s) (including wish guarantees and
-    # Capturing Radiance) is 1.103%". Before it, a 50/50 gave 1.067%.
+    # Capturing Radiance) is 1.103%". Before it, a 50/50 gave 1.067% (1.6% / 1.5).
     chances = pull_distribution(BANNER, pity=0, guaranteed=False, copies=1)
     pulls_per_featured = sum(pulls * chance for pulls, chance in enumerate(chances))
     assert 1 / pulls_per_featured == pytest.approx(0.01103, abs=5e-6)

@@ -64,7 +64,9 @@ The app is private until these are done. Do not deploy it publicly or share the 
 and remind the owner when a change moves toward a public launch. None of this is legal advice:
 have a lawyer read the texts before launch.
 
-- Licence: MIT, chosen by the owner (`LICENSE`). Still to do: list the licences of dependencies.
+- Licence: MIT, chosen by the owner (`LICENSE`). Still to do: list the licences of dependencies,
+  and of data the bundle ships: `frontend/src/wishes/genshin-banners.ts` and the history steps
+  come from paimon.moe (MIT, copyright (c) 2021 Made Baruna): its full notice must ship too.
 - Disclaimer: "Fan project, not affiliated with HoYoverse" stays visible. Read HoYoverse's current
   fan content policy; no ads, payments or donations until it is confirmed allowed. Game images
   come from Enka.Network and belong to HoYoverse. The tool icons and the site's icon are game

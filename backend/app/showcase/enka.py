@@ -272,9 +272,8 @@ def _character(avatar: _Avatar) -> Character:
         constellation=len(avatar.talent_id_list),
         talents=levels,
         stats=_stats(avatar.fight_prop_map),
-        base_stats=tuple(
-            Stat(key, avatar.fight_prop_map.get(prop, 0.0)) for prop, key in BASES.items()
-        ),
+        # A missing base would read as 0 and make every percent bonus worth nothing.
+        base_stats=tuple(Stat(key, avatar.fight_prop_map[prop]) for prop, key in BASES.items()),
         weapon=_weapon(weapons[0]),
         artifacts=tuple(
             _artifact(item) for item in avatar.equip_list if isinstance(item, _Artifact)

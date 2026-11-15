@@ -108,8 +108,9 @@ The app opens on Honkai: Star Rail; Genshin Impact is one tap away.
   servers only.
 - **Wish forecast** — chance to pull a featured 5★ character with the pulls you have, and how
   many pulls 50%, 90%, 99% and 100% take. Exact math, not a simulation. Capturing Radiance is
-  counted as the average chance of a 50/50 that reproduces the game's published rate (1.103%
-  for the featured character): 54.47%. The game does not publish how a streak of lost 50/50s
+  counted as a flat chance for every 50/50, set so the forecast reproduces the game's published
+  rate for the featured character (1.103%): 54.47% with this model's soft pity ramp (the two
+  published rates alone give about 54.9%). The game does not publish how a streak of lost 50/50s
   raises it, so a player's own odds may differ from that average.
 - **Warp forecast** — the same exact odds for Star Rail's character and light cone event warps.
 - **Telegram bot** — a Star Rail showcase and warp odds in Telegram; see below to run it.

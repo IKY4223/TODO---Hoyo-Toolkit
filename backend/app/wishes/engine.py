@@ -37,7 +37,8 @@ class Forecast:
 # Capturing Radiance (5.0 and later) can turn a lost 50/50 into the featured character. The game
 # publishes only the result: the featured 5-star's consolidated rate "including wish guarantees
 # and Capturing Radiance" is 1.103% (wish details, read from the game's text map in November
-# 2026). With this ramp, a flat featured rate of 54.47% reproduces it.
+# 2026). With this ramp, a flat featured rate of 54.47% reproduces it (the published rates alone,
+# 1.103% over 1.6%, give 54.9%: the rest is the ramp's own estimate).
 # shortcut: the trigger itself is not published (community guesses say it grows with each 50/50
 # lost in a row), so every 50/50 here gets the average chance; model the streak if HoYoverse or
 # a large data set confirms the rule.

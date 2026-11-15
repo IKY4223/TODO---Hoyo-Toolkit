@@ -209,6 +209,9 @@ test('tries the artifacts others in the showcase wear, in place of the own one',
   expect(screen.getByText(/14,851 \(\+10%\)/)).toBeDefined()
   expect(screen.getByText(/no artifact here does better/)).toBeDefined()
   expect(screen.queryByText(/Bennett/)).toBeNull()
+  // Any change to the hit makes the answer stale: it goes until asked again.
+  change('Enemy level', '95')
+  expect(screen.queryByText(/Ganyu · Blizzard Strayer/)).toBeNull()
   const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit]
   expect(url).toBe('/api/damage/artifacts')
   expect(JSON.parse(String(init.body))).toMatchObject({
@@ -254,10 +257,19 @@ test('sends no bonus when none is chosen', async () => {
   expect(sentBody(fetchMock)).toMatchObject({ bonus: null })
 })
 
-test('a character without bonuses starts with none', () => {
+test('a character without bonuses starts with none, with its element and Physical at 0%', () => {
   const plain = { ...AMBER, stats: [{ key: 'atk', value: 2000 } as const] }
   open(plain, async () => Response.json(DAMAGE))
-  expect(screen.getByLabelText<HTMLSelectElement>('Damage bonus').value).toBe('')
+  const select = screen.getByLabelText<HTMLSelectElement>('Damage bonus')
+  expect(select.value).toBe('')
+  // A goblet of her element tried from the showcase must count, so its bonus can be chosen.
+  expect([...select.options].map((option) => option.textContent)).toEqual([
+    'None',
+    'Pyro DMG 0%',
+    'Physical DMG 0%',
+  ])
+  change('Hit', '2')
+  expect(select.value).toBe('pyro_dmg')
 })
 
 test.each([

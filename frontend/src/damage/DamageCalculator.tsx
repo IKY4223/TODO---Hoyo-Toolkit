@@ -212,10 +212,21 @@ export function DamageCalculator(props: {
   const t = useT()
   const language = useLanguage()
   const localized = useLocalized()
-  const bonuses = character.stats.filter((stat) => isKeyOf(BONUSES, stat.key))
+  const held = character.stats.filter((stat) => isKeyOf(BONUSES, stat.key))
+  // Enka leaves out a bonus at 0%; the character's own element and Physical stay on offer, so a
+  // goblet of either tried from the showcase counts.
+  const bonuses = [
+    ...held,
+    ...[character.element && `${character.element}_dmg`, 'physical_dmg']
+      .filter((key) => key && isKeyOf(BONUSES, key) && !held.some((stat) => stat.key === key))
+      .map((key) => ({ key: choice(BONUSES, key), value: 0 })),
+  ]
   const [hit, setHit] = useState(OWN_MULTIPLIER)
   const [parts, setParts] = useState<readonly Part[]>(OWN_PART)
-  const [bonus, setBonus] = useState<string>(bonuses[0]?.key ?? NO_BONUS)
+  const [bonus, setBonus] = useState<string>(held[0]?.key ?? NO_BONUS)
+  // Each change to the form makes a trial's answer stale; it shows only for the form it read.
+  const [edits, setEdits] = useState(0)
+  const [trialAt, setTrialAt] = useState(-1)
 
   const choose = (value: string): void => {
     setHit(value)
@@ -241,6 +252,7 @@ export function DamageCalculator(props: {
   const tryArtifacts = (): void => {
     if (!form.current?.reportValidity()) return
     const request = readRequest(new FormData(form.current), character, parts)
+    setTrialAt(edits)
     void runTrial(async () =>
       fetchComparison({
         ...request,
@@ -254,7 +266,7 @@ export function DamageCalculator(props: {
   return (
     <details>
       <summary>{t('Damage')}</summary>
-      <form ref={form} onSubmit={submit}>
+      <form ref={form} onSubmit={submit} onChange={() => setEdits(edits + 1)}>
         {character.attacks.length ? (
           <label>
             {t('Hit')}
@@ -423,7 +435,9 @@ export function DamageCalculator(props: {
           </p>
           {'message' in trial && <p role="alert">{localized(trial.message)}</p>}
           <div aria-live="polite">
-            {'data' in trial && <Trials comparison={trial.data} tried={tried} />}
+            {'data' in trial && trialAt === edits ? (
+              <Trials comparison={trial.data} tried={tried} />
+            ) : null}
           </div>
         </>
       ) : null}

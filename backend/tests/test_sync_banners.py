@@ -2,7 +2,7 @@
 
 import pytest
 
-from scripts.sync_banners import character_banners
+from scripts.sync_banners import _key, character_banners
 
 NAMES = {"venti": "Venti", "klee": "Klee", "hu_tao": "Hu Tao", "raiden_shogun": "Raiden Shogun"}
 
@@ -63,6 +63,23 @@ def test_reads_each_character_banner_with_its_featured_names() -> None:
 def test_a_featured_key_with_no_known_character_stops_the_sync() -> None:
     with pytest.raises(ValueError, match="nahida"):
         character_banners(LIST.replace("'venti'", "'nahida'"), NAMES)
+
+
+@pytest.mark.parametrize(
+    ("name", "key"),
+    [
+        ("Hu Tao", "hu_tao"),
+        ("Kamisato Ayaka", "kamisato_ayaka"),
+        ("Raiden Shogun", "raiden_shogun"),
+    ],
+)
+def test_names_become_the_keys_the_list_uses(name: str, key: str) -> None:
+    assert _key(name) == key
+
+
+def test_a_date_that_cannot_be_stops_the_sync() -> None:
+    with pytest.raises(ValueError, match="2020-02-30"):
+        character_banners(LIST.replace("2020-09-28 00:00:00", "2020-02-30 25:00:00", 1), NAMES)
 
 
 def test_a_banner_without_dates_stops_the_sync() -> None:

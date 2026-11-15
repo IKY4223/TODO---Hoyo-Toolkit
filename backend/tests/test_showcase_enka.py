@@ -194,10 +194,11 @@ def unknown_stat(raw: Any) -> None:
         b"{}",
         b"[]",
         altered(lambda raw: raw["avatarInfoList"][0].pop("fightPropMap")),
+        altered(lambda raw: raw["avatarInfoList"][0]["fightPropMap"].pop("4")),  # base ATK
         altered(lambda raw: raw["avatarInfoList"][0].update(equipList=[])),
         altered(unknown_stat),
     ],
-    ids=["not-json", "empty", "wrong-type", "no-stats", "no-weapon", "unknown-stat"],
+    ids=["not-json", "empty", "wrong-type", "no-stats", "no-base-atk", "no-weapon", "unknown-stat"],
 )
 def test_unreadable_response_is_reported_not_guessed(body: bytes) -> None:
     with pytest.raises(UpstreamDataError):

@@ -1,7 +1,7 @@
 from typing import Literal
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.damage.artifacts import swap
 from app.damage.engine import Damage, Enemy, Hit, Reaction, damage
@@ -70,6 +70,9 @@ class DamageRequest(BaseModel):
     res_reduction: float = Field(default=0, ge=0, le=MAX_RESISTANCE, allow_inf_nan=False)
 
 
+BASE_KEYS = (StatKey.HP, StatKey.ATK, StatKey.DEF)
+
+
 class BaseStat(BaseModel):
     key: Literal[StatKey.HP, StatKey.ATK, StatKey.DEF]
     value: float = Field(ge=0, le=MAX_STAT, allow_inf_nan=False)
@@ -86,6 +89,15 @@ class ArtifactRequest(DamageRequest):
         max_length=3, description="HP, ATK and DEF before any bonus, as the showcase gives them"
     )
     equipped: list[ArtifactStats] = Field(max_length=len(Slot))
+
+    @field_validator("base_stats")
+    @classmethod
+    def _each_base_once(cls, value: list[BaseStat]) -> list[BaseStat]:
+        # Without one, its percent bonuses would count for nothing, silently.
+        if sorted(stat.key for stat in value) != sorted(BASE_KEYS):
+            raise ValueError("base_stats must give HP, ATK and DEF once each")
+        return value
+
     candidates: list[ArtifactStats] = Field(min_length=1, max_length=MAX_CANDIDATES)
 
 

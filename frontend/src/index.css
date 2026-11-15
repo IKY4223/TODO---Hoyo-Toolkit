@@ -418,11 +418,13 @@ label {
 
 /* Fields most hits leave at zero, folded away inside a form. */
 details.extras {
-  display: grid;
-  gap: 1rem;
-  padding: 0 0.75rem 0.75rem;
+  padding: 0 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
+}
+
+details.extras[open] {
+  padding-bottom: 0.75rem;
 }
 
 details.extras > :not(summary) {

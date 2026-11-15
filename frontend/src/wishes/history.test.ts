@@ -246,6 +246,14 @@ describe('fiftyFifty', () => {
     expect(count([early], ASIA)).toEqual({ won: 0, lost: 0, uncounted: 1 })
   })
 
+  test("an end in Asia time is moved to the player's server too", () => {
+    const ending = [{ ...BANNERS[0], end: '2026-01-20 15:00:00', endAsia: true }]
+    // 15:00 at UTC+8 is 08:00 at UTC+1, on the Europe server.
+    const late = five('Diluc', '2026-01-20 09:00:00')
+    expect(fiftyFifty([late], 1, ending, NAMES)).toEqual({ won: 0, lost: 0, uncounted: 1 })
+    expect(fiftyFifty([late], ASIA, ending, NAMES)).toEqual({ won: 0, lost: 1, uncounted: 0 })
+  })
+
   test('the game data names the featured characters of past banners', () => {
     // Ballad in Goblets, Venti's first banner, autumn 2020.
     const fives = [five('Diluc', '2020-10-01 12:00:00'), five('Venti', '2020-10-02 12:00:00')]
