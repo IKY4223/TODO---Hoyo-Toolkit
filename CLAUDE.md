@@ -117,12 +117,11 @@ have a lawyer read the texts before launch.
 
 Remind the owner of these until they confirm them.
 
-- Set `CLIENT_IP_HEADER=CF-Connecting-IP` on SnapDeploy (the move from http to https was seen
-  working on the live site on 16 November 2026).
 - Ask SnapDeploy whether the container can be reached without Cloudflare; if it can,
   `CF-Connecting-IP` can be forged (the `shortcut:` in `backend/app/ratelimit.py`).
 - Confirmed so far: Secret scanning and Push protection are on; Star Rail final stats
-  match the game once numbers are cut off the way the game prints them (1160.63 DEF reads 1160).
+  match the game once numbers are cut off the way the game prints them (1160.63 DEF reads 1160);
+  `CLIENT_IP_HEADER=CF-Connecting-IP` is set on SnapDeploy (16 November 2026).
 
 ## Working notes
 
@@ -135,7 +134,7 @@ For a session picking the work up again.
   fill `LEGAL-DRAFTS.md`, translate it to Russian and make the privacy policy and terms pages
   (EN and RU, linked from the footer, driven in `app.spec.ts`); a lawyer reads them first;
   (2) strix against the deployed site, once a key is available; (3) operations: the host's
-  HTTPS setting, `CLIENT_IP_HEADER` on SnapDeploy, an abuse
+  HTTPS setting, an abuse
   contact, the site's address in Enka's User-Agent, `noindex` off only on launch day.
   Waiting on the owner: name and email (Outlook was down), the lawyer (StarRailRes is AGPL-3.0),
   sending `HOYOVERSE-LETTER.md`. Donations stay out until HoYoverse says yes in writing. `HANDOFF.md` holds the owner's task list and the plan of

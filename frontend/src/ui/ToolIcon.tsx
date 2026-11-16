@@ -1,4 +1,4 @@
-import type { JSX } from 'react'
+import { useId, type JSX } from 'react'
 
 // The tools' signs are drawn for this app on a 24px grid, in the text colour, after the games'
 // own menu signs so players know them: none is traced from the game's art. Each is a list of
@@ -11,19 +11,15 @@ const SIGNS = {
     'M5.5 13h3a2.5 2.5 0 0 1 2.5 2.5v3A2.5 2.5 0 0 1 8.5 21h-3A2.5 2.5 0 0 1 3 18.5v-3A2.5 2.5 0 0 1 5.5 13Z',
     'M17 12.5c.6 3.1 1.4 3.9 4.5 4.5-3.1.6-3.9 1.4-4.5 4.5-.6-3.1-1.4-3.9-4.5-4.5 3.1-.6 3.9-1.4 4.5-4.5Z',
   ],
-  // Star Rail builds: a character's head, shaggy hair round the face.
+  // Star Rail builds: a character's bob of hair with pointed locks; CUTS draws the face's edge.
   builds: [
-    'M12 2C8.5 2 5.5 4 4.6 7.6c-.5 2.1-.2 4.4-1.4 6.6 1.2-.2 2.1-.8 2.6-1.6.1 2.7 1 5.2 2.5 7.2l1-1.9c.9.7 1.8 1.1 2.7 1.1s1.8-.4 2.7-1.1l1 1.9c1.5-2 2.4-4.5 2.5-7.2.5.8 1.4 1.4 2.6 1.6-1.2-2.2-.9-4.5-1.4-6.6C18.5 4 15.5 2 12 2ZM7.8 10.6l1.8-2.4 1.2 1.8 2.4-3.1.7 2.5 2.3-.8c.2.7.2 1.4.2 2-.2 3.5-2.1 6.1-4.4 6.1s-4.1-2.5-4.2-6.1Z',
-    'M12.5 2.4c.5-1.2 1.7-1.8 3-1.6-.9.5-1.5 1.2-1.6 2Z',
+    'M12 2.2C6.9 2.2 3.4 5.6 3.4 10.2C3.4 12.4 2.9 14.3 1.7 16C3.1 15.9 4.3 15.3 5.1 14.4C5.2 16.3 5.7 18 6.7 19.6L7.9 17.6C8.2 19.1 8.8 20.5 9.8 21.6L10.4 19.2C10.9 19.5 11.4 19.6 12 19.6C12.6 19.6 13.1 19.5 13.6 19.2L14.2 21.6C15.2 20.5 15.8 19.1 16.1 17.6L17.3 19.6C18.3 18 18.8 16.3 18.9 14.4C19.7 15.3 20.9 15.9 22.3 16C21.1 14.3 20.6 12.4 20.6 10.2C20.6 5.6 17.1 2.2 12 2.2Z',
   ],
-  // Genshin builds: two characters face to face.
+  // Genshin builds: two characters in profile, facing right, spiky hair; the front one has a tuft.
   'gi-builds': [
-    'M2.1 7.2C2.9 4.6 5.3 3.2 7.7 3.6 9.8 4 10.9 5.9 10.6 8L11.4 9.8C11.5 10 11.4 10.2 11.1 10.3L10.4 10.5 10.3 11.9C10.2 12.7 9.5 13.2 8.7 13.1L7.8 13 8 15H3.7C3.6 13.6 2.9 12.7 2.2 11.9 1.2 10.6 1.6 8.8 2.1 7.2Z',
-    'M5.6 3.9C5.9 2.4 7 1.6 8.4 1.7 7.8 2.2 7.5 2.9 7.6 3.6Z',
-    'M1.8 20.5C2.1 17.6 4.1 15.7 6.9 15.7S11.2 17.6 11.4 20.5Z',
-    'M21.9 7.2C21.1 4.6 18.7 3.2 16.3 3.6 14.2 4 13.1 5.9 13.4 8L12.6 9.8C12.5 10 12.6 10.2 12.9 10.3L13.6 10.5 13.7 11.9C13.8 12.7 14.5 13.2 15.3 13.1L16.2 13 16 15H20.3C20.4 13.6 21.1 12.7 21.8 11.9 22.8 10.6 22.4 8.8 21.9 7.2Z',
-    'M18.4 3.9C18.1 2.4 17 1.6 15.6 1.7 16.2 2.2 16.5 2.9 16.4 3.6Z',
-    'M22.2 20.5C21.9 17.6 19.9 15.7 17.1 15.7S12.8 17.6 12.6 20.5Z',
+    'M16.7 4.62C19.04 4.62 20.66 6.24 20.84 8.4L19.76 8.31L20.48 9.84L20.12 10.2L21.11 12L20.3 12.27L20.39 13.44C20.3 14.25 19.76 14.7 19.04 14.7L18.32 14.79L18.32 16.14L20.12 20.64H13.46L14.9 16.5L14.36 15.6L13.1 16.68L13.19 15.06L11.48 15.6L12.38 13.98L10.67 13.62L11.84 12.36L10.58 11.46L11.84 10.56C11.3 9.48 11.48 7.86 12.38 6.78L11.84 5.88L13.28 5.88C14.18 5.07 15.35 4.62 16.7 4.62Z',
+    'M7.2 3.7C9.8 3.7 11.6 5.5 11.8 7.9L10.6 7.8L11.4 9.5L11 9.9L12.1 11.9L11.2 12.2L11.3 13.5C11.2 14.4 10.6 14.9 9.8 14.9L9 15L9 16.5L11 21.5H3.6L5.2 16.9L4.6 15.9L3.2 17.1L3.3 15.3L1.4 15.9L2.4 14.1L0.5 13.7L1.8 12.3L0.4 11.3L1.8 10.3C1.2 9.1 1.4 7.3 2.4 6.1L1.8 5.1L3.4 5.1C4.4 4.2 5.7 3.7 7.2 3.7Z',
+    'M6.6 3.9C6.6 2.5 7.6 1.7 9 1.8C8.3 2.3 7.9 3 7.9 3.8Z',
   ],
   // Relics: a Planar Ornament's ring between two arcs.
   relics: [
@@ -62,6 +58,16 @@ const SIGNS = {
   ],
 } as const
 
+// Thin lines cut out of a sign, where the game's sign shows an edge inside the shape.
+const CUTS: Partial<Record<keyof typeof SIGNS, string>> = {
+  // The edge of the face, under the bangs.
+  builds:
+    'M8.4 10.6C8.3 14.8 9.8 18 12 18.6C14.2 18 15.7 14.8 15.6 10.6L14.1 12L13 9.2L11.4 11.8C11.1 9.8 11.5 7.8 12.6 6C10.5 7 9.3 8.6 9 11.2',
+  // The front head's outline, parting it from the one behind; each one's hairline and collar.
+  'gi-builds':
+    'M7.2 3.7C9.8 3.7 11.6 5.5 11.8 7.9L10.6 7.8L11.4 9.5L11 9.9L12.1 11.9L11.2 12.2L11.3 13.5C11.2 14.4 10.6 14.9 9.8 14.9L9 15L9 16.5L11 21.5H3.6L5.2 16.9L4.6 15.9L3.2 17.1L3.3 15.3L1.4 15.9L2.4 14.1L0.5 13.7L1.8 12.3L0.4 11.3L1.8 10.3C1.2 9.1 1.4 7.3 2.4 6.1L1.8 5.1L3.4 5.1C4.4 4.2 5.7 3.7 7.2 3.7ZM10.5 10.1C9.4 10.9 8.8 12.3 9 14.1M19.67 10.38C18.68 11.1 18.14 12.36 18.32 13.98M5.2 16.9C6.5 17.6 7.8 17.5 9 16.5M14.9 16.5C16.07 17.13 17.24 17.04 18.32 16.14',
+}
+
 // The theme button's signs stay line drawings.
 const LINES = {
   // The light theme.
@@ -83,6 +89,11 @@ function isLine(name: ToolIconName): name is keyof typeof LINES {
 
 /** A tool's icon, beside its name: decorative, hidden from screen readers. */
 export function ToolIcon({ name }: { readonly name: ToolIconName }): JSX.Element {
+  const mask = `cut-${useId().replace(/[^\w-]/g, '')}` // a url(#…) reference wants a plain id
+  const cut = isLine(name) ? undefined : CUTS[name]
+  const fills = isLine(name)
+    ? null
+    : SIGNS[name].map((d) => <path key={d} d={d} fill="currentColor" fillRule="evenodd" />)
   return (
     <svg
       viewBox="0 0 24 24"
@@ -101,10 +112,23 @@ export function ToolIcon({ name }: { readonly name: ToolIconName }): JSX.Element
           strokeLinecap="round"
           strokeLinejoin="round"
         />
+      ) : cut ? (
+        <>
+          <mask id={mask}>
+            <rect width="24" height="24" fill="white" />
+            <path
+              d={cut}
+              fill="none"
+              stroke="black"
+              strokeWidth="1.1"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </mask>
+          <g mask={`url(#${mask})`}>{fills}</g>
+        </>
       ) : (
-        SIGNS[name].map((d) => (
-          <path key={d} d={d} fill="currentColor" fillRule="evenodd" />
-        ))
+        fills
       )}
     </svg>
   )
