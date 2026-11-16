@@ -321,56 +321,6 @@ nav a[aria-current] {
   transition: background-color 150ms;
 }
 
-/* A tool's icon is the game's own sign, painted in the text colour through a mask. */
-.tool-icon[data-icon] {
-  display: inline-block;
-}
-
-.tool-icon[data-icon]::before {
-  display: block;
-  width: 24px;
-  height: 24px;
-  background: currentcolor;
-  content: "";
-  mask: var(--sign) center / contain no-repeat;
-}
-
-.tool-icon[data-icon="home"] {
-  --sign: url("/icons/home.png");
-}
-
-.tool-icon[data-icon="builds"] {
-  --sign: url("/icons/builds.png");
-}
-
-.tool-icon[data-icon="relics"] {
-  --sign: url("/icons/relics.png");
-}
-
-.tool-icon[data-icon="warps"] {
-  --sign: url("/icons/warps.png");
-}
-
-.tool-icon[data-icon="history"] {
-  --sign: url("/icons/history.png");
-}
-
-.tool-icon[data-icon="speed"] {
-  --sign: url("/icons/speed.png");
-}
-
-.tool-icon[data-icon="gi-builds"] {
-  --sign: url("/icons/gi-builds.png");
-}
-
-.tool-icon[data-icon="gi-wishes"] {
-  --sign: url("/icons/gi-wishes.png");
-}
-
-.tool-icon[data-icon="gi-history"] {
-  --sign: url("/icons/gi-history.png");
-}
-
 form {
   display: grid;
   gap: 1rem;

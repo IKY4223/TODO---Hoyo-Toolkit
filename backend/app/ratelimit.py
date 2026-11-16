@@ -34,6 +34,13 @@ class RateLimiter:
         self._windows: dict[str, tuple[float, int]] = {}  # client -> (window end, requests used)
         self._lock = Lock()  # endpoints run on a thread pool
 
+    def seconds_until_spent_clears(self, client: str) -> float:
+        """How long a client that spent its allowance must wait, else 0; counts nothing."""
+        with self._lock:
+            ends, used = self._windows.get(client, (0.0, 0))
+            now = self._clock()
+            return ends - now if ends > now and used >= self.limit else 0.0
+
     def seconds_until_allowed(self, client: str) -> float:
         """Count one request: 0 when it may go ahead, otherwise how long the client must wait."""
         with self._lock:

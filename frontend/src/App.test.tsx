@@ -96,21 +96,28 @@ test('each game lists only its own tools', async () => {
   expect(tools()).toEqual(['Builds', 'Wishes', 'History'])
 })
 
-test("each tool carries the game's own sign", () => {
+test('each tool carries a sign drawn for the site, not a file of the game', () => {
   render(<App />)
-  const signs = within(screen.getByRole('navigation', { name: 'Tools' }))
+  const icons = within(screen.getByRole('navigation', { name: 'Tools' }))
     .getAllByRole('link')
-    .map((link) => link.querySelector('[data-icon]')?.getAttribute('data-icon'))
-  expect(signs).toEqual(['builds', 'relics', 'warps', 'history', 'speed'])
+    .map((link) => link.querySelector('[data-icon]'))
+  expect(icons.map((icon) => icon?.getAttribute('data-icon'))).toEqual([
+    'builds',
+    'relics',
+    'warps',
+    'history',
+    'speed',
+  ])
+  expect(icons.map((icon) => icon?.tagName)).toEqual(icons.map(() => 'svg'))
 })
 
-test('Genshin tools carry Genshin signs', async () => {
+test('Genshin tools carry the same signs for the same jobs', async () => {
   window.location.hash = '#genshin/builds'
   render(<App />)
   const signs = within(await screen.findByRole('navigation', { name: 'Tools' }))
     .getAllByRole('link')
     .map((link) => link.querySelector('[data-icon]')?.getAttribute('data-icon'))
-  expect(signs).toEqual(['gi-builds', 'gi-wishes', 'gi-history'])
+  expect(signs).toEqual(['builds', 'warps', 'history'])
 })
 
 test('the menu lists every tool of every game and marks where you are', () => {

@@ -52,9 +52,9 @@ The app opens on Honkai: Star Rail; Genshin Impact is one tap away.
   the screen; still usable 360px wide with 44px touch targets. Plain colours, by the owner's
   choice: a neutral grey ground, near-white text and a blue accent in Geist, or a light grey
   ground with white cards as the light theme.
-- **Icons** — the tools carry the game's own signs: Honkai: Star Rail's phone menu icons and its
-  speed stat icon, and Genshin's Paimon menu icons, painted in the text colour (see Credits).
-  The site's own mark and browser icon are drawn for it: a four-pointed star.
+- **Icons** — every icon is drawn for the site (`frontend/src/ui/ToolIcon.tsx`), in the text
+  colour: the tools' signs, and the site's mark and browser icon, a four-pointed star. The
+  repository holds no game art.
 - **Light and dark themes** — the app follows the device's setting until the player taps the
   theme button in the top bar, which switches to the other theme; a long press, a right click or
   the keyboard's menu key goes back to the device's. The pick is kept on the device.
@@ -155,7 +155,8 @@ Planned, in order:
    and for videos it allows partner programmes of video sites and "any other profit-making
    methods" not. A site that shows the game's images is such a work, so a donation button waits
    until HoYoverse says yes in writing (the guide names hsrcs_en@hoyoverse.com for
-   authorisation) or the site stops using game material. Genshin's own guide was not found.
+   authorisation; `HOYOVERSE-LETTER.md` is a draft for the owner to send) or the site stops using
+   game material. Genshin's own guide was not found.
 4. Zenless Zone Zero: undecided.
 
 The Telegram bot is out of the plan, by the owner's choice (November 2026): no host, no Mini
@@ -296,6 +297,8 @@ The image listens on the port in `PORT` (8000 without it), as hosts such as Snap
 Until the launch checklist in `CLAUDE.md` is done, the site is for its owner only. Every page
 tells search engines not to list it, and setting `SITE_PASSWORD` on the host makes every page
 ask for that password (any user name); only `/api/health` stays open for the host's checks.
+A client gets 10 wrong passwords a minute, then waits. Use a random password of 20 characters
+or more: it is the only lock.
 
 On [SnapDeploy](https://snapdeploy.dev), from its phone app or the site: Deploy from GitHub,
 pick this repository and `main`, and it builds the `Dockerfile` as it is. Add the environment
@@ -308,8 +311,7 @@ acceptable use policy names Telegram bot frameworks among what it refuses. It ne
 ## Licence
 
 MIT: see `LICENSE`. Game data, names and images belong to HoYoverse and are not under this
-licence: that includes the game's icons in `frontend/public/icons`. HoYoverse has given no permission for them; they are used the
-way fan tools commonly use game art, and come out if HoYoverse asks.
+licence. The site's icons are its own; the game images it shows are loaded from Enka.Network.
 
 ## Credits
 
@@ -319,13 +321,6 @@ Spread come from the game's own tables as
 (`ProudSkillExcelConfigData`, `ElementCoeffExcelConfigData`, the text maps). That repository
 states no licence: the data is the game's and belongs to HoYoverse. The damage formula is the
 [KQM Theorycrafting Library](https://library.keqingmains.com/combat-mechanics/damage/damage-formula)'s.
-
-The tool icons are the games' own: the phone menu signs and the speed stat icon of Honkai: Star
-Rail, taken from [StarRailRes](https://github.com/Mar-7th/StarRailRes) (`icon/sign`,
-`icon/property`). Genshin's tools carry Genshin Impact's Paimon menu icons (Character,
-Wish, Adventurer Handbook), from the files the
-[Genshin Impact Wiki](https://genshin-impact.fandom.com/wiki/Paimon_Menu) on Fandom keeps,
-turned into white marks. All of them belong to HoYoverse.
 
 The Genshin wish history steps for Android and iPhone, and the list of character event banners
 the 50/50 count reads (`src/data/banners.js`, turned into `frontend/src/wishes/genshin-banners.ts`

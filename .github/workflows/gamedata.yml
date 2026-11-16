@@ -3,14 +3,16 @@ name: Game data
 # A new game version adds characters, gear and sets that the vendored game data lacks. Every day
 # this syncs the data from Enka.Network and StarRailRes; when it changed, it runs every check and
 # opens (or updates) a pull request for the owner to merge, red when a check failed.
+#
+# Two jobs, so the token that can push never sits where downloaded code runs: `sync` runs the
+# sync scripts and ./check.sh (which fetches tools through npx) with a read-only token kept out of
+# git; `publish` only applies the resulting patch, commits, pushes and opens the pull request.
 on:
   schedule:
     - cron: "17 5 * * *" # daily: a game version lands in the sources within a day or two
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 concurrency: gamedata
 
@@ -21,22 +23,37 @@ env:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      base: ${{ steps.base.outputs.ref }}
+      open: ${{ steps.base.outputs.open }}
+      changed: ${{ steps.diff.outputs.changed }}
+      check: ${{ steps.check.outcome }}
     steps:
-      - uses: actions/checkout@v7
       # An open update keeps its branch: a fix the owner pushed to it must survive the next sync.
       - name: Continue an open update
         id: base
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if [ -n "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
-            git fetch --depth=1 origin "$BRANCH:$BRANCH"
-            git switch "$BRANCH"
+          if [ -n "$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
             echo "open=true" >> "$GITHUB_OUTPUT"
+            echo "ref=$BRANCH" >> "$GITHUB_OUTPUT"
           else
             echo "open=false" >> "$GITHUB_OUTPUT"
+            echo "ref=${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
           fi
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.base.outputs.ref }}
+          persist-credentials: false
+      # No caches in this job: it runs the code of the game-data branch, and a cache it saved would
+      # be read by builds of main (cache poisoning).
       - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: false
       - run: uv run python scripts/sync_gamedata.py
         working-directory: backend
       - run: uv run python scripts/sync_starrail_data.py
@@ -46,14 +63,11 @@ jobs:
         run: |
           if git diff --quiet; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
           git diff --stat
-
       # A pull request opened with this workflow's token does not start CI, so the checks run here.
       - if: steps.diff.outputs.changed == 'true'
         uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
       - if: steps.diff.outputs.changed == 'true'
         run: npm ci && npx playwright install --with-deps chromium
         working-directory: frontend
@@ -61,15 +75,38 @@ jobs:
         id: check
         continue-on-error: true
         run: ./check.sh
+      # The synced data and what ./check.sh regenerated from it (the API types), new files too.
+      - if: steps.diff.outputs.changed == 'true'
+        run: git add -A && git diff --cached --binary > "$RUNNER_TEMP/gamedata.patch"
+      - if: steps.diff.outputs.changed == 'true'
+        uses: actions/upload-artifact@v5
+        with:
+          name: gamedata-patch
+          path: ${{ runner.temp }}/gamedata.patch
 
+  publish:
+    needs: sync
+    if: needs.sync.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.sync.outputs.base }}
+      - uses: actions/download-artifact@v5
+        with:
+          name: gamedata-patch
+          path: ${{ runner.temp }}
       - name: Open or update the pull request
-        if: steps.diff.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          OPEN: ${{ steps.base.outputs.open }}
-          OUTCOME: ${{ steps.check.outcome }}
+          OPEN: ${{ needs.sync.outputs.open }}
+          OUTCOME: ${{ needs.sync.outputs.check }}
           RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
+          git apply "$RUNNER_TEMP/gamedata.patch"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
@@ -94,5 +131,5 @@ jobs:
             gh pr create --base main --head "$BRANCH" --title "Game data update" --body "$body"
           fi
       - name: Fail the run when a check failed
-        if: steps.check.outcome == 'failure'
+        if: needs.sync.outputs.check == 'failure'
         run: exit 1

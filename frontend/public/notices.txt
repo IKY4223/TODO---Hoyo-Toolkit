@@ -11,15 +11,14 @@ interest thereof and therein (intellectual property rights included) not derived
 Honkai: Star Rail or Genshin Impact belong to their respective owners.
 
 Character, weapon, light cone, artifact and relic images are loaded from Enka.Network. The
-tool icons are the games' own menu signs.
+site's own icons are drawn for it.
 
 Sources of game data
 --------------------
-- Honkai: Star Rail texts, numbers and icons: StarRailRes (Mar-7th/StarRailRes), whose
+- Honkai: Star Rail texts and numbers: StarRailRes (Mar-7th/StarRailRes), whose
   repository is under the GNU Affero General Public License v3.0.
 - Genshin Impact talent tables and text maps: Dimbreath/AnimeGameData, which states no
   licence.
-- Genshin Impact menu icons: the Genshin Impact Wiki on Fandom.
 - Showcases, and the store of names and icons the site maps them with: Enka.Network
   (EnkaNetwork/API-docs), which states no licence.
 

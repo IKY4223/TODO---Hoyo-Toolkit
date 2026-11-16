@@ -1,5 +1,6 @@
 import base64
 import binascii
+import math
 import os
 import secrets
 from collections.abc import Awaitable, Callable
@@ -14,6 +15,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from app.damage.api import router as damage_router
+from app.ratelimit import RateLimiter, client_key
 from app.showcase.api import router as showcase_router
 from app.starrail.api import characters_router, relics_router
 from app.starrail.api import router as starrail_router
@@ -43,6 +45,8 @@ SECURITY_HEADERS = {
 # A test deploy can ask for a password: set SITE_PASSWORD on the host. The host's health check
 # must still reach the app.
 OPEN_PATHS = ("/api/health",)
+# Wrong passwords a client may try in a minute, so the one shared password cannot be guessed.
+password_failures = RateLimiter(limit=10, window=60)
 
 
 def _password_given(request: Request, password: str) -> bool:
@@ -61,12 +65,21 @@ async def ask_for_password(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
     password = os.environ.get("SITE_PASSWORD", "")
-    if password and request.url.path not in OPEN_PATHS and not _password_given(request, password):
-        return Response(
-            status_code=401,
-            headers={"WWW-Authenticate": 'Basic realm="HoYo Toolkit", charset="UTF-8"'},
-        )
-    return await call_next(request)
+    if not password or request.url.path in OPEN_PATHS:
+        return await call_next(request)
+    client = client_key(request)
+    # Checked before the password, so a client out of guesses learns nothing from one more.
+    wait = password_failures.seconds_until_spent_clears(client)
+    if wait > 0:
+        return Response(status_code=429, headers={"Retry-After": str(math.ceil(wait))})
+    if _password_given(request, password):
+        return await call_next(request)
+    if "Authorization" in request.headers:  # a browser's first request only asks for a password
+        password_failures.seconds_until_allowed(client)
+    return Response(
+        status_code=401,
+        headers={"WWW-Authenticate": 'Basic realm="HoYo Toolkit", charset="UTF-8"'},
+    )
 
 
 @app.middleware("http")

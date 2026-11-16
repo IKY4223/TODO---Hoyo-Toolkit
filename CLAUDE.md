@@ -68,15 +68,14 @@ have a lawyer read the texts before launch.
   (`licenses.txt`, Vite's `build.license`); `frontend/public/notices.txt` holds the rest:
   paimon.moe's full MIT notice, the Geist font's OFL, the data sources and HoYoverse's legal
   statement. Keep it current when a source or a font changes. Open: StarRailRes, the source of
-  the Star Rail data and icons, is under AGPL-3.0; a lawyer should say what that asks of the site.
+  the Star Rail data, is under AGPL-3.0; a lawyer should say what that asks of the site.
 - Disclaimer: "Fan project, not affiliated with HoYoverse" stays visible, with the legal
   statement HoYoverse's Honkai: Star Rail Fan Creations Guide v2.0 asks for (read November 2026;
   Genshin's guide was not found). That guide allows game material for non-commercial personal
   use only: no ads, payments or donations until HoYoverse allows them in writing (README plan). Game images
-  come from Enka.Network and belong to HoYoverse. The tool icons and the site's icon are game
-  art kept in the repository (`frontend/public/icons`), used without HoYoverse's
-  permission, as fan tools commonly do: decide before launch whether to keep them, and take them
-  out if HoYoverse asks.
+  come from Enka.Network and belong to HoYoverse. The tool icons are drawn for the site
+  (`frontend/src/ui/ToolIcon.tsx`) since November 2026: the repository holds no game art.
+  `HOYOVERSE-LETTER.md` is a draft asking HoYoverse to allow donations; the owner sends it.
 - Privacy policy, written for what the app really does: UIDs, IP addresses (rate limits and server
   logs), the pasted wish history link (used once, never kept), pulls kept in the browser's local
   storage, and the third parties involved (Enka.Network, HoYoverse, the host). Name who is
@@ -91,8 +90,14 @@ have a lawyer read the texts before launch.
   429, 500, 503 and 504, and a 404 whose `code` is `profile_unavailable` (done; reread November
   2026). They state no credit, commercial-use or image terms; the Star Rail
   endpoint is not documented there. Read them again before launch.
-- Security: install the `usestrix/strix` plugin and run it against the deployed site, along with
-  the `claude-security` scan of the code. Fix what they find before launch.
+- Security: the `claude-security` scan of the code ran in November 2026 (effort medium, whole
+  tree): two findings, both fixed in PR #23 (password guesses limited in `ask_for_password`; the
+  game data workflow split so its write token never meets `./check.sh`); five candidates were
+  rejected by its panel. Run it again after large changes. Still to do: install the
+  `usestrix/strix` plugin (the owner, on a computer) and run it against the deployed site; fix
+  what it finds. Owner's part: protect `main` from pushes by the Actions token, and a random
+  `SITE_PASSWORD` of 20 or more characters. Run the scan from the main session with the Workflow
+  tool (`/config workflows=true`): a subagent has no Workflow tool and stops at once.
 - Telegram: the bot's token is a secret (environment variable, never in the repository or logs);
   the privacy policy covers the Telegram user ids and messages the bot receives, how long they
   are kept, and that UIDs sent to the bot reach Enka.Network. With `TELEGRAM_STATE_FILE` set, the
@@ -113,11 +118,19 @@ Remind the owner of these until they confirm them.
 
 For a session picking the work up again.
 
-- State: PRs #1 to #17 are merged. `HANDOFF.md` holds the owner's task list and the plan of
+- State: PRs #1 to #22 are merged. PR #23 (stage 21, part A) is open on
+  `claude/peaceful-hamilton-1xvlg9`: licences and notices, HoYoverse's legal statement, Enka's
+  newer errors, the site's own icons, `LEGAL-DRAFTS.md`, `HOYOVERSE-LETTER.md` and the security
+  fixes. Stage 21 next steps, in order: (1) once the owner gives the name and the contact email,
+  fill `LEGAL-DRAFTS.md`, translate it to Russian and make the privacy policy and terms pages
+  (EN and RU, linked from the footer, driven in `app.spec.ts`); a lawyer reads them first;
+  (2) strix against the deployed site; (3) operations: HTTPS, `FORWARDED_ALLOW_IPS`, an abuse
+  contact, the site's address in Enka's User-Agent, `noindex` off only on launch day.
+  Waiting on the owner: name and email (Outlook was down), the lawyer (StarRailRes is AGPL-3.0),
+  sending `HOYOVERSE-LETTER.md`. Donations stay out until HoYoverse says yes in writing. `HANDOFF.md` holds the owner's task list and the plan of
   stages 17 to 22; `README.md` and this file win where they differ.
-- PR #19 is merged: the owner's November 2026 choices. Tool icons are the games' own menu signs
-  (`frontend/public/icons`, painted through a CSS mask): Star Rail's from StarRailRes, Genshin's
-  from the Genshin Impact Wiki on Fandom (`gi-*.png`). The site's mark and browser icon are a
+- PR #19 is merged: the owner's November 2026 choices. Tool icons were the games' own menu
+  signs then; the owner had them redrawn as the site's own in stage 21. The site's mark and browser icon are a
   four-pointed star drawn for it (the owner did not like the Stellar Jade there). The
   palette is plain grey and blue. The wide-screen layout fills the screen (fields across the
   page, results below).
