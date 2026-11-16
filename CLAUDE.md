@@ -68,15 +68,14 @@ have a lawyer read the texts before launch.
   (`licenses.txt`, Vite's `build.license`); `frontend/public/notices.txt` holds the rest:
   paimon.moe's full MIT notice, the Geist font's OFL, the data sources and HoYoverse's legal
   statement. Keep it current when a source or a font changes. Open: StarRailRes, the source of
-  the Star Rail data and icons, is under AGPL-3.0; a lawyer should say what that asks of the site.
+  the Star Rail data, is under AGPL-3.0; a lawyer should say what that asks of the site.
 - Disclaimer: "Fan project, not affiliated with HoYoverse" stays visible, with the legal
   statement HoYoverse's Honkai: Star Rail Fan Creations Guide v2.0 asks for (read November 2026;
   Genshin's guide was not found). That guide allows game material for non-commercial personal
   use only: no ads, payments or donations until HoYoverse allows them in writing (README plan). Game images
-  come from Enka.Network and belong to HoYoverse. The tool icons and the site's icon are game
-  art kept in the repository (`frontend/public/icons`), used without HoYoverse's
-  permission, as fan tools commonly do: decide before launch whether to keep them, and take them
-  out if HoYoverse asks.
+  come from Enka.Network and belong to HoYoverse. The tool icons are drawn for the site
+  (`frontend/src/ui/ToolIcon.tsx`) since November 2026: the repository holds no game art.
+  `HOYOVERSE-LETTER.md` is a draft asking HoYoverse to allow donations; the owner sends it.
 - Privacy policy, written for what the app really does: UIDs, IP addresses (rate limits and server
   logs), the pasted wish history link (used once, never kept), pulls kept in the browser's local
   storage, and the third parties involved (Enka.Network, HoYoverse, the host). Name who is
@@ -115,9 +114,8 @@ For a session picking the work up again.
 
 - State: PRs #1 to #17 are merged. `HANDOFF.md` holds the owner's task list and the plan of
   stages 17 to 22; `README.md` and this file win where they differ.
-- PR #19 is merged: the owner's November 2026 choices. Tool icons are the games' own menu signs
-  (`frontend/public/icons`, painted through a CSS mask): Star Rail's from StarRailRes, Genshin's
-  from the Genshin Impact Wiki on Fandom (`gi-*.png`). The site's mark and browser icon are a
+- PR #19 is merged: the owner's November 2026 choices. Tool icons were the games' own menu
+  signs then; the owner had them redrawn as the site's own in stage 21. The site's mark and browser icon are a
   four-pointed star drawn for it (the owner did not like the Stellar Jade there). The
   palette is plain grey and blue. The wide-screen layout fills the screen (fields across the
   page, results below).

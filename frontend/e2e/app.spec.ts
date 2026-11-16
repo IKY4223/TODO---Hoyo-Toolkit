@@ -603,28 +603,17 @@ test('on a wide screen a form is seen whole and the turn order sits beside the t
   expect(problems).toEqual([])
 })
 
-test("the tools' signs and the site's icon are served as images", async ({ page }) => {
+test("the tools' signs are drawn by the site, which ships no game art", async ({ page }) => {
   await page.goto('/#starrail/builds')
   const signs = await page
-    .locator('[data-icon]')
+    .locator('svg[data-icon]')
     .evaluateAll((icons) => [...new Set(icons.map((icon) => icon.getAttribute('data-icon')))])
-  expect(signs.toSorted()).toEqual(['builds', 'history', 'relics', 'speed', 'warps'])
-  // A missing file would come back as the app's own page: the type tells them apart.
-  const others = ['home', 'gi-builds', 'gi-wishes', 'gi-history']
-  const files = [...signs, ...others].map((sign) => `/icons/${sign}.png`)
-  const types = await Promise.all(
-    files.map(
-      async (path) => (await page.request.get(path)).headers()['content-type'],
-    ),
-  )
-  expect(types).toEqual(types.map(() => 'image/png'))
+  // The theme button's icon is among them; the start page's sits in the menu, closed here.
+  expect(signs.toSorted()).toEqual(['auto', 'builds', 'history', 'relics', 'speed', 'warps'])
+  // The game's own signs used to be served from /icons: a missing file comes back as the page.
+  const old = await page.request.get('/icons/warps.png')
+  expect(old.headers()['content-type']).not.toBe('image/png')
   expect((await page.request.get('/favicon.svg')).headers()['content-type']).toBe('image/svg+xml')
-  // The sign is painted through a mask, in the colour of the text.
-  const mask = await page
-    .locator('[data-icon="warps"]')
-    .first()
-    .evaluate((icon) => getComputedStyle(icon, '::before').maskImage)
-  expect(mask).toContain('/icons/warps.png')
   // The theme button's icon sits in the middle of the button, not pushed to its right.
   const [button, icon] = await Promise.all([
     page.getByRole('button', { name: /^Theme/ }).boundingBox(),
