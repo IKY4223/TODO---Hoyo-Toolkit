@@ -297,6 +297,8 @@ The image listens on the port in `PORT` (8000 without it), as hosts such as Snap
 Until the launch checklist in `CLAUDE.md` is done, the site is for its owner only. Every page
 tells search engines not to list it, and setting `SITE_PASSWORD` on the host makes every page
 ask for that password (any user name); only `/api/health` stays open for the host's checks.
+A client gets 10 wrong passwords a minute, then waits. Use a random password of 20 characters
+or more: it is the only lock.
 
 On [SnapDeploy](https://snapdeploy.dev), from its phone app or the site: Deploy from GitHub,
 pick this repository and `main`, and it builds the `Dockerfile` as it is. Add the environment

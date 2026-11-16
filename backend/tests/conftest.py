@@ -1,5 +1,6 @@
 import pytest
 
+from app import main
 from app.damage import api as damage_api
 from app.showcase import api as showcase_api
 from app.starrail import api as starrail_api
@@ -10,6 +11,7 @@ from app.wishes import api as wishes_api
 def fresh_rate_limits() -> None:
     """Every test starts with its full request allowance."""
     damage_api.limiter.clear()
+    main.password_failures.clear()
     showcase_api.limiter.clear()
     wishes_api.limiter.clear()
     wishes_api.history_limiter.clear()
