@@ -49,7 +49,11 @@ jobs:
         with:
           ref: ${{ steps.base.outputs.ref }}
           persist-credentials: false
+      # No caches in this job: it runs the code of the game-data branch, and a cache it saved would
+      # be read by builds of main (cache poisoning).
       - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: false
       - run: uv run python scripts/sync_gamedata.py
         working-directory: backend
       - run: uv run python scripts/sync_starrail_data.py
@@ -64,8 +68,6 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
       - if: steps.diff.outputs.changed == 'true'
         run: npm ci && npx playwright install --with-deps chromium
         working-directory: frontend
