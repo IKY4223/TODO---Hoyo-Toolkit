@@ -74,7 +74,9 @@ have a lawyer read the texts before launch.
   Genshin's guide was not found). That guide allows game material for non-commercial personal
   use only: no ads, payments or donations until HoYoverse allows them in writing (README plan). Game images
   come from Enka.Network and belong to HoYoverse. The tool icons are drawn for the site
-  (`frontend/src/ui/ToolIcon.tsx`) since November 2026: the repository holds no game art.
+  (`frontend/src/ui/ToolIcon.tsx`) after the games' menu signs, so players know them, but not
+  traced from them: the repository holds no game art. Look at them again if donations ever
+  come, since the guide's leave covers non-commercial use only.
   `HOYOVERSE-LETTER.md` is a draft asking HoYoverse to allow donations; the owner sends it.
 - Privacy policy, written for what the app really does: UIDs, IP addresses (rate limits and server
   logs), the pasted wish history link (used once, never kept), pulls kept in the browser's local
@@ -98,8 +100,7 @@ have a lawyer read the texts before launch.
   checked the deployed site by hand on 16 November 2026 (CORS, validation, traversal, the history
   host, the limits, headers) and fixed what it found: HSTS, http moved to https before the
   password, request bodies capped at 64 kB, no docs pages, `CLIENT_IP_HEADER` for the limits.
-  Run strix before launch if a key becomes available. Owner's part: protect `main` from pushes by the Actions token, and a random
-  `SITE_PASSWORD` of 20 or more characters. Run the scan from the main session with the Workflow
+  Run strix before launch if a key becomes available. Owner's part: protect `main` from pushes by the Actions token. Run the scan from the main session with the Workflow
   tool (`/config workflows=true`): a subagent has no Workflow tool and stops at once.
 - Telegram: the bot's token is a secret (environment variable, never in the repository or logs);
   the privacy policy covers the Telegram user ids and messages the bot receives, how long they
@@ -116,9 +117,8 @@ have a lawyer read the texts before launch.
 
 Remind the owner of these until they confirm them.
 
-- After the security hardening is deployed: `curl -sI http://<site>/` answers 308 with a
-  `Location` on the site's own https address; only then set `SITE_PASSWORD` (20+ random
-  characters) and `CLIENT_IP_HEADER=CF-Connecting-IP` on SnapDeploy.
+- Set `CLIENT_IP_HEADER=CF-Connecting-IP` on SnapDeploy (the move from http to https was seen
+  working on the live site on 16 November 2026).
 - Ask SnapDeploy whether the container can be reached without Cloudflare; if it can,
   `CF-Connecting-IP` can be forged (the `shortcut:` in `backend/app/ratelimit.py`).
 - Confirmed so far: Secret scanning and Push protection are on; Star Rail final stats
@@ -135,13 +135,15 @@ For a session picking the work up again.
   fill `LEGAL-DRAFTS.md`, translate it to Russian and make the privacy policy and terms pages
   (EN and RU, linked from the footer, driven in `app.spec.ts`); a lawyer reads them first;
   (2) strix against the deployed site, once a key is available; (3) operations: the host's
-  HTTPS setting, `CLIENT_IP_HEADER` and `SITE_PASSWORD` on SnapDeploy, an abuse
+  HTTPS setting, `CLIENT_IP_HEADER` on SnapDeploy, an abuse
   contact, the site's address in Enka's User-Agent, `noindex` off only on launch day.
   Waiting on the owner: name and email (Outlook was down), the lawyer (StarRailRes is AGPL-3.0),
   sending `HOYOVERSE-LETTER.md`. Donations stay out until HoYoverse says yes in writing. `HANDOFF.md` holds the owner's task list and the plan of
   stages 17 to 22; `README.md` and this file win where they differ.
 - PR #19 is merged: the owner's November 2026 choices. Tool icons were the games' own menu
-  signs then; the owner had them redrawn as the site's own in stage 21. The site's mark and browser icon are a
+  signs then; the owner had them redrawn as the site's own in stage 21, then (16 November 2026)
+  redrawn again to look like the games' signs without copying them, Genshin's tools with their
+  own (`gi-builds`, `gi-wishes`, `gi-history`). The site's mark and browser icon are a
   four-pointed star drawn for it (the owner did not like the Stellar Jade there). The
   palette is plain grey and blue. The wide-screen layout fills the screen (fields across the
   page, results below).
@@ -175,6 +177,8 @@ For a session picking the work up again.
   traffic, which a cloud session cannot route; get-shit-done is archived and moved to
   `open-gsd/gsd-core`, and adds hooks and a workflow of its own).
 - Hosting: the owner tests the site on SnapDeploy (Docker from GitHub, free tier sleeps when
-  idle), behind `SITE_PASSWORD`. Its acceptable use policy refuses Telegram bot frameworks, so the
+  idle), open without a password by the owner's choice (November 2026: only two people use it).
+  The code's password gate (`SITE_PASSWORD`) stays for later; do not ask for it again. Its
+  acceptable use policy refuses Telegram bot frameworks, so the
   bot needs another host. The owner gave an email for the privacy policy's contact: use it only
   in that page, when it is written, and remind them it will be public there.
