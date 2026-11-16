@@ -116,7 +116,12 @@ have a lawyer read the texts before launch.
 
 Remind the owner of these until they confirm them.
 
-- None open. Confirmed so far: Secret scanning and Push protection are on; Star Rail final stats
+- After the security hardening is deployed: `curl -sI http://<site>/` answers 308 with a
+  `Location` on the site's own https address; only then set `SITE_PASSWORD` (20+ random
+  characters) and `CLIENT_IP_HEADER=CF-Connecting-IP` on SnapDeploy.
+- Ask SnapDeploy whether the container can be reached without Cloudflare; if it can,
+  `CF-Connecting-IP` can be forged (the `shortcut:` in `backend/app/ratelimit.py`).
+- Confirmed so far: Secret scanning and Push protection are on; Star Rail final stats
   match the game once numbers are cut off the way the game prints them (1160.63 DEF reads 1160).
 
 ## Working notes
