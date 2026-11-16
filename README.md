@@ -184,7 +184,7 @@ Before any public launch, the checklist in `CLAUDE.md` comes first.
 Requires Python 3.12+, uv and Node 22.
 
 ```sh
-# terminal 1: API on http://localhost:8000 (docs at /docs)
+# terminal 1: API on http://localhost:8000
 cd backend
 uv run uvicorn app.main:app --reload
 
@@ -273,14 +273,19 @@ against the real backend with Enka.Network replaced by a recorded response.
 
 Each client gets 10 showcase requests, 150 wish history pages and 60 forecast or damage requests
 a minute; past that the API answers
-429 with a `Retry-After` header. Clients are told apart by address, so behind a reverse proxy set
-`FORWARDED_ALLOW_IPS` to the proxy's address, or every visitor will share one allowance.
+429 with a `Retry-After` header. Clients are told apart by address, so behind a reverse proxy
+every visitor would share one allowance. Behind Cloudflare, as on SnapDeploy, set
+`CLIENT_IP_HEADER=CF-Connecting-IP`: the app then counts the visitor's address that Cloudflare
+sends. Elsewhere set `FORWARDED_ALLOW_IPS` to the proxy's own address. Never set it to `*`: uvicorn
+would then trust an `X-Forwarded-For` the visitor wrote.
 
 ## Security
 
 Every response carries a Content-Security-Policy that allows scripts, styles and requests only
 from the app itself, and images also from Enka.Network. Enka's answers are size-limited and
-validated before use; a request that fails upstream is logged.
+validated before use; a request that fails upstream is logged. Request bodies over 64 kB get 413.
+Browsers are told to keep to HTTPS for a year, and a visit Cloudflare reports as plain http is
+moved to https before anything else, the password included. The API serves no docs pages.
 
 ## Docker
 
@@ -302,7 +307,8 @@ or more: it is the only lock.
 
 On [SnapDeploy](https://snapdeploy.dev), from its phone app or the site: Deploy from GitHub,
 pick this repository and `main`, and it builds the `Dockerfile` as it is. Add the environment
-variable `SITE_PASSWORD` with a password of your own before the first deploy. The free tier
+variable `SITE_PASSWORD` with a password of your own before the first deploy, and
+`CLIENT_IP_HEADER` set to `CF-Connecting-IP` (see Request limits). The free tier
 sleeps after 15 idle minutes and wakes in about a minute on the next visit.
 
 The Telegram bot does not run there: a sleeping container cannot poll, and SnapDeploy's

@@ -6,6 +6,7 @@ move them to Redis when the app runs more than one worker.
 
 import ipaddress
 import math
+import os
 import time
 from collections.abc import Callable
 from threading import Lock
@@ -65,17 +66,29 @@ class RateLimiter:
             self._windows.clear()
 
 
+def _is_address(text: str) -> bool:
+    try:
+        ipaddress.ip_address(text)
+    except ValueError:
+        return False
+    return True
+
+
 def client_key(request: Request) -> str:
     """Who to count a request against.
 
-    shortcut: this is the peer address, so behind a reverse proxy every visitor shares one
-    allowance; set FORWARDED_ALLOW_IPS to the proxy's address when deploying behind one.
+    The peer address, unless the host names a header its proxy sets (CLIENT_IP_HEADER, such as
+    Cloudflare's CF-Connecting-IP); otherwise behind a proxy every visitor shares one allowance.
+    shortcut: the header is trusted as sent, so anyone reaching the app around the proxy can pick
+    their key; check with the host that the app is reachable only through it.
     """
-    host = request.client.host if request.client else UNKNOWN_CLIENT
-    try:
-        address = ipaddress.ip_address(host)
-    except ValueError:
+    header = os.environ.get("CLIENT_IP_HEADER", "")
+    named = request.headers.get(header, "").strip() if header else ""
+    peer = request.client.host if request.client else UNKNOWN_CLIENT
+    host = named if _is_address(named) else peer
+    if not _is_address(host):
         return host
+    address = ipaddress.ip_address(host)
     if isinstance(address, ipaddress.IPv4Address):
         return host
     if address.ipv4_mapped:

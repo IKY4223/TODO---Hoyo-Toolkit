@@ -15,9 +15,10 @@ class Clock:
         return self.now
 
 
-def request_from(host: str | None) -> Request:
+def request_from(host: str | None, headers: dict[str, str] | None = None) -> Request:
     client = (host, 50000) if host else None
-    return Request({"type": "http", "client": client, "headers": []})
+    raw = [(name.lower().encode(), value.encode()) for name, value in (headers or {}).items()]
+    return Request({"type": "http", "client": client, "headers": raw})
 
 
 def test_allows_the_limit_then_reports_the_wait() -> None:
@@ -100,3 +101,32 @@ def test_each_tool_has_its_own_limit() -> None:
         "/api/wishes/forecast", params={"pity": 0, "guaranteed": True, "copies": 1, "pulls": 1}
     )
     assert forecast.status_code == 200
+
+
+PROXY = "10.0.0.1"  # every visitor arrives from the host's proxy
+
+
+def test_a_client_ip_header_is_ignored_unless_the_host_names_it() -> None:
+    assert client_key(request_from(PROXY, {"CF-Connecting-IP": "203.0.113.7"})) == PROXY
+
+
+@pytest.mark.parametrize(
+    ("value", "key"),
+    [
+        ("203.0.113.7", "203.0.113.7"),
+        (" 203.0.113.7 ", "203.0.113.7"),
+        ("2001:db8:1:2::1", "2001:db8:1:2::/64"),
+        ("not an address", PROXY),  # garbage counts against the proxy, as before
+        ("", PROXY),
+    ],
+)
+def test_the_named_header_says_who_the_visitor_is(
+    monkeypatch: pytest.MonkeyPatch, value: str, key: str
+) -> None:
+    monkeypatch.setenv("CLIENT_IP_HEADER", "CF-Connecting-IP")
+    assert client_key(request_from(PROXY, {"CF-Connecting-IP": value})) == key
+
+
+def test_without_the_named_header_the_peer_is_counted(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("CLIENT_IP_HEADER", "CF-Connecting-IP")
+    assert client_key(request_from(PROXY)) == PROXY

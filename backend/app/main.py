@@ -1,5 +1,6 @@
 import base64
 import binascii
+import json
 import math
 import os
 import secrets
@@ -10,9 +11,11 @@ from typing import Literal
 from fastapi import FastAPI, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from starlette.datastructures import Headers
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from app.damage.api import router as damage_router
 from app.ratelimit import RateLimiter, client_key
@@ -21,7 +24,9 @@ from app.starrail.api import characters_router, relics_router
 from app.starrail.api import router as starrail_router
 from app.wishes.api import router as wishes_router
 
-app = FastAPI(title="HoYo Toolkit API")
+# No docs pages: they load scripts from a CDN past the site's policy. The frontend's types come
+# from app.openapi(), which works without them.
+app = FastAPI(title="HoYo Toolkit API", docs_url=None, redoc_url=None, openapi_url=None)
 app.include_router(damage_router)
 app.include_router(showcase_router)
 app.include_router(starrail_router)
@@ -29,9 +34,9 @@ app.include_router(relics_router)
 app.include_router(characters_router)
 app.include_router(wishes_router)
 
-# The pages FastAPI generates for the API docs load scripts from a CDN.
-DOCS_PATHS = ("/docs", "/redoc")
 SECURITY_HEADERS = {
+    # No includeSubDomains: the site lives on the host's shared domain.
+    "Strict-Transport-Security": "max-age=31536000",
     # Scripts, styles and requests only from this origin; icons also from Enka's image host.
     "Content-Security-Policy": (
         "default-src 'self'; img-src 'self' https://enka.network; object-src 'none'; "
@@ -47,6 +52,9 @@ SECURITY_HEADERS = {
 OPEN_PATHS = ("/api/health",)
 # Wrong passwords a client may try in a minute, so the one shared password cannot be guessed.
 password_failures = RateLimiter(limit=10, window=60)
+# The largest request the site sends, a wish history page pasted in Cyrillic, is about 30 kB.
+MAX_BODY_BYTES = 64 * 1024
+TOO_LARGE = "The request is too large."
 
 
 def _password_given(request: Request, password: str) -> bool:
@@ -82,13 +90,75 @@ async def ask_for_password(
     )
 
 
+class LimitBody:
+    """Refuses a request body over MAX_BODY_BYTES, whether declared up front or sent in chunks."""
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        too_large = JSONResponse({"detail": TOO_LARGE}, status_code=413)
+        declared = Headers(scope=scope).get("content-length", "")
+        if declared.isdigit() and int(declared) > MAX_BODY_BYTES:
+            await too_large(scope, receive, send)
+            return
+        # Read the whole body first: it is small, and an error raised inside `receive` would reach
+        # the route as a generic 400.
+        body = b""
+        more = True
+        while more:
+            message = await receive()
+            if message["type"] != "http.request":
+                return  # the client left
+            body += message.get("body", b"")
+            more = message.get("more_body", False)
+            if len(body) > MAX_BODY_BYTES:
+                await too_large(scope, receive, send)
+                return
+        replayed = False
+
+        async def replay() -> Message:
+            nonlocal replayed
+            if replayed:
+                return await receive()
+            replayed = True
+            return {"type": "http.request", "body": body, "more_body": False}
+
+        await self.app(scope, replay, send)
+
+
+app.add_middleware(LimitBody)
+
+
+def _visited_over_http(request: Request) -> bool:
+    # The app sees plain http from the host's proxy whatever the visitor used, so it goes by the
+    # scheme Cloudflare notes; without that note nothing moves, which cannot loop.
+    try:
+        visitor = json.loads(request.headers.get("CF-Visitor", "{}"))
+    except ValueError:
+        return False
+    return isinstance(visitor, dict) and visitor.get("scheme") == "http"
+
+
+# Defined after the password check, so it runs first: a password must never be asked over http.
+@app.middleware("http")
+async def move_to_https(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    if request.url.path not in OPEN_PATHS and _visited_over_http(request):
+        return RedirectResponse(str(request.url.replace(scheme="https")), status_code=308)
+    return await call_next(request)
+
+
 @app.middleware("http")
 async def add_security_headers(
     request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
     response = await call_next(request)
-    if request.url.path not in DOCS_PATHS:
-        response.headers.update(SECURITY_HEADERS)
+    response.headers.update(SECURITY_HEADERS)
     return response
 
 

@@ -93,9 +93,12 @@ have a lawyer read the texts before launch.
 - Security: the `claude-security` scan of the code ran in November 2026 (effort medium, whole
   tree): two findings, both fixed in PR #23 (password guesses limited in `ask_for_password`; the
   game data workflow split so its write token never meets `./check.sh`); five candidates were
-  rejected by its panel. Run it again after large changes. Still to do: install the
-  `usestrix/strix` plugin (the owner, on a computer) and run it against the deployed site; fix
-  what it finds. Owner's part: protect `main` from pushes by the Actions token, and a random
+  rejected by its panel. Run it again after large changes. strix has not run: it needs Docker
+  and a paid LLM key, which the owner cannot pay for (November 2026). In its place a session
+  checked the deployed site by hand on 16 November 2026 (CORS, validation, traversal, the history
+  host, the limits, headers) and fixed what it found: HSTS, http moved to https before the
+  password, request bodies capped at 64 kB, no docs pages, `CLIENT_IP_HEADER` for the limits.
+  Run strix before launch if a key becomes available. Owner's part: protect `main` from pushes by the Actions token, and a random
   `SITE_PASSWORD` of 20 or more characters. Run the scan from the main session with the Workflow
   tool (`/config workflows=true`): a subagent has no Workflow tool and stops at once.
 - Telegram: the bot's token is a secret (environment variable, never in the repository or logs);
@@ -104,27 +107,35 @@ have a lawyer read the texts before launch.
   bot keeps on disk the ids of chats that chose a language with `/lang`, until they are deleted.
 - Shared links: a link to a build carries the player's UID; whoever has it sees that showcase.
   Say so in the privacy policy (a UID is public in the game, but the link tells who shared it).
-- Operations: HTTPS only, `FORWARDED_ALLOW_IPS` set to the proxy, rate limits and cache moved out
-  of process if there is more than one worker, a contact address for abuse reports.
+- Operations: HTTPS only, `CLIENT_IP_HEADER=CF-Connecting-IP` behind Cloudflare (elsewhere
+  `FORWARDED_ALLOW_IPS` set to the proxy, never `*`), rate limits and cache moved out of process
+  if there is more than one worker, a contact address for abuse reports. Ask the host whether the
+  app can be reached around Cloudflare: if it can, `CF-Connecting-IP` can be forged.
 
 ## Owner checks still open
 
 Remind the owner of these until they confirm them.
 
-- None open. Confirmed so far: Secret scanning and Push protection are on; Star Rail final stats
+- After the security hardening is deployed: `curl -sI http://<site>/` answers 308 with a
+  `Location` on the site's own https address; only then set `SITE_PASSWORD` (20+ random
+  characters) and `CLIENT_IP_HEADER=CF-Connecting-IP` on SnapDeploy.
+- Ask SnapDeploy whether the container can be reached without Cloudflare; if it can,
+  `CF-Connecting-IP` can be forged (the `shortcut:` in `backend/app/ratelimit.py`).
+- Confirmed so far: Secret scanning and Push protection are on; Star Rail final stats
   match the game once numbers are cut off the way the game prints them (1160.63 DEF reads 1160).
 
 ## Working notes
 
 For a session picking the work up again.
 
-- State: PRs #1 to #22 are merged. PR #23 (stage 21, part A) is open on
-  `claude/peaceful-hamilton-1xvlg9`: licences and notices, HoYoverse's legal statement, Enka's
-  newer errors, the site's own icons, `LEGAL-DRAFTS.md`, `HOYOVERSE-LETTER.md` and the security
-  fixes. Stage 21 next steps, in order: (1) once the owner gives the name and the contact email,
+- State: PRs #1 to #24 are merged; stage 21, part A (licences and notices, HoYoverse's legal
+  statement, Enka's newer errors, the site's own icons, `LEGAL-DRAFTS.md`, `HOYOVERSE-LETTER.md`,
+  the security fixes) is in `main`. The by-hand check of the deployed site and its fixes are on
+  `claude/security-hardening`. Stage 21 next steps, in order: (1) once the owner gives the name and the contact email,
   fill `LEGAL-DRAFTS.md`, translate it to Russian and make the privacy policy and terms pages
   (EN and RU, linked from the footer, driven in `app.spec.ts`); a lawyer reads them first;
-  (2) strix against the deployed site; (3) operations: HTTPS, `FORWARDED_ALLOW_IPS`, an abuse
+  (2) strix against the deployed site, once a key is available; (3) operations: the host's
+  HTTPS setting, `CLIENT_IP_HEADER` and `SITE_PASSWORD` on SnapDeploy, an abuse
   contact, the site's address in Enka's User-Agent, `noindex` off only on launch day.
   Waiting on the owner: name and email (Outlook was down), the lawyer (StarRailRes is AGPL-3.0),
   sending `HOYOVERSE-LETTER.md`. Donations stay out until HoYoverse says yes in writing. `HANDOFF.md` holds the owner's task list and the plan of
