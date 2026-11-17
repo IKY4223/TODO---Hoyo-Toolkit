@@ -141,7 +141,8 @@ For a session picking the work up again.
   stages 17 to 22; `README.md` and this file win where they differ.
 - PR #19 is merged: the owner's November 2026 choices. Tool icons were the games' own menu
   signs then; the owner had them redrawn as the site's own in stage 21, then (16 November 2026)
-  redrawn again to look like the games' signs without copying them, Genshin's tools with their
+  redrawn again to look like the games' signs without copying them (closer still on 17 November
+  2026: same layout and parts, own lines), Genshin's tools with their
   own (`gi-builds`, `gi-wishes`, `gi-history`). The site's mark and browser icon are a
   four-pointed star drawn for it (the owner did not like the Stellar Jade there). The
   palette is plain grey and blue. The wide-screen layout fills the screen (fields across the
