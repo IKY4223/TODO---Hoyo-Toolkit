@@ -79,7 +79,7 @@ jobs:
       - if: steps.diff.outputs.changed == 'true'
         run: git add -A && git diff --cached --binary > "$RUNNER_TEMP/gamedata.patch"
       - if: steps.diff.outputs.changed == 'true'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: gamedata-patch
           path: ${{ runner.temp }}/gamedata.patch
