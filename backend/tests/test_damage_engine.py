@@ -1,6 +1,6 @@
 import pytest
 
-from app.damage.engine import Enemy, Hit, Reaction, damage
+from app.damage.engine import Enemy, Hit, Reaction, Transformative, damage
 from app.damage.levels import LEVEL_MULTIPLIERS
 from app.showcase.models import Scaling, StatKey
 
@@ -159,3 +159,94 @@ def test_aggravate_and_spread_add_to_the_base(reaction: Reaction, base: float) -
     added = base * LEVEL_MULTIPLIERS[LEVEL] * (1 + 5 * 200 / 1400)
     hit = Hit(scalings=(Scaling(StatKey.ATK, 1.0),), bonus=None, reaction=reaction)
     assert damage(LEVEL, STATS, hit, ENEMY).non_crit == pytest.approx((2000 + added) * 0.45)
+
+
+@pytest.mark.parametrize(
+    ("reaction", "factor"),
+    # 200 EM gives 34.75% to Vaporize and Melt; Crimson Witch's 15% is added beside it.
+    [(Reaction.WEAK, 1.5 * 1.4975), (Reaction.STRONG, 2 * 1.4975)],
+)
+def test_reaction_bonus_adds_to_an_amplifying_reaction(reaction: Reaction, factor: float) -> None:
+    hit = Hit(
+        scalings=(Scaling(StatKey.ATK, 1.0),), bonus=None, reaction=reaction, reaction_bonus=0.15
+    )
+    assert damage(LEVEL, STATS, hit, ENEMY).non_crit == pytest.approx(900 * factor)
+
+
+def test_reaction_bonus_adds_to_aggravate() -> None:
+    # Thundering Fury's 20% beside the 5 x 200 / 1400 from mastery.
+    added = 1.15 * LEVEL_MULTIPLIERS[LEVEL] * (1 + 5 * 200 / 1400 + 0.2)
+    hit = Hit(
+        scalings=(Scaling(StatKey.ATK, 1.0),),
+        bonus=None,
+        reaction=Reaction.AGGRAVATE,
+        reaction_bonus=0.2,
+    )
+    assert damage(LEVEL, STATS, hit, ENEMY).non_crit == pytest.approx((2000 + added) * 0.45)
+
+
+def test_reaction_bonus_does_nothing_without_a_reaction() -> None:
+    hit = Hit(
+        scalings=(Scaling(StatKey.ATK, 1.0),),
+        bonus=None,
+        reaction=Reaction.NONE,
+        reaction_bonus=0.4,
+    )
+    assert damage(LEVEL, STATS, hit, ENEMY).non_crit == pytest.approx(900)
+
+
+def test_no_transformative_reaction_deals_nothing_more() -> None:
+    assert damage(LEVEL, STATS, PLAIN, ENEMY).reaction == 0
+
+
+@pytest.mark.parametrize(
+    ("reaction", "multiplier"),
+    [
+        (Transformative.BURNING, 0.25),
+        (Transformative.SUPERCONDUCT, 1.5),
+        (Transformative.SWIRL, 0.6),
+        (Transformative.ELECTRO_CHARGED, 2),
+        (Transformative.SHATTERED, 3),
+        (Transformative.OVERLOADED, 2.75),
+        (Transformative.BLOOM, 2),
+        (Transformative.HYPERBLOOM, 3),
+        (Transformative.BURGEON, 3),
+    ],
+)
+def test_transformative_reaction_grows_with_level_and_mastery(
+    reaction: Transformative, multiplier: float
+) -> None:
+    # 200 EM adds 16 x 200 / 2200 to the reaction; it takes the enemy's 10% resistance.
+    expected = multiplier * LEVEL_MULTIPLIERS[LEVEL] * (1 + 16 * 200 / 2200) * 0.9
+    hit = Hit(
+        scalings=(Scaling(StatKey.ATK, 1.0),),
+        bonus=None,
+        reaction=Reaction.NONE,
+        transformative=reaction,
+    )
+    assert damage(LEVEL, STATS, hit, ENEMY).reaction == pytest.approx(expected)
+
+
+def test_transformative_reaction_ignores_defense_crit_and_the_hit() -> None:
+    hit = Hit(
+        scalings=(Scaling(StatKey.ATK, 9.0),),
+        bonus=StatKey.PYRO_DMG,
+        reaction=Reaction.STRONG,
+        transformative=Transformative.OVERLOADED,
+        reaction_bonus=0.4,  # Thundering Fury
+    )
+    tough = Enemy(level=90, resistance=0.1, def_reduction=0.5, def_ignore=0.5)
+    expected = 2.75 * LEVEL_MULTIPLIERS[LEVEL] * (1 + 16 * 200 / 2200 + 0.4) * 0.9
+    assert damage(LEVEL, STATS, hit, tough).reaction == pytest.approx(expected)
+
+
+def test_transformative_reaction_takes_resistance_and_its_reduction() -> None:
+    hit = Hit(
+        scalings=(Scaling(StatKey.ATK, 1.0),),
+        bonus=None,
+        reaction=Reaction.NONE,
+        transformative=Transformative.SWIRL,
+    )
+    shredded = Enemy(level=90, resistance=0.1, res_reduction=0.4)  # Viridescent Venerer
+    expected = 0.6 * LEVEL_MULTIPLIERS[LEVEL] * (1 + 16 * 200 / 2200) * 1.15
+    assert damage(LEVEL, STATS, hit, shredded).reaction == pytest.approx(expected)

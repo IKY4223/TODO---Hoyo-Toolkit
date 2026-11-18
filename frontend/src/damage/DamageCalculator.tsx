@@ -38,6 +38,19 @@ const REACTIONS = {
   spread: 'Spread',
 } as const satisfies Record<DamageRequest['reaction'], Message>
 
+// The game's own names. Each deals damage of its own beside the hit.
+const TRANSFORMATIVE = {
+  overloaded: 'Overloaded',
+  superconduct: 'Superconduct',
+  electro_charged: 'Electro-Charged',
+  shattered: 'Shattered',
+  swirl: 'Swirl',
+  burning: 'Burning',
+  bloom: 'Bloom',
+  hyperbloom: 'Hyperbloom',
+  burgeon: 'Burgeon',
+} as const satisfies Record<NonNullable<DamageRequest['transformative']>, Message>
+
 const BONUSES = {
   physical_dmg: true,
   pyro_dmg: true,
@@ -68,6 +81,7 @@ const DEFAULT_ENEMY_LEVEL = 90
 const DEFAULT_RESISTANCE_PERCENT = 10
 const PERCENT = 100
 const NO_BONUS = ''
+const NO_REACTION = ''
 const OWN_MULTIPLIER = ''
 // A multiplier from the tables is shown to two decimals of a percent, as the game prints it.
 const SHOWN_DECIMALS = 100
@@ -113,6 +127,7 @@ function likelyBonus(attack: Attack, character: Character, offered: readonly str
 
 function readRequest(data: FormData, character: Character, parts: readonly Part[]): DamageRequest {
   const bonus = data.get('bonus')
+  const transformative = data.get('transformative')
   const fraction = (name: string): number => Number(data.get(name)) / PERCENT
   return {
     level: character.level,
@@ -120,6 +135,9 @@ function readRequest(data: FormData, character: Character, parts: readonly Part[
     scalings: parts.map(({ stat, percent }) => ({ stat, multiplier: Number(percent) / PERCENT })),
     bonus: bonus === NO_BONUS ? null : choice(BONUSES, bonus),
     reaction: choice(REACTIONS, data.get('reaction')),
+    transformative:
+      transformative === NO_REACTION ? null : choice(TRANSFORMATIVE, transformative),
+    reaction_bonus: fraction('reaction_bonus'),
     flat: Number(data.get('flat')),
     enemy_level: Number(data.get('enemy_level')),
     enemy_resistance: fraction('enemy_resistance'),
@@ -153,6 +171,9 @@ function Reduction(props: {
   )
 }
 
+// A transformative reaction is damage too: an Elemental Mastery piece may lose on the hit.
+const total = (damage: Damage): number => damage.average + damage.reaction
+
 const statsOf = ({ slot, main, subs }: Artifact): ArtifactRequest['equipped'][number] => ({
   slot,
   main,
@@ -166,14 +187,14 @@ function Trials(props: {
 }): JSX.Element {
   const { comparison, tried } = props
   const t = useT()
-  const now = comparison.current.average
+  const now = total(comparison.current)
   const slots = Object.entries(SLOTS).flatMap(([slot, label]) => {
     const own = tried.flatMap((candidate, at) => {
       const damage = comparison.candidates[at]
       return candidate.artifact.slot === slot && damage ? [{ ...candidate, damage }] : []
     })
     const best = own.reduce<(typeof own)[number] | null>(
-      (top, next) => (top && top.damage.average >= next.damage.average ? top : next),
+      (top, next) => (top && total(top.damage) >= total(next.damage) ? top : next),
       null,
     )
     return best ? [{ slot, label, best }] : []
@@ -184,12 +205,12 @@ function Trials(props: {
         <li key={slot}>
           <strong>{t(label)}</strong>{' '}
           <span>
-            {best.damage.average > now
+            {total(best.damage) > now
               ? [
                   best.owner,
                   best.artifact.set_name,
-                  `${formatStat(best.artifact.main, t)} — ${whole.format(best.damage.average)}`,
-                ].join(' · ') + ` (${relative.format(best.damage.average / now - 1)})`
+                  `${formatStat(best.artifact.main, t)} — ${whole.format(total(best.damage))}`,
+                ].join(' · ') + ` (${relative.format(total(best.damage) / now - 1)})`
               : t('no artifact here does better')}
           </span>
         </li>
@@ -350,6 +371,27 @@ export function DamageCalculator(props: {
           </select>
         </label>
         <label>
+          {t('Transformative reaction')}
+          <select name="transformative">
+            <option value={NO_REACTION}>{t('None')}</option>
+            {Object.entries(TRANSFORMATIVE).map(([reaction, label]) => (
+              <option key={reaction} value={reaction}>
+                {t(label)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <Reduction
+          name="reaction_bonus"
+          label="Reaction bonus, %"
+          max={MAX_RESISTANCE * PERCENT}
+        />
+        <p className="hint">
+          {t(
+            "A transformative reaction's damage is shown apart: it ignores DEF and cannot crit. It takes the resistance below, so give the one to its element (Physical for Shattered). Reaction bonuses (Crimson Witch, Thundering Fury) are entered by hand.",
+          )}
+        </p>
+        <label>
           {t('Enemy level')}
           <input
             name="enemy_level"
@@ -415,6 +457,12 @@ export function DamageCalculator(props: {
                 <dd>{whole.format(state.data[key])}</dd>
               </div>
             ))}
+            {state.data.reaction > 0 && (
+              <div>
+                <dt>{t('Reaction damage')}</dt>
+                <dd>{whole.format(state.data.reaction)}</dd>
+              </div>
+            )}
           </dl>
         )}
       </div>

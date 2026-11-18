@@ -27,7 +27,9 @@ VALID: dict[str, Any] = {
 def test_returns_non_crit_crit_and_average() -> None:
     response = client.post(URL, json=VALID)
     assert response.status_code == 200
-    assert response.json() == pytest.approx({"non_crit": 900, "crit": 1800, "average": 1350})
+    assert response.json() == pytest.approx(
+        {"non_crit": 900, "crit": 1800, "average": 1350, "reaction": 0}
+    )
 
 
 def test_uses_the_bonus_and_reaction_asked_for() -> None:
@@ -55,6 +57,9 @@ def test_uses_the_bonus_and_reaction_asked_for() -> None:
         {"res_reduction": 10.1},
         {"bonus": "atk"},
         {"reaction": "overload"},
+        {"transformative": "overload"},
+        {"reaction_bonus": -0.1},
+        {"reaction_bonus": 10.1},
         {"enemy_level": 0},
         {"enemy_level": 201},
         {"enemy_resistance": -1.1},
@@ -104,3 +109,30 @@ def test_takes_aggravate_and_spread() -> None:
         response = client.post(URL, json={**VALID, "reaction": reaction})
         assert response.status_code == 200
         assert response.json()["non_crit"] > 900
+
+
+def test_adds_the_reaction_bonus_to_the_reaction() -> None:
+    body = client.post(URL, json={**VALID, "reaction": "strong", "reaction_bonus": 0.15}).json()
+    assert body["non_crit"] == pytest.approx(900 * 2 * 1.4975)
+
+
+def test_gives_the_transformative_reaction_its_own_number() -> None:
+    body = client.post(URL, json={**VALID, "transformative": "overloaded"}).json()
+    assert body["non_crit"] == pytest.approx(900)  # the hit is unchanged
+    assert body["reaction"] == pytest.approx(2.75 * 1446.8535 * (1 + 16 * 200 / 2200) * 0.9)
+
+
+def test_compares_artifacts_for_the_reaction_too() -> None:
+    em = {"key": "elemental_mastery", "value": 187}
+    flower = {"slot": "flower", "main": {"key": "hp", "value": 4780}, "subs": []}
+    body = client.post(
+        URL + "/artifacts",
+        json={
+            **VALID,
+            "transformative": "bloom",
+            "base_stats": [{"key": k, "value": 1000} for k in ("hp", "atk", "def")],
+            "equipped": [flower],
+            "candidates": [{"slot": "sands", "main": em, "subs": []}],
+        },
+    ).json()
+    assert body["candidates"][0]["reaction"] > body["current"]["reaction"]
