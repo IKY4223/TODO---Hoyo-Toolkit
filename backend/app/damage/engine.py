@@ -7,7 +7,8 @@ its "Transformative Reactions" page (read 18 November 2026) for Overloaded, Bloo
 
 shortcut: Lunar reactions (6.0 and later) are not modelled: neither page gives their formula.
 Electro-Charged is counted as one tick; a transformative reaction's resistance is taken as the
-hit's. Add each when a source or a feature needs it.
+hit's; one reaction bonus serves both reactions of a hit, though sets give each its own (Thundering
+Fury: 20% to Aggravate, 40% to Hyperbloom). Add each when a source or a feature needs it.
 """
 
 from collections.abc import Mapping

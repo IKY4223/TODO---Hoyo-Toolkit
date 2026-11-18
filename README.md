@@ -141,7 +141,9 @@ Planned, in order:
    a `shortcut:` comment:
    - Lunar reactions (6.0 and later), which follow a formula of their own that no source read
      so far gives: their lines stay out of the hit list. Electro-Charged is counted as one tick,
-     and a transformative reaction takes the hit's resistance;
+     a transformative reaction takes the hit's resistance, and one reaction bonus serves both the
+     hit's reaction and the transformative one (Thundering Fury gives 20% to Aggravate, 40% to
+     Hyperbloom);
    - set and passive effects (a reaction damage bonus is typed in by hand);
    - the damage bonus of a Normal Attack by a catalyst or an infused attack (the form guesses
      Physical); talent lines told apart from buffs by words of their English name;
