@@ -98,7 +98,7 @@ have a lawyer read the texts before launch.
   checked the deployed site by hand on 16 November 2026 (CORS, validation, traversal, the history
   host, the limits, headers) and fixed what it found: HSTS, http moved to https before the
   password, request bodies capped at 64 kB, no docs pages, `CLIENT_IP_HEADER` for the limits.
-  Run strix before launch if a key becomes available. Owner's part: protect `main` from pushes by the Actions token, and a random
+  strix is off the plan: the owner has no credits for it (18 November 2026). Owner's part: protect `main` from pushes by the Actions token, and a random
   `SITE_PASSWORD` of 20 or more characters. Run the scan from the main session with the Workflow
   tool (`/config workflows=true`): a subagent has no Workflow tool and stops at once.
 - Telegram: the bot's token is a secret (environment variable, never in the repository or logs);
@@ -109,7 +109,7 @@ have a lawyer read the texts before launch.
   Say so in the privacy policy (a UID is public in the game, but the link tells who shared it).
 - Operations: HTTPS only, `CLIENT_IP_HEADER=CF-Connecting-IP` behind Cloudflare (elsewhere
   `FORWARDED_ALLOW_IPS` set to the proxy, never `*`), rate limits and cache moved out of process
-  if there is more than one worker, a contact address for abuse reports. Ask the host whether the
+  if there is more than one worker, abuse reports through the repository's issues (no email, the owner's choice). Ask the host whether the
   app can be reached around Cloudflare: if it can, `CF-Connecting-IP` can be forged.
 
 ## Owner checks still open
@@ -131,13 +131,12 @@ For a session picking the work up again.
 - State: PRs #1 to #24 are merged; stage 21, part A (licences and notices, HoYoverse's legal
   statement, Enka's newer errors, the site's own icons, `LEGAL-DRAFTS.md`, `HOYOVERSE-LETTER.md`,
   the security fixes) is in `main`. The by-hand check of the deployed site and its fixes are on
-  `claude/security-hardening`. Stage 21 next steps, in order: (1) once the owner gives the name and the contact email,
+  `claude/security-hardening`. Stage 21 next steps, in order: (1) once the owner gives the name (the contact is the repository's issues, no email),
   fill `LEGAL-DRAFTS.md`, translate it to Russian and make the privacy policy and terms pages
   (EN and RU, linked from the footer, driven in `app.spec.ts`); a lawyer reads them first;
-  (2) strix against the deployed site, once a key is available; (3) operations: the host's
-  HTTPS setting, `CLIENT_IP_HEADER` and `SITE_PASSWORD` on SnapDeploy, an abuse
-  contact, the site's address in Enka's User-Agent, `noindex` off only on launch day.
-  Waiting on the owner: name and email (Outlook was down), the lawyer (StarRailRes is AGPL-3.0),
+  (2) operations: the host's
+  HTTPS setting, `CLIENT_IP_HEADER` and `SITE_PASSWORD` on SnapDeploy, the site's address in Enka's User-Agent, `noindex` off only on launch day.
+  Waiting on the owner: the name, the lawyer (StarRailRes is AGPL-3.0),
   sending `HOYOVERSE-LETTER.md`. Donations stay out until HoYoverse says yes in writing. `HANDOFF.md` holds the owner's task list and the plan of
   stages 17 to 22; `README.md` and this file win where they differ.
 - PR #19 is merged: the owner's November 2026 choices. Tool icons were the games' own menu
@@ -176,5 +175,5 @@ For a session picking the work up again.
   `open-gsd/gsd-core`, and adds hooks and a workflow of its own).
 - Hosting: the owner tests the site on SnapDeploy (Docker from GitHub, free tier sleeps when
   idle), behind `SITE_PASSWORD`. Its acceptable use policy refuses Telegram bot frameworks, so the
-  bot needs another host. The owner gave an email for the privacy policy's contact: use it only
-  in that page, when it is written, and remind them it will be public there.
+  bot needs another host. The site shows no email anywhere: questions, data requests and abuse
+  reports go to the repository's issues (the owner's choice, 18 November 2026).
