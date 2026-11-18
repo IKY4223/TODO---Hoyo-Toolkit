@@ -95,7 +95,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ needs.sync.outputs.base }}
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: gamedata-patch
           path: ${{ runner.temp }}
