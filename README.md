@@ -53,7 +53,8 @@ The app opens on Honkai: Star Rail; Genshin Impact is one tap away.
   choice: a neutral grey ground, near-white text and a blue accent in Geist, or a light grey
   ground with white cards as the light theme.
 - **Icons** — every icon is drawn for the site (`frontend/src/ui/ToolIcon.tsx`), in the text
-  colour: the tools' signs, and the site's mark and browser icon, a four-pointed star. The
+  colour. The tools' signs are drawn after each game's own menu signs, so players know them, but
+  not traced from them; the site's mark and browser icon are a four-pointed star. The
   repository holds no game art.
 - **Light and dark themes** — the app follows the device's setting until the player taps the
   theme button in the top bar, which switches to the other theme; a long press, a right click or

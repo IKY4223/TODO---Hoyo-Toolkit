@@ -111,13 +111,13 @@ test('each tool carries a sign drawn for the site, not a file of the game', () =
   expect(icons.map((icon) => icon?.tagName)).toEqual(icons.map(() => 'svg'))
 })
 
-test('Genshin tools carry the same signs for the same jobs', async () => {
+test("Genshin tools carry signs drawn after Genshin's own", async () => {
   window.location.hash = '#genshin/builds'
   render(<App />)
   const signs = within(await screen.findByRole('navigation', { name: 'Tools' }))
     .getAllByRole('link')
     .map((link) => link.querySelector('[data-icon]')?.getAttribute('data-icon'))
-  expect(signs).toEqual(['builds', 'warps', 'history'])
+  expect(signs).toEqual(['gi-builds', 'gi-wishes', 'gi-history'])
 })
 
 test('the menu lists every tool of every game and marks where you are', () => {
