@@ -117,10 +117,10 @@ const partsOf = (attack: Attack): Part[] =>
       percent: String(Math.round(scaling.multiplier * PERCENT * SHOWN_DECIMALS) / SHOWN_DECIMALS),
     }))
 
-// shortcut: a Normal Attack is taken as Physical and a skill or burst as the character's element,
-// which is wrong for catalysts and infused attacks; the player can change it in the form.
+// shortcut: a Normal Attack is taken as Physical, a catalyst's and every skill or burst as the
+// character's element, which is wrong for infused attacks; the player can change it in the form.
 function likelyBonus(attack: Attack, character: Character, offered: readonly string[]): string {
-  const physical = attack.talent === 0 || !character.element
+  const physical = (attack.talent === 0 && character.weapon_type !== 'catalyst') || !character.element
   const bonus = physical ? 'physical_dmg' : `${character.element}_dmg`
   return offered.includes(bonus) ? bonus : NO_BONUS
 }

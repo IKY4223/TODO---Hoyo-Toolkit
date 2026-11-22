@@ -220,7 +220,8 @@ const RU = {
   'Broken Keel': 'Сломанный киль',
   'at Effect RES {tiers}': 'при сопротивлении эффектам {tiers}',
   'Own summon': 'Свой призыв',
-  'comes in with {value} action(s)': 'появляется, действий: {value}',
+  'comes in with {value} {count|action|actions}':
+    'появляется, {value} {count|действие|действия|действий}',
   'until its countdown acts': 'до хода отсчёта',
   'On entering its state': 'При входе в особое состояние',
   Enemies: 'Враги',
@@ -231,7 +232,7 @@ const RU = {
   'No enemy': 'Без врага',
   'action delay +{value}': 'задержка хода +{value}',
   'SPD −{value}': 'скорость −{value}',
-  '{value} stack(s)': 'стаков: {value}',
+  '{value} {count|stack|stacks}': '{value} {count|стак|стака|стаков}',
   once: 'один раз',
   'from Eidolon {eidolon}': 'с эйдолона {eidolon}',
   'lands at a base chance of {chance}': 'попадает с базовым шансом {chance}',
@@ -239,8 +240,8 @@ const RU = {
   'Own countdown': 'Свой отсчёт',
   'comes in': 'появляется',
   'one extra turn': 'один дополнительный ход',
-  'again after {turns} turn(s)': 'снова через ходов: {turns}',
-  '{count} time(s) each time it comes': 'раз за каждый призыв: {count}',
+  'again after {turns} {turns|turn|turns}': 'снова через {turns} {turns|ход|хода|ходов}',
+  '{count} {count|time|times} each time it comes': '{count} {count|раз|раза|раз} за каждый призыв',
   'in its state': 'в особом состоянии',
   'by Elation characters on the team': 'по числу персонажей Радости в команде',
   'outside its state': 'вне особого состояния',
@@ -254,7 +255,7 @@ const RU = {
   Teammates: 'Союзники',
   'action advance +{value}': 'ускорение хода +{value}',
   'SPD +{value}': 'скорость +{value}',
-  'lasts {turns} turn(s)': 'ходов: {turns}',
+  'lasts {turns} {turns|turn|turns}': 'длится {turns} {turns|ход|хода|ходов}',
   'SPD at least {spd}': 'скорость от {spd}',
   'at SPD {tiers}': 'при скорости от {tiers}',
   'below SPD {tiers}': 'при скорости ниже {tiers}',
@@ -540,13 +541,32 @@ function subscribe(notify: () => void): () => void {
   }
 }
 
+// The forms a "{count|turn|turns}" lists, in the order of the language's plural categories.
+const PLURAL_FORMS = { en: ['one', 'other'], ru: ['one', 'few', 'many'] } as const
+// "{name|form|form...}": the word for the number in `name`. For name "turns" it accepts
+// "{turns|turn|turns}" and rejects "{turns}", which the plain substitution fills.
+// https://regex101.com/?flavor=javascript&regex=%5C%7Bturns%5C%7C(%5B%5E%7D%5D*)%5C%7D&testString=%7Bturns%7Cturn%7Cturns%7D%20%7Bturns%7D
+const pluralOf = (name: string): RegExp => new RegExp(`\\{${name}\\|([^}]*)\\}`, 'g')
+
+function withPlurals(text: string, language: Language, name: string, value: string | number): string {
+  if (typeof value !== 'number') return text
+  const forms: readonly string[] = PLURAL_FORMS[language]
+  const at = forms.indexOf(new Intl.PluralRules(language).select(value))
+  // A category the list lacks (Russian "other", for fractions) takes the last form.
+  return text.replace(pluralOf(name), (_, words: string) => {
+    const choices = words.split('|')
+    return choices[at] ?? choices.at(-1) ?? ''
+  })
+}
+
 export const translate = (
   language: Language,
   message: Message,
   values: Readonly<Record<string, string | number>> = {},
 ): string =>
   Object.entries(values).reduce<string>(
-    (text, [name, value]) => text.replaceAll(`{${name}}`, String(value)),
+    (text, [name, value]) =>
+      withPlurals(text, language, name, value).replaceAll(`{${name}}`, String(value)),
     language === 'ru' ? RU[message] : message,
   )
 

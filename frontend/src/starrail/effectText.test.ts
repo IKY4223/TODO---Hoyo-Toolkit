@@ -80,13 +80,13 @@ test('a summon brought in to stay says no count of actions', () => {
     'Every turn · Own summon: comes in',
   )
   expect(turnEffectText(turn('aglaea-countdown'), 1, t)).toBe(
-    'On Ultimate · Own countdown: comes in with 1 action(s)',
+    'On Ultimate · Own countdown: comes in with 1 action',
   )
 })
 
 test('a debuff with a base chance says it', () => {
   expect(turnEffectText(turn('welt-skill'), 0.1, t, 0.75)).toBe(
-    'Every turn · Enemies: SPD −10% · lasts 2 turn(s) · lands at a base chance of 75%',
+    'Every turn · Enemies: SPD −10% · lasts 2 turns · lands at a base chance of 75%',
   )
 })
 
@@ -95,7 +95,7 @@ test('describes turn effects', () => {
     'Every turn · Chosen ally: action advance +100%',
   )
   expect(turnEffectText(turn('asta-ultimate'), 50, t)).toBe(
-    'On Ultimate · All allies: SPD +50 · lasts 2 turn(s)',
+    'On Ultimate · All allies: SPD +50 · lasts 2 turns',
   )
   expect(turnEffectText(turn('vonwacq'), 0.4, t)).toBe(
     'At battle start · Self: action advance +40% · SPD at least 120',
@@ -104,7 +104,7 @@ test('describes turn effects', () => {
     "On the memosprite's turn · Chosen ally: action advance +100%",
   )
   expect(turnEffectText(turn('lingsha-skill-summon'), 3, t)).toBe(
-    'Every turn · Own summon: comes in with 3 action(s)',
+    'Every turn · Own summon: comes in with 3 actions',
   )
   expect(turnEffectText(turn('firefly-spd'), 60, t)).toBe(
     'On Ultimate · Self: SPD +60 · until its countdown acts',
@@ -116,9 +116,9 @@ test('describes turn effects', () => {
     'On Ultimate · Enemies: action delay +40%',
   )
   expect(turnEffectText(turn('welt-skill'), 0.1, t)).toBe(
-    'Every turn · Enemies: SPD −10% · lasts 2 turn(s)',
+    'Every turn · Enemies: SPD −10% · lasts 2 turns',
   )
-  expect(turnEffectText(turn('jingliu-technique'), 1, t)).toBe('At battle start · Self: 1 stack(s)')
+  expect(turnEffectText(turn('jingliu-technique'), 1, t)).toBe('At battle start · Self: 1 stack')
   expect(turnEffectText(turn('jingliu-talent'), 1, t)).toBe(
     'On entering its state · Self: action advance +100%',
   )

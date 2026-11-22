@@ -7,7 +7,7 @@ import pytest
 
 from app.damage.levels import LEVEL_MULTIPLIERS
 from app.showcase.gamedata import GAMEDATA, TALENTS
-from app.showcase.models import StatKey
+from app.showcase.models import StatKey, WeaponType
 
 TALENT_LEVELS = 15  # 10, plus up to 3 from constellations, plus the game's spare rows
 
@@ -27,6 +27,12 @@ def test_nearly_every_character_has_talent_tables() -> None:
     missing = groups - {int(group) for group in TALENTS}
     assert len(missing) <= len(groups) // 10
     assert TALENTS.keys() <= {str(group) for group in groups}
+
+
+def test_each_character_knows_its_weapon_type() -> None:
+    # Lisa (10000006) fights with a catalyst, Amber (10000021) with a bow.
+    assert GAMEDATA.characters["10000006"].weapon_type == WeaponType.CATALYST
+    assert GAMEDATA.characters["10000021"].weapon_type == WeaponType.BOW
 
 
 def test_the_file_is_what_the_sync_writes() -> None:

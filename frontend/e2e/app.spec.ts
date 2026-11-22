@@ -76,6 +76,14 @@ test('imports a showcase and shows every character with its gear', async ({ page
   expect(problems).toEqual([]) // also proves the Content-Security-Policy lets the app run
 })
 
+test("guesses a catalyst's Normal Attack as its element", async ({ page }) => {
+  await loadShowcase(page, '600000006') // the test server's Lisa, a catalyst user
+  const lisa = card(page, 'Lisa')
+  await lisa.getByText('Damage', { exact: true }).click()
+  await lisa.getByLabel('Hit').selectOption('0') // her first Normal Attack hit
+  await expect(lisa.getByLabel('Damage bonus')).toHaveValue('electro_dmg')
+})
+
 test('calculates damage for an imported character', async ({ page }) => {
   await loadShowcase(page)
   const ganyu = card(page, 'Ganyu')
@@ -219,9 +227,9 @@ test("plans Aglaea's Supreme Stance and says each debuff's base chance", async (
   await page.goto('/#starrail/speed')
   const tool = shown(page)
   await expect(
-    tool.getByText('Every turn · Enemies: SPD −10% · lasts 2 turn(s) · lands at a base chance of 75%'),
+    tool.getByText('Every turn · Enemies: SPD −10% · lasts 2 turns · lands at a base chance of 75%'),
   ).toBeVisible()
-  await expect(tool.getByText('On Ultimate · Own countdown: comes in with 1 action(s)')).toBeVisible()
+  await expect(tool.getByText('On Ultimate · Own countdown: comes in with 1 action')).toBeVisible()
   await tool.getByLabel('Ultimate every N turns').first().selectOption('4')
   await expect(tool.locator('.timeline')).toContainText('Countdown of Aglaea')
   await expect(tool.locator('.timeline')).toContainText('Memosprite of Aglaea')

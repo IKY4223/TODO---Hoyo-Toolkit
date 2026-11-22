@@ -320,6 +320,7 @@ export interface components {
             /** Name */
             name: string;
             element: components["schemas"]["Element"] | null;
+            weapon_type: components["schemas"]["WeaponType"] | null;
             /** Level */
             level: number;
             /** Constellation */
@@ -850,6 +851,11 @@ export interface components {
             /** Icon */
             icon: string | null;
         };
+        /**
+         * WeaponType
+         * @enum {string}
+         */
+        WeaponType: "sword" | "claymore" | "polearm" | "catalyst" | "bow";
     };
     responses: never;
     parameters: never;

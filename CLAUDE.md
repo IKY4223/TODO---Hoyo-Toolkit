@@ -118,8 +118,6 @@ have a lawyer read the texts before launch.
 
 Remind the owner of these until they confirm them.
 
-- Install the Vercel GitHub app on this repository, so pushes to `main` deploy and each pull
-  request gets a preview; then a session runs `vercel git connect`.
 - How long Vercel keeps the runtime logs on the Hobby plan (the dashboard shows it): the
   `[LOG DAYS]` of `LEGAL-DRAFTS.md`. The function runs in the US (`iad1`): the `[HOST]` country.
 - Confirmed so far: Secret scanning and Push protection are on; Star Rail final stats
@@ -130,7 +128,7 @@ Remind the owner of these until they confirm them.
 
 For a session picking the work up again.
 
-- State: PRs #1 to #24 are merged; stage 21, part A (licences and notices, HoYoverse's legal
+- State: PRs #1 to #37 are merged; stage 21, part A (licences and notices, HoYoverse's legal
   statement, Enka's newer errors, the site's own icons, `LEGAL-DRAFTS.md`, `HOYOVERSE-LETTER.md`,
   the security fixes) is in `main`. The by-hand check of the deployed site and its fixes are on
   `claude/security-hardening`. Stage 21 next steps, in order: (1) once the owner gives the name (the contact is the repository's issues, no email),
@@ -181,8 +179,8 @@ For a session picking the work up again.
   `open-gsd/gsd-core`, and adds hooks and a workflow of its own).
 - Hosting: since 22 November 2026 the site runs on Vercel, project
   `professional-skibidists/hoyo-toolkit` (Hobby), https://hoyo-toolkit.vercel.app: `vercel.json`
-  makes the Vite build a CDN service and the FastAPI app a Python function for `/api`. Deploy with
-  `vercel deploy` from the repo root (CLI logged in as the owner) until Git is connected. It
+  makes the Vite build a CDN service and the FastAPI app a Python function for `/api`. Git is
+  connected (22 November 2026): a merge into `main` deploys it, each branch gets a preview. It
   replaced SnapDeploy, whose account the owner deleted; the Dockerfile stays for self-hosting and
   the CI `docker` job. Open without a password by the owner's choice (November 2026: only two
   people use it); on Vercel `SITE_PASSWORD` would lock only `/api`. Do not ask for a password

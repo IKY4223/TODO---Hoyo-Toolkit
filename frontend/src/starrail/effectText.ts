@@ -70,7 +70,7 @@ const TARGETS = {
   enemies: 'Enemies',
 } as const satisfies Record<Target, Parameters<Translate>[0]>
 
-/** "On Ultimate · All allies: SPD +12% · lasts 1 turn(s)" */
+/** "On Ultimate · All allies: SPD +12% · lasts 1 turn" */
 /** What a turn effect does; `chance` is a debuff's base chance to land, from chanceOf. */
 export function turnEffectText(
   effect: TurnEffect,
@@ -85,20 +85,20 @@ export function turnEffectText(
     advance: t('action advance +{value}', { value: amount }),
     spd: t('SPD +{value}', { value: amount }),
     spd_percent: t('SPD +{value}', { value: amount }),
-    summon: effect.stays ? t('comes in') : t('comes in with {value} action(s)', { value: amount }),
+    summon: effect.stays ? t('comes in') : t('comes in with {value} {count|action|actions}', { value: amount, count: value }),
     delay: t('action delay +{value}', { value: amount }),
     slow: t('SPD −{value}', { value: amount }),
-    stack: t('{value} stack(s)', { value: amount }),
+    stack: t('{value} {count|stack|stacks}', { value: amount, count: value }),
     extra: t('one extra turn'),
   }[effect.kind]
   const notes = [
-    effect.turns ? t('lasts {turns} turn(s)', { turns: effect.turns }) : '',
+    effect.turns ? t('lasts {turns} {turns|turn|turns}', { turns: effect.turns }) : '',
     effect.untilSummonLeaves ? t('until its countdown acts') : '',
     effect.withoutSummon ? t('outside its state') : '',
     effect.minSpd ? t('SPD at least {spd}', { spd: effect.minSpd }) : '',
     effect.once ? t('once') : '',
-    effect.cooldown ? t('again after {turns} turn(s)', { turns: effect.cooldown }) : '',
-    effect.charges ? t('{count} time(s) each time it comes', { count: effect.charges }) : '',
+    effect.cooldown ? t('again after {turns} {turns|turn|turns}', { turns: effect.cooldown }) : '',
+    effect.charges ? t('{count} {count|time|times} each time it comes', { count: effect.charges }) : '',
     effect.duringSummon ? t('in its state') : '',
     effect.eidolon ? t('from Eidolon {eidolon}', { eidolon: effect.eidolon }) : '',
     effect.byElation ? t('by Elation characters on the team') : '',

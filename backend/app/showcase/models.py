@@ -4,6 +4,14 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 
+class WeaponType(StrEnum):
+    SWORD = "sword"
+    CLAYMORE = "claymore"
+    POLEARM = "polearm"
+    CATALYST = "catalyst"
+    BOW = "bow"
+
+
 class Element(StrEnum):
     PYRO = "pyro"
     HYDRO = "hydro"
@@ -89,6 +97,7 @@ class Character:
     id: int  # the game's own id, stable across renames and languages
     name: str
     element: Element | None  # unknown for the elementless Traveler and for too-new characters
+    weapon_type: WeaponType | None  # unknown for too-new characters
     level: int
     constellation: int
     talents: tuple[int, ...]  # normal attack, skill, burst, with constellation boosts

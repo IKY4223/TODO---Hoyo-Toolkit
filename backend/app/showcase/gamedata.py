@@ -8,7 +8,7 @@ from typing import Literal
 
 from pydantic import BaseModel, TypeAdapter
 
-from app.showcase.models import Element, StatKey
+from app.showcase.models import Element, StatKey, WeaponType
 
 HERE = Path(__file__).parent
 
@@ -16,6 +16,7 @@ HERE = Path(__file__).parent
 class CharacterData(BaseModel):
     name: str
     element: Element | None
+    weapon_type: WeaponType | None = None  # the store leaves it out for a few entries
     icon: str
     talents: list[tuple[int, int]]  # (talent id, id constellations boost it by), in display order
 
