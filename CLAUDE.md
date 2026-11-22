@@ -74,7 +74,9 @@ have a lawyer read the texts before launch.
   Genshin's guide was not found). That guide allows game material for non-commercial personal
   use only: no ads, payments or donations until HoYoverse allows them in writing (README plan). Game images
   come from Enka.Network and belong to HoYoverse. The tool icons are drawn for the site
-  (`frontend/src/ui/ToolIcon.tsx`) since November 2026: the repository holds no game art.
+  (`frontend/src/ui/ToolIcon.tsx`) after the games' menu signs, so players know them, but not
+  traced from them: the repository holds no game art. Look at them again if donations ever
+  come, since the guide's leave covers non-commercial use only.
   `HOYOVERSE-LETTER.md` is a draft asking HoYoverse to allow donations; the owner sends it.
 - Privacy policy, written for what the app really does: UIDs, IP addresses (rate limits and server
   logs), the pasted wish history link (used once, never kept), pulls kept in the browser's local
@@ -98,8 +100,7 @@ have a lawyer read the texts before launch.
   checked the deployed site by hand on 16 November 2026 (CORS, validation, traversal, the history
   host, the limits, headers) and fixed what it found: HSTS, http moved to https before the
   password, request bodies capped at 64 kB, no docs pages, `CLIENT_IP_HEADER` for the limits.
-  Run strix before launch if a key becomes available. Owner's part: protect `main` from pushes by the Actions token, and a random
-  `SITE_PASSWORD` of 20 or more characters. Run the scan from the main session with the Workflow
+  Run strix before launch if a key becomes available. Owner's part: protect `main` from pushes by the Actions token. Run the scan from the main session with the Workflow
   tool (`/config workflows=true`): a subagent has no Workflow tool and stops at once.
 - Telegram: the bot's token is a secret (environment variable, never in the repository or logs);
   the privacy policy covers the Telegram user ids and messages the bot receives, how long they
@@ -107,22 +108,23 @@ have a lawyer read the texts before launch.
   bot keeps on disk the ids of chats that chose a language with `/lang`, until they are deleted.
 - Shared links: a link to a build carries the player's UID; whoever has it sees that showcase.
   Say so in the privacy policy (a UID is public in the game, but the link tells who shared it).
-- Operations: HTTPS only, `CLIENT_IP_HEADER=CF-Connecting-IP` behind Cloudflare (elsewhere
-  `FORWARDED_ALLOW_IPS` set to the proxy, never `*`), rate limits and cache moved out of process
-  if there is more than one worker, a contact address for abuse reports. Ask the host whether the
-  app can be reached around Cloudflare: if it can, `CF-Connecting-IP` can be forged.
+- Operations: HTTPS only, `CLIENT_IP_HEADER=x-real-ip` on Vercel (Vercel writes it; behind
+  Cloudflare `CF-Connecting-IP`, elsewhere `FORWARDED_ALLOW_IPS` set to the proxy, never `*`),
+  rate limits and cache moved out of process once traffic needs more than a few function
+  instances, a contact address for abuse reports. Never set `CF-Connecting-IP` on Vercel: it
+  passes that header through as the visitor wrote it.
 
 ## Owner checks still open
 
 Remind the owner of these until they confirm them.
 
-- After the security hardening is deployed: `curl -sI http://<site>/` answers 308 with a
-  `Location` on the site's own https address; only then set `SITE_PASSWORD` (20+ random
-  characters) and `CLIENT_IP_HEADER=CF-Connecting-IP` on SnapDeploy.
-- Ask SnapDeploy whether the container can be reached without Cloudflare; if it can,
-  `CF-Connecting-IP` can be forged (the `shortcut:` in `backend/app/ratelimit.py`).
+- Install the Vercel GitHub app on this repository, so pushes to `main` deploy and each pull
+  request gets a preview; then a session runs `vercel git connect`. Then shut SnapDeploy down.
+- How long Vercel keeps the runtime logs on the Hobby plan (the dashboard shows it): the
+  `[LOG DAYS]` of `LEGAL-DRAFTS.md`. The function runs in the US (`iad1`): the `[HOST]` country.
 - Confirmed so far: Secret scanning and Push protection are on; Star Rail final stats
-  match the game once numbers are cut off the way the game prints them (1160.63 DEF reads 1160).
+  match the game once numbers are cut off the way the game prints them (1160.63 DEF reads 1160);
+  `CLIENT_IP_HEADER=x-real-ip` is set on Vercel, Production and Preview (22 November 2026).
 
 ## Working notes
 
@@ -135,13 +137,17 @@ For a session picking the work up again.
   fill `LEGAL-DRAFTS.md`, translate it to Russian and make the privacy policy and terms pages
   (EN and RU, linked from the footer, driven in `app.spec.ts`); a lawyer reads them first;
   (2) strix against the deployed site, once a key is available; (3) operations: the host's
-  HTTPS setting, `CLIENT_IP_HEADER` and `SITE_PASSWORD` on SnapDeploy, an abuse
+  HTTPS setting, an abuse
   contact, the site's address in Enka's User-Agent, `noindex` off only on launch day.
   Waiting on the owner: name and email (Outlook was down), the lawyer (StarRailRes is AGPL-3.0),
   sending `HOYOVERSE-LETTER.md`. Donations stay out until HoYoverse says yes in writing. `HANDOFF.md` holds the owner's task list and the plan of
   stages 17 to 22; `README.md` and this file win where they differ.
 - PR #19 is merged: the owner's November 2026 choices. Tool icons were the games' own menu
-  signs then; the owner had them redrawn as the site's own in stage 21. The site's mark and browser icon are a
+  signs then; the owner had them redrawn as the site's own in stage 21, then (16 November 2026)
+  redrawn again to look like the games' signs without copying them (on 18 November 2026 Star
+  Rail's build sign was redrawn once more and Genshin's became a sword; the others are as of
+  16 November), Genshin's tools with their
+  own (`gi-builds`, `gi-wishes`, `gi-history`). The site's mark and browser icon are a
   four-pointed star drawn for it (the owner did not like the Stellar Jade there). The
   palette is plain grey and blue. The wide-screen layout fills the screen (fields across the
   page, results below).
@@ -149,7 +155,7 @@ For a session picking the work up again.
   effects table's rest (Aglaea's Supreme Stance, Robin • Summeretto's Fever, extra turns, later
   kits of Welt and Jingliu by trace ids, base chances). Left: Ultimates by energy (needs a source).
   The owner took the Telegram bot's host and Mini App out of the plan (November 2026); the bot's
-  code stays. Stage 20, Genshin, follows `STAGE-20.md`: PR A (talent multipliers from the game's
+  code stays. Stage 20, Genshin (its plan file was removed once built): PR A (talent multipliers from the game's
   tables, hits in the damage form, shred, flat damage, Aggravate and Spread) and PR B (Capturing
   Radiance as the published average, the artifact trial, the 50/50 share) are built. Next by
   HANDOFF.md: stage 21, getting ready for a public launch.
@@ -174,7 +180,12 @@ For a session picking the work up again.
   owner asked for headroom and get-shit-done; neither was installed (headroom proxies model
   traffic, which a cloud session cannot route; get-shit-done is archived and moved to
   `open-gsd/gsd-core`, and adds hooks and a workflow of its own).
-- Hosting: the owner tests the site on SnapDeploy (Docker from GitHub, free tier sleeps when
-  idle), behind `SITE_PASSWORD`. Its acceptable use policy refuses Telegram bot frameworks, so the
-  bot needs another host. The owner gave an email for the privacy policy's contact: use it only
+- Hosting: since 22 November 2026 the site runs on Vercel, project
+  `professional-skibidists/hoyo-toolkit` (Hobby), https://hoyo-toolkit.vercel.app: `vercel.json`
+  makes the Vite build a CDN service and the FastAPI app a Python function for `/api`. Deploy with
+  `vercel deploy` from the repo root (CLI logged in as the owner) until Git is connected. It
+  replaced SnapDeploy; the Dockerfile stays for self-hosting and the CI `docker` job. Open
+  without a password by the owner's choice (November 2026: only two people use it); on Vercel
+  `SITE_PASSWORD` would lock only `/api`. Do not ask for a password again. The Telegram bot
+  needs another host: Vercel runs no long-lived process. The owner gave an email for the privacy policy's contact: use it only
   in that page, when it is written, and remind them it will be public there.
