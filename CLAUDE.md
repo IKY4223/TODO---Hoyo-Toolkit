@@ -152,7 +152,7 @@ For a session picking the work up again.
   effects table's rest (Aglaea's Supreme Stance, Robin • Summeretto's Fever, extra turns, later
   kits of Welt and Jingliu by trace ids, base chances). Left: Ultimates by energy (needs a source).
   The owner took the Telegram bot's host and Mini App out of the plan (November 2026); the bot's
-  code stays. Stage 20, Genshin, follows `STAGE-20.md`: PR A (talent multipliers from the game's
+  code stays. Stage 20, Genshin (its plan file was removed once built): PR A (talent multipliers from the game's
   tables, hits in the damage form, shred, flat damage, Aggravate and Spread) and PR B (Capturing
   Radiance as the published average, the artifact trial, the 50/50 share) are built. Next by
   HANDOFF.md: stage 21, getting ready for a public launch.
