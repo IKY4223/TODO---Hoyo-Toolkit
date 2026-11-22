@@ -6,6 +6,7 @@ import {
   tierValue,
   turnValue,
   chanceOf,
+  realChance,
   syzygyBonus,
   valueFor,
   withEffects,
@@ -170,6 +171,13 @@ test("a debuff says its base chance at the character's skill level, Eidolons add
   expect(chanceOf(turn('welt-skill-e4'), { ...WELT, eidolon: 4 })).toBeCloseTo(1.1)
   expect(chanceOf(turn('welt-ultimate'), WELT)).toBe(1)
   expect(chanceOf(turn('boothill-ultimate'), WELT)).toBeUndefined() // a delay with no chance
+})
+
+test('Effect Hit Rate raises a base chance and Effect RES lowers it, never past 100%', () => {
+  expect(realChance(0.75, 0.2, 0)).toBeCloseTo(0.9)
+  expect(realChance(0.75, 0.2, 0.4)).toBeCloseTo(0.54)
+  expect(realChance(1, 0.67, 0.4)).toBe(1) // 1.002, capped
+  expect(realChance(1, 0, 1.2)).toBe(0) // Effect RES past 100% cannot make it negative
 })
 
 test("Jingliu enters her state with one more Syzygy in the later kit, and one more from Eidolon 6", () => {

@@ -128,8 +128,8 @@ Planned, in order:
    energy gain, which neither StarRailRes nor Enka.Network's store gives: it waits for a source.
    Left out of the effects built so far, each with a `shortcut:` comment in
    `frontend/src/starrail/effects.ts`, as each depends on the battle or waits its turn:
-   - debuffs weighed by Effect Hit Rate against the enemy's Effect RES (the base chance is shown
-     and the player ticks whether it landed);
+   - an enemy's RES to a debuff's own kind (with the enemy's Effect RES typed in, the chance
+     weighed by Effect Hit Rate is shown, a community formula; the player ticks whether it landed);
    - Welt's Weightless delay per hit taken; the later Jingliu's Syzygy from allies losing HP; the
      later Firefly's countdown delay per Weakness Break;
    - Robin • Summeretto's Vibes from the Special Guest, her Technique and Eidolon 2's first gain,

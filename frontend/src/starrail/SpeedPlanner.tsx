@@ -8,6 +8,7 @@ import {
   baseOf,
   chanceOf,
   feverOf,
+  realChance,
   statOf,
   syzygyBonus,
   turnValue,
@@ -28,6 +29,7 @@ const ICON_SIZE = 40
 const SUMMON = ':summon'
 const ENEMY = 'enemy'
 const MAX_ENEMY_SPD = 999
+const PERCENT = 100
 const TENTHS = 10
 const speed = numberFormat({ minimumFractionDigits: 1, maximumFractionDigits: 1 })
 // Rounded up: 133.3 SPD would fall short of a 133.34 breakpoint.
@@ -116,6 +118,7 @@ export function SpeedPlanner(): JSX.Element {
   const [picked, setPicked] = useState<number[]>()
   const [changes, setChanges] = useState<Readonly<Record<number, Settings>>>({})
   const [enemySpd, setEnemySpd] = useState('')
+  const [enemyRes, setEnemyRes] = useState('')
   const teamIds = picked ?? characters.slice(0, TEAM_SIZE).map(({ id }) => id)
   const team = characters.filter(({ id }) => teamIds.includes(id))
 
@@ -139,6 +142,12 @@ export function SpeedPlanner(): JSX.Element {
   }
 
   const typed = Number(enemySpd)
+  const res = Number(enemyRes) / PERCENT
+  // A debuff's chance against the enemy, once its Effect RES is typed in.
+  const realOf = (chance: number | undefined, character: StarRailCharacter): number | undefined =>
+    chance === undefined || enemyRes === '' || !(res >= 0 && res <= 1)
+      ? undefined
+      : realChance(chance, statOf(character, 'effect_hit_rate'), res)
   const enemy: Unit[] =
     enemySpd && typed > 0 && typed <= MAX_ENEMY_SPD
       ? [{ key: ENEMY, spd: typed, baseSpd: typed, ultimateEvery: 0, effects: [], enemy: true }]
@@ -207,6 +216,19 @@ export function SpeedPlanner(): JSX.Element {
               value={enemySpd}
               placeholder={t('No enemy')}
               onChange={(event) => setEnemySpd(event.target.value)}
+            />
+          </label>
+          <label>
+            {t('Enemy Effect RES, %')}
+            <input
+              type="number"
+              inputMode="decimal"
+              min={0}
+              max={PERCENT}
+              step="any"
+              value={enemyRes}
+              placeholder={t('Unknown')}
+              onChange={(event) => setEnemyRes(event.target.value)}
             />
           </label>
           <ul className="cards">
@@ -293,7 +315,13 @@ export function SpeedPlanner(): JSX.Element {
                             <span>
                               <strong>{sourceName(effect.source, character, t)}</strong>
                               <br />
-                              {turnEffectText(effect, value, t, chanceOf(effect, character))}
+                              {turnEffectText(
+                                effect,
+                                value,
+                                t,
+                                chanceOf(effect, character),
+                                realOf(chanceOf(effect, character), character),
+                              )}
                             </span>
                           </label>
                         ))}

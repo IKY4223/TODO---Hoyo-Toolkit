@@ -236,6 +236,10 @@ const RU = {
   once: 'один раз',
   'from Eidolon {eidolon}': 'с эйдолона {eidolon}',
   'lands at a base chance of {chance}': 'попадает с базовым шансом {chance}',
+  'lands at a base chance of {chance}, {real} against this enemy':
+    'попадает с базовым шансом {chance}, по этому врагу {real}',
+  'Enemy Effect RES, %': 'Сопротивление эффектам врага, %',
+  'Unknown': 'Неизвестно',
   'Its owner': 'Его владелец',
   'Own countdown': 'Свой отсчёт',
   'comes in': 'появляется',

@@ -97,6 +97,16 @@ test('memosprites and summons take their own turns', () => {
   ])
 })
 
+test("a debuff's chance against the enemy comes once its Effect RES is typed in", () => {
+  const welt = character(1004, 'Welt', 120)
+  show([{ ...welt, stats: [...welt.stats, { key: 'effect_hit_rate', value: 0.2 }] }])
+  const base = 'Every turn · Enemies: SPD −10% · lasts 2 turns · lands at a base chance of 75%'
+  expect(screen.getByText(base)).toBeDefined()
+  // 75% × (1 + 20% Effect Hit Rate) × (1 − 40% Effect RES) = 54%.
+  fireEvent.change(screen.getByLabelText('Enemy Effect RES, %'), { target: { value: '40' } })
+  expect(screen.getByText(`${base}, 54% against this enemy`)).toBeDefined()
+})
+
 test('a team has at most four members', () => {
   show([1, 2, 3, 4, 5].map((id) => character(id, `C${id}`, 100)))
   const fifth = screen.getByLabelText('C5')
