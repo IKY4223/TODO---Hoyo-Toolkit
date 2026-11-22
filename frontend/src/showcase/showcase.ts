@@ -95,6 +95,7 @@ const isWeapon = (value: unknown): value is Weapon =>
 const isArtifact = (value: unknown): value is Artifact =>
   isRecord(value) &&
   isKeyOf(SLOTS, value.slot) &&
+  isNumber(value.set_id) &&
   isString(value.set_name) &&
   isNumber(value.rarity) &&
   isNumber(value.level) &&

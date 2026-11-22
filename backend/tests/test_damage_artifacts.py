@@ -130,6 +130,7 @@ def test_answers_the_damage_now_and_with_each_candidate() -> None:
         {"candidates": [{**REQUEST["equipped"][0], "subs": [REQUEST["equipped"][0]["main"]] * 5}]},
         {"candidates": [{**REQUEST["equipped"][0], "slot": "hat"}]},
         {"candidates": [{**REQUEST["equipped"][0], "set_id": -1}]},
+        {"candidates": [{**REQUEST["equipped"][0], "set_id": 1_000_001}]},
     ],
     ids=[
         "no candidates",
@@ -142,7 +143,8 @@ def test_answers_the_damage_now_and_with_each_candidate() -> None:
         "one base thrice",
         "five subs",
         "slot",
-        "set id",
+        "negative set id",
+        "set id too large",
     ],
 )
 def test_rejects_requests_no_showcase_can_make(override: dict[str, Any]) -> None:
@@ -160,8 +162,25 @@ def test_a_swap_that_breaks_a_set_loses_its_bonus() -> None:
         json={**REQUEST, "equipped": equipped, "candidates": [same_set, other_set]},
     ).json()
     assert body["candidates"][0] == pytest.approx(body["current"])
-    # The same piece without the set: her ATK falls by 18% of her base, and her damage with it.
-    assert body["candidates"][1]["average"] < body["current"]["average"]
+    # The same piece without the set: Gladiator's ATK +18% of her base is gone, nothing else.
+    weaker = {**STATS, StatKey.ATK: STATS[StatKey.ATK] - 0.18 * BASE[StatKey.ATK]}
+    expected = client.post(
+        "/api/damage",
+        json={**REQUEST, "stats": [{"key": key, "value": value} for key, value in weaker.items()]},
+    ).json()
+    assert body["candidates"][1] == pytest.approx(expected)
+
+
+def test_an_artifact_sent_without_its_set_counts_as_no_set() -> None:
+    # Clients from before set ids leave the field out; the trial still answers.
+    bare = [
+        {key: value for key, value in item.items() if key != "set_id"}
+        for item in REQUEST["equipped"]
+    ]
+    response = client.post(
+        "/api/damage/artifacts", json={**REQUEST, "equipped": bare, "candidates": bare[:1]}
+    )
+    assert response.status_code == 200
 
 
 def test_the_showcase_gives_each_artifact_its_set() -> None:

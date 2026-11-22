@@ -91,7 +91,8 @@ test('a swap that breaks a set loses its 2-piece bonus', async ({ page }) => {
   await amber.getByLabel('Hit').selectOption('0') // a Normal Attack: Physical
   await amber.getByRole('button', { name: 'Try artifacts from the showcase' }).click()
   // Ganyu's plume and circlet would add damage on their stats alone, but each breaks one of
-  // Amber's two 2-piece sets (Physical DMG +25%), so no slot does better.
+  // Amber's two 2-piece sets (Physical DMG +25%); her flower breaks one too, and her sands and
+  // goblet (Elemental Mastery, Cryo DMG) do nothing for a Physical hit. No slot does better.
   await expect(amber.locator('.trials').getByText('no artifact here does better')).toHaveCount(5)
 })
 
