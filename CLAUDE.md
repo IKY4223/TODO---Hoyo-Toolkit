@@ -108,20 +108,23 @@ have a lawyer read the texts before launch.
   bot keeps on disk the ids of chats that chose a language with `/lang`, until they are deleted.
 - Shared links: a link to a build carries the player's UID; whoever has it sees that showcase.
   Say so in the privacy policy (a UID is public in the game, but the link tells who shared it).
-- Operations: HTTPS only, `CLIENT_IP_HEADER=CF-Connecting-IP` behind Cloudflare (elsewhere
-  `FORWARDED_ALLOW_IPS` set to the proxy, never `*`), rate limits and cache moved out of process
-  if there is more than one worker, abuse reports through the repository's issues (no email, the owner's choice). Ask the host whether the
-  app can be reached around Cloudflare: if it can, `CF-Connecting-IP` can be forged.
+- Operations: HTTPS only, `CLIENT_IP_HEADER=x-real-ip` on Vercel (Vercel writes it; behind
+  Cloudflare `CF-Connecting-IP`, elsewhere `FORWARDED_ALLOW_IPS` set to the proxy, never `*`),
+  rate limits and cache moved out of process once traffic needs more than a few function
+  instances, abuse reports through the repository's issues (no email, the owner's choice). Never
+  set `CF-Connecting-IP` on Vercel: it passes that header through as the visitor wrote it.
 
 ## Owner checks still open
 
 Remind the owner of these until they confirm them.
 
-- Ask SnapDeploy whether the container can be reached without Cloudflare; if it can,
-  `CF-Connecting-IP` can be forged (the `shortcut:` in `backend/app/ratelimit.py`).
+- Install the Vercel GitHub app on this repository, so pushes to `main` deploy and each pull
+  request gets a preview; then a session runs `vercel git connect`.
+- How long Vercel keeps the runtime logs on the Hobby plan (the dashboard shows it): the
+  `[LOG DAYS]` of `LEGAL-DRAFTS.md`. The function runs in the US (`iad1`): the `[HOST]` country.
 - Confirmed so far: Secret scanning and Push protection are on; Star Rail final stats
   match the game once numbers are cut off the way the game prints them (1160.63 DEF reads 1160);
-  `CLIENT_IP_HEADER=CF-Connecting-IP` is set on SnapDeploy (16 November 2026).
+  `CLIENT_IP_HEADER=x-real-ip` is set on Vercel, Production and Preview (22 November 2026).
 
 ## Working notes
 
@@ -176,9 +179,13 @@ For a session picking the work up again.
   owner asked for headroom and get-shit-done; neither was installed (headroom proxies model
   traffic, which a cloud session cannot route; get-shit-done is archived and moved to
   `open-gsd/gsd-core`, and adds hooks and a workflow of its own).
-- Hosting: the owner tests the site on SnapDeploy (Docker from GitHub, free tier sleeps when
-  idle), open without a password by the owner's choice (November 2026: only two people use it).
-  The code's password gate (`SITE_PASSWORD`) stays for later; do not ask for it again. Its
-  acceptable use policy refuses Telegram bot frameworks, so the
-  bot needs another host. The site shows no email anywhere: questions, data requests and abuse
-  reports go to the repository's issues (the owner's choice, 18 November 2026).
+- Hosting: since 22 November 2026 the site runs on Vercel, project
+  `professional-skibidists/hoyo-toolkit` (Hobby), https://hoyo-toolkit.vercel.app: `vercel.json`
+  makes the Vite build a CDN service and the FastAPI app a Python function for `/api`. Deploy with
+  `vercel deploy` from the repo root (CLI logged in as the owner) until Git is connected. It
+  replaced SnapDeploy, whose account the owner deleted; the Dockerfile stays for self-hosting and
+  the CI `docker` job. Open without a password by the owner's choice (November 2026: only two
+  people use it); on Vercel `SITE_PASSWORD` would lock only `/api`. Do not ask for a password
+  again. The Telegram bot needs another host: Vercel runs no long-lived process. The site shows no
+  email anywhere: questions, data requests and abuse reports go to the repository's issues (the
+  owner's choice, 18 November 2026).

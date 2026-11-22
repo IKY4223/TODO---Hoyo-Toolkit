@@ -29,8 +29,8 @@ router = APIRouter(
     dependencies=[Depends(limited(showcase_api.limiter))],
 )
 
-# shortcut: the cache lives in one process, so each worker keeps its own;
-# move it to Redis when the app runs more than one worker.
+# shortcut: the cache lives in one process, so each worker (on Vercel, each function instance)
+# keeps its own; move it to Redis when traffic grows past a few instances.
 cache = TtlCache[dict[Language, StarRailShowcase]](max_entries=256)
 
 
