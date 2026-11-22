@@ -25,6 +25,8 @@ class GameData(BaseModel):
     characters: dict[str, CharacterData]
     weapons: dict[str, str]
     sets: dict[str, str]
+    # A set id -> the stats its 2-piece effect always gives; conditional effects are not here.
+    set_bonuses: dict[str, dict[StatKey, float]] = {}
 
 
 class TalentName(BaseModel):

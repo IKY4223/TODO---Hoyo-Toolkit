@@ -201,8 +201,10 @@ test('hit names follow the language', async () => {
   }
 })
 
+const SET_IDS: Readonly<Record<string, number>> = { Gladiator: 15001, 'Noblesse Oblige': 15007 }
 const sands = (name: string, share: number): Artifact => ({
   slot: 'sands',
+  set_id: SET_IDS[name] ?? 0,
   set_name: name,
   rarity: 5,
   level: 20,
@@ -242,9 +244,11 @@ test('tries the artifacts others in the showcase wear, in place of the own one',
   expect(url).toBe('/api/damage/artifacts')
   expect(JSON.parse(String(init.body))).toMatchObject({
     base_stats: amber.base_stats,
-    equipped: [{ slot: 'sands', main: { key: 'atk_percent', value: 0.4 } }],
+    // Each with its set, so a swap that breaks or completes one recounts its bonus.
+    equipped: [{ slot: 'sands', set_id: 15001, main: { key: 'atk_percent', value: 0.4 } }],
     candidates: CANDIDATES.map(({ artifact }) => ({
       slot: artifact.slot,
+      set_id: artifact.set_id,
       main: artifact.main,
       subs: artifact.subs,
     })),

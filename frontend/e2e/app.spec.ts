@@ -84,6 +84,18 @@ test("guesses a catalyst's Normal Attack as its element", async ({ page }) => {
   await expect(lisa.getByLabel('Damage bonus')).toHaveValue('electro_dmg')
 })
 
+test('a swap that breaks a set loses its 2-piece bonus', async ({ page }) => {
+  await loadShowcase(page)
+  const amber = card(page, 'Amber')
+  await amber.getByText('Damage', { exact: true }).click()
+  await amber.getByLabel('Hit').selectOption('0') // a Normal Attack: Physical
+  await amber.getByRole('button', { name: 'Try artifacts from the showcase' }).click()
+  // Ganyu's plume and circlet would add damage on their stats alone, but each breaks one of
+  // Amber's two 2-piece sets (Physical DMG +25%); her flower breaks one too, and her sands and
+  // goblet (Elemental Mastery, Cryo DMG) do nothing for a Physical hit. No slot does better.
+  await expect(amber.locator('.trials').getByText('no artifact here does better')).toHaveCount(5)
+})
+
 test('calculates damage for an imported character', async ({ page }) => {
   await loadShowcase(page)
   const ganyu = card(page, 'Ganyu')

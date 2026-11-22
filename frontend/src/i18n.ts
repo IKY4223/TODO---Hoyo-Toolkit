@@ -139,8 +139,8 @@ const RU = {
   'Enemy DEF ignored, %': 'Игнорирование защиты врага, %',
   'Enemy RES reduction, %': 'Снижение сопротивления врага, %',
   'Try artifacts from the showcase': 'Примерить артефакты с витрины',
-  "For the hit above: each slot's best artifact among those the showcase's other characters wear. Set bonuses are not recounted.":
-    'Для удара выше: лучший артефакт каждого слота из тех, что носят другие персонажи витрины. Бонусы наборов не пересчитываются.',
+  "For the hit above: each slot's best artifact among those the showcase's other characters wear. A set's 2-piece stat bonus is recounted; other set effects are not.":
+    'Для удара выше: лучший артефакт каждого слота из тех, что носят другие персонажи витрины. Бонус характеристик за 2 предмета набора пересчитывается, другие эффекты наборов — нет.',
   'no artifact here does better': 'лучше нынешнего нет',
   'DEF reduction counts up to 90%, as in the game.':
     'Снижение защиты учитывается до 90%, как в игре.',

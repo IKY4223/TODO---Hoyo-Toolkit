@@ -3121,6 +3121,153 @@
    "weapon_type": "sword"
   }
  },
+ "set_bonuses": {
+  "10001": {
+   "atk_percent": 0.18
+  },
+  "10002": {
+   "atk_percent": 0.18
+  },
+  "10003": {
+   "def_percent": 0.3
+  },
+  "10005": {
+   "crit_rate": 0.12
+  },
+  "10007": {
+   "elemental_mastery": 80.0
+  },
+  "10009": {
+   "energy_recharge": 0.2
+  },
+  "10010": {
+   "hp": 1000.0
+  },
+  "10011": {
+   "def": 100.0
+  },
+  "10012": {
+   "energy_recharge": 0.2
+  },
+  "10013": {},
+  "14001": {
+   "cryo_dmg": 0.15
+  },
+  "14002": {},
+  "14003": {},
+  "14004": {
+   "healing_bonus": 0.15
+  },
+  "15001": {
+   "atk_percent": 0.18
+  },
+  "15002": {
+   "anemo_dmg": 0.15
+  },
+  "15003": {
+   "elemental_mastery": 80.0
+  },
+  "15004": {
+   "cryo_dmg": 0.15
+  },
+  "15005": {
+   "electro_dmg": 0.15
+  },
+  "15006": {
+   "pyro_dmg": 0.15
+  },
+  "15008": {
+   "physical_dmg": 0.25
+  },
+  "15014": {
+   "geo_dmg": 0.15
+  },
+  "15015": {},
+  "15016": {
+   "hydro_dmg": 0.15
+  },
+  "15017": {
+   "hp_percent": 0.2
+  },
+  "15018": {
+   "physical_dmg": 0.25
+  },
+  "15019": {
+   "atk_percent": 0.18
+  },
+  "15020": {
+   "energy_recharge": 0.2
+  },
+  "15021": {
+   "def_percent": 0.3
+  },
+  "15022": {
+   "healing_bonus": 0.15
+  },
+  "15023": {
+   "atk_percent": 0.18
+  },
+  "15024": {
+   "atk_percent": 0.18
+  },
+  "15025": {
+   "dendro_dmg": 0.15
+  },
+  "15026": {
+   "elemental_mastery": 80.0
+  },
+  "15027": {
+   "anemo_dmg": 0.15
+  },
+  "15028": {
+   "elemental_mastery": 80.0
+  },
+  "15029": {
+   "hydro_dmg": 0.15
+  },
+  "15030": {
+   "hp_percent": 0.2
+  },
+  "15033": {
+   "healing_bonus": 0.15
+  },
+  "15034": {
+   "atk_percent": 0.18
+  },
+  "15035": {
+   "atk_percent": 0.18
+  },
+  "15036": {
+   "atk_percent": 0.18
+  },
+  "15040": {
+   "cryo_dmg": 0.15
+  },
+  "15041": {
+   "elemental_mastery": 80.0
+  },
+  "15042": {
+   "energy_recharge": 0.2
+  },
+  "15043": {
+   "elemental_mastery": 80.0
+  },
+  "15044": {
+   "atk_percent": 0.18
+  },
+  "15045": {
+   "energy_recharge": 0.2
+  },
+  "15046": {
+   "atk_percent": 0.18
+  },
+  "15047": {
+   "atk_percent": 0.18
+  },
+  "15048": {
+   "atk_percent": 0.18
+  }
+ },
  "sets": {
   "10001": "Resolution of Sojourner",
   "10002": "Brave Heart",

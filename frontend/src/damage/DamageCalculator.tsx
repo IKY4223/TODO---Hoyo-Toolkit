@@ -174,8 +174,9 @@ function Reduction(props: {
 // A transformative reaction is damage too: an Elemental Mastery piece may lose on the hit.
 const total = (damage: Damage): number => damage.average + damage.reaction
 
-const statsOf = ({ slot, main, subs }: Artifact): ArtifactRequest['equipped'][number] => ({
+const statsOf = ({ slot, set_id, main, subs }: Artifact): ArtifactRequest['equipped'][number] => ({
   slot,
+  set_id,
   main,
   subs,
 })
@@ -478,7 +479,7 @@ export function DamageCalculator(props: {
           </button>
           <p className="hint">
             {t(
-              "For the hit above: each slot's best artifact among those the showcase's other characters wear. Set bonuses are not recounted.",
+              "For the hit above: each slot's best artifact among those the showcase's other characters wear. A set's 2-piece stat bonus is recounted; other set effects are not.",
             )}
           </p>
           {'message' in trial && <p role="alert">{localized(trial.message)}</p>}

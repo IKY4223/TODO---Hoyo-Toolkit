@@ -70,6 +70,7 @@ class Weapon:
 @dataclass(frozen=True)
 class Artifact:
     slot: Slot
+    set_id: int  # the game's id; GameData names it and gives its 2-piece stat bonus
     set_name: str
     rarity: int
     level: int  # 0 to 20
