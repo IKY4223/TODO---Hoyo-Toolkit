@@ -83,6 +83,29 @@ ELEMENTS = {
     "Grass": "dendro",
     "None": None,  # the Traveler before resonating with an element
 }
+# The fight prop ids of Enka's set bonuses (relics.json AddProps) that change damage, as the API
+# keys them. Checked against the game's own names for each id (EquipAffixExcelConfigData, level 0
+# of each set's affix, November 2026). Incoming healing (27), Pyro and Electro RES (50, 51) and
+# Shield Strength (81) deal no damage and are left out.
+SET_STATS = {
+    "2": "hp",
+    "3": "hp_percent",
+    "6": "atk_percent",
+    "8": "def",
+    "9": "def_percent",
+    "20": "crit_rate",
+    "23": "energy_recharge",
+    "26": "healing_bonus",
+    "28": "elemental_mastery",
+    "30": "physical_dmg",
+    "40": "pyro_dmg",
+    "41": "electro_dmg",
+    "42": "hydro_dmg",
+    "43": "dendro_dmg",
+    "44": "anemo_dmg",
+    "45": "geo_dmg",
+    "46": "cryo_dmg",
+}
 WEAPON_TYPES = {
     "WEAPON_SWORD_ONE_HAND": "sword",
     "WEAPON_CLAYMORE": "claymore",
@@ -192,6 +215,7 @@ def talents(groups: set[int]) -> dict[str, list[dict[str, Any]]]:
 
 def main() -> None:
     names = load("locs.json")["en"]
+    relic_sets = load("relics.json")["Sets"]
     gamedata = {
         "characters": {
             key: {
@@ -215,8 +239,11 @@ def main() -> None:
             key: names[str(weapon["NameTextMapHash"])]
             for key, weapon in load("weapons.json").items()
         },
-        "sets": {
-            key: names[relic_set["Name"]] for key, relic_set in load("relics.json")["Sets"].items()
+        "sets": {key: names[relic_set["Name"]] for key, relic_set in relic_sets.items()},
+        "set_bonuses": {
+            key: {SET_STATS[prop]: value for prop, value in props.items() if prop in SET_STATS}
+            for key, relic_set in relic_sets.items()
+            if (props := relic_set.get("AddProps"))
         },
     }
     TARGET.write_text(json.dumps(gamedata, ensure_ascii=False, indent=1, sort_keys=True) + "\n")

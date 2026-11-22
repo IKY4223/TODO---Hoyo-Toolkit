@@ -39,6 +39,7 @@ const SHOWCASE: Showcase = {
       artifacts: [
         {
           slot: 'flower',
+          set_id: 15008,
           set_name: 'Bloodstained Chivalry',
           rarity: 5,
           level: 20,

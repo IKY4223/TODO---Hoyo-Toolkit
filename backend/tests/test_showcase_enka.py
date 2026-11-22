@@ -135,6 +135,7 @@ def test_artifact_stats_are_fractions_for_percent_stats(showcase: Showcase) -> N
     flower = showcase.characters[0].artifacts[0]
     assert flower == Artifact(
         slot=Slot.FLOWER,
+        set_id=15008,
         set_name="Bloodstained Chivalry",
         rarity=5,
         level=20,

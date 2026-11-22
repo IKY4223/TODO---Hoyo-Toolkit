@@ -3,7 +3,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field, field_validator
 
-from app.damage.artifacts import swap
+from app.damage.artifacts import set_change, swap
 from app.damage.engine import Damage, Enemy, Hit, Reaction, Transformative, damage
 from app.ratelimit import RateLimiter, limited
 from app.showcase.models import Scaling, Slot, Stat, StatKey
@@ -32,6 +32,7 @@ MAX_RESISTANCE = 10
 MAX_FLAT = 1_000_000
 MAX_SUBSTATS = 4
 MAX_CANDIDATES = 60  # every artifact of a full showcase: 12 characters, 5 slots
+MAX_SET_ID = 1_000_000  # set ids run to 15 048 today
 
 limiter = RateLimiter(limit=60, window=60)
 
@@ -90,6 +91,7 @@ class BaseStat(BaseModel):
 
 class ArtifactStats(BaseModel):
     slot: Slot
+    set_id: int = Field(default=0, ge=0, le=MAX_SET_ID, description="0 when unknown: no set bonus")
     main: StatValue
     subs: list[StatValue] = Field(max_length=MAX_SUBSTATS)
 
@@ -156,17 +158,19 @@ def compare_artifacts(request: ArtifactRequest) -> ArtifactComparison:
     """The hit's damage now, and with each candidate in place of the artifact in its slot."""
     stats = {stat.key: stat.value for stat in request.stats}
     base: dict[StatKey, float] = {stat.key: stat.value for stat in request.base_stats}
-    worn = {artifact.slot: _stats(artifact) for artifact in reversed(request.equipped)}
+    # The first artifact given for a slot is the one worn there.
+    worn = {artifact.slot: artifact for artifact in reversed(request.equipped)}
+    sets = [artifact.set_id for artifact in worn.values()]
     hit, enemy = _hit(request), _enemy(request)
+
+    def put_on(candidate: ArtifactStats) -> dict[StatKey, float]:
+        old = worn.get(candidate.slot)
+        bonus = set_change(sets, old.set_id if old else None, candidate.set_id)
+        return swap(stats, base, _stats(old) if old else [], [*_stats(candidate), *bonus])
+
     return ArtifactComparison(
         current=damage(request.level, stats, hit, enemy),
         candidates=[
-            damage(
-                request.level,
-                swap(stats, base, worn.get(candidate.slot, []), _stats(candidate)),
-                hit,
-                enemy,
-            )
-            for candidate in request.candidates
+            damage(request.level, put_on(candidate), hit, enemy) for candidate in request.candidates
         ],
     )

@@ -201,6 +201,8 @@ export interface components {
         /** Artifact */
         Artifact: {
             slot: components["schemas"]["Slot"];
+            /** Set Id */
+            set_id: number;
             /** Set Name */
             set_name: string;
             /** Rarity */
@@ -288,6 +290,12 @@ export interface components {
         /** ArtifactStats */
         ArtifactStats: {
             slot: components["schemas"]["Slot"];
+            /**
+             * Set Id
+             * @description 0 when unknown: no set bonus
+             * @default 0
+             */
+            set_id: number;
             main: components["schemas"]["StatValue"];
             /** Subs */
             subs: components["schemas"]["StatValue"][];

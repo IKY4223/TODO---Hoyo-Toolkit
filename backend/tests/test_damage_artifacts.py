@@ -6,9 +6,10 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
-from app.damage.artifacts import swap
+from app.damage.artifacts import set_change, swap
 from app.main import app
 from app.showcase.enka import parse
+from app.showcase.gamedata import GAMEDATA
 from app.showcase.models import Stat, StatKey
 
 client = TestClient(app)
@@ -30,6 +31,27 @@ def test_base_stats_come_from_the_showcase() -> None:
     assert BASE[StatKey.ATK] == pytest.approx(942.92, abs=0.01)
     assert BASE[StatKey.HP] == pytest.approx(9796.73, abs=0.01)
     assert BASE[StatKey.DEF] == pytest.approx(630.21, abs=0.01)
+
+
+GLADIATOR, NOBLESSE = 15001, 15007  # 2-piece: ATK +18%; Elemental Burst DMG +20%, not a stat
+
+
+def test_a_set_keeps_its_bonus_when_one_piece_gives_way_to_another_of_it() -> None:
+    assert set_change([GLADIATOR, GLADIATOR, 0], GLADIATOR, GLADIATOR) == []
+
+
+def test_breaking_a_two_piece_set_takes_its_bonus_away() -> None:
+    assert set_change([GLADIATOR, GLADIATOR, NOBLESSE], GLADIATOR, NOBLESSE) == [
+        Stat(StatKey.ATK_PERCENT, -0.18)
+    ]
+
+
+def test_completing_a_two_piece_set_adds_its_bonus() -> None:
+    assert set_change([GLADIATOR, NOBLESSE], None, GLADIATOR) == [Stat(StatKey.ATK_PERCENT, 0.18)]
+
+
+def test_a_set_whose_bonus_is_no_stat_adds_nothing() -> None:
+    assert set_change([NOBLESSE], None, NOBLESSE) == []
 
 
 def test_putting_the_same_artifact_back_changes_nothing() -> None:
@@ -60,6 +82,7 @@ def test_a_goblet_of_another_element_moves_the_bonus() -> None:
 def _artifact(item: Any) -> dict[str, Any]:
     return {
         "slot": item.slot,
+        "set_id": item.set_id,
         "main": {"key": item.main.key, "value": item.main.value},
         "subs": [{"key": sub.key, "value": sub.value} for sub in item.subs],
     }
@@ -106,6 +129,7 @@ def test_answers_the_damage_now_and_with_each_candidate() -> None:
         {"base_stats": [{"key": "atk", "value": 900}] * 3},
         {"candidates": [{**REQUEST["equipped"][0], "subs": [REQUEST["equipped"][0]["main"]] * 5}]},
         {"candidates": [{**REQUEST["equipped"][0], "slot": "hat"}]},
+        {"candidates": [{**REQUEST["equipped"][0], "set_id": -1}]},
     ],
     ids=[
         "no candidates",
@@ -118,7 +142,27 @@ def test_answers_the_damage_now_and_with_each_candidate() -> None:
         "one base thrice",
         "five subs",
         "slot",
+        "set id",
     ],
 )
 def test_rejects_requests_no_showcase_can_make(override: dict[str, Any]) -> None:
     assert client.post("/api/damage/artifacts", json={**REQUEST, **override}).status_code == 422
+
+
+def test_a_swap_that_breaks_a_set_loses_its_bonus() -> None:
+    equipped = [
+        {**item, "set_id": GLADIATOR if index < 2 else 0}  # two pieces
+        for index, item in enumerate(REQUEST["equipped"])
+    ]
+    same_set, other_set = equipped[0], {**equipped[0], "set_id": 0}
+    body = client.post(
+        "/api/damage/artifacts",
+        json={**REQUEST, "equipped": equipped, "candidates": [same_set, other_set]},
+    ).json()
+    assert body["candidates"][0] == pytest.approx(body["current"])
+    # The same piece without the set: her ATK falls by 18% of her base, and her damage with it.
+    assert body["candidates"][1]["average"] < body["current"]["average"]
+
+
+def test_the_showcase_gives_each_artifact_its_set() -> None:
+    assert {item.set_id for item in GANYU.artifacts} <= {int(key) for key in GAMEDATA.sets}

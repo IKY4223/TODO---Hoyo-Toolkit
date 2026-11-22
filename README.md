@@ -81,8 +81,8 @@ The app opens on Honkai: Star Rail; Genshin Impact is one tap away.
   damage bonus a hit gets is a guess (Physical for a Normal Attack, the element otherwise) the
   player can change. "Try artifacts from the showcase" puts each artifact the showcase's other
   characters wear in its slot and shows, per slot, the one that would add most to that hit (and
-  to its transformative reaction, if one is chosen) and by how much (set bonuses are not
-  recounted).
+  to its transformative reaction, if one is chosen) and by how much (a set's 2-piece stat
+  bonus is recounted when a swap breaks or completes the set; other set effects are not).
 - **Wish history** — import the whole wish history straight from a phone: on Android, copy the
   text of the error page the game's history shows offline and paste it in. Shows every banner's
   pity and each 5★ with the pulls it took, and on the character event wishes the 50/50s won and
@@ -151,7 +151,8 @@ Planned, in order:
    - the newest characters (Sandrone, Mitya, Valeriy, Vodyanitsa, Vesna, Alyosha, Odette and two
      of the Traveler's elements): the game's tables published so far (June 2026) do not hold
      their talents, so their hits wait for the next sync;
-   - artifact set bonuses in the trial, and artifacts not worn by a showcased character (Enka
+   - set effects in the trial past each set's 2-piece stat bonus (conditional and 4-piece
+     effects), and artifacts not worn by a showcased character (Enka
      does not give the inventory).
    Of the wish history: the share of 50/50s won in Star Rail. No open list of Star Rail banners
    was found; the warp history gives each warp's `gacha_id`, so the game's own banner table

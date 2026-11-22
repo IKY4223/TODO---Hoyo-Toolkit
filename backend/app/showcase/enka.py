@@ -228,6 +228,7 @@ def _artifact(item: _Artifact) -> Artifact:
     flat = item.flat
     return Artifact(
         slot=SLOTS[flat.equip_type],
+        set_id=flat.set_id,
         set_name=GAMEDATA.sets.get(str(flat.set_id), UNKNOWN_SET),
         rarity=flat.rank_level,
         level=item.reliquary.level - 1,  # Enka counts artifact levels from 1
