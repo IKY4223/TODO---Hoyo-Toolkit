@@ -12,7 +12,16 @@ import pytest
 from app.showcase import enka
 from app.showcase.enka import EnkaError, UpstreamDataError, parse
 from app.showcase.gamedata import TALENTS
-from app.showcase.models import Artifact, Element, Scaling, Showcase, Slot, Stat, StatKey
+from app.showcase.models import (
+    Artifact,
+    Element,
+    Scaling,
+    Showcase,
+    Slot,
+    Stat,
+    StatKey,
+    WeaponType,
+)
 
 FIXTURE = (Path(__file__).parent / "fixtures" / "enka_showcase.json").read_bytes()
 UID = "700000001"
@@ -50,6 +59,7 @@ def test_character_identity(showcase: Showcase) -> None:
     assert (amber.level, amber.constellation) == (90, 6)
     assert (ganyu.name, ganyu.element) == ("Ganyu", Element.CRYO)
     assert (ganyu.level, ganyu.constellation) == (90, 0)
+    assert (amber.weapon_type, ganyu.weapon_type) == (WeaponType.BOW, WeaponType.BOW)
 
 
 def test_talents_include_constellation_boosts(showcase: Showcase) -> None:
@@ -176,6 +186,7 @@ def test_character_newer_than_the_game_data_is_still_listed() -> None:
 
     newcomer = parse(UID, altered(rename))[0].characters[0]
     assert (newcomer.name, newcomer.element, newcomer.talents) == ("Unknown character", None, ())
+    assert newcomer.weapon_type is None
     assert newcomer.icon is None
     assert newcomer.attacks == ()
     assert newcomer.id == 19999999

@@ -285,6 +285,7 @@ def _character(avatar: _Avatar) -> Character:
         id=avatar.avatar_id,
         name=data.name if data else UNKNOWN_CHARACTER,
         element=data.element if data else None,
+        weapon_type=data.weapon_type if data else None,
         level=int(avatar.prop_map[LEVEL_PROP].val),
         constellation=len(avatar.talent_id_list),
         talents=levels,

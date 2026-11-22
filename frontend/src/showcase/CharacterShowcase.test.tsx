@@ -15,6 +15,7 @@ const SHOWCASE: Showcase = {
       id: 10000021,
       name: 'Amber',
       element: 'pyro',
+      weapon_type: 'bow',
       level: 90,
       constellation: 6,
       talents: [10, 13, 13],

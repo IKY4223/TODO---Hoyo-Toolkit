@@ -83,6 +83,13 @@ ELEMENTS = {
     "Grass": "dendro",
     "None": None,  # the Traveler before resonating with an element
 }
+WEAPON_TYPES = {
+    "WEAPON_SWORD_ONE_HAND": "sword",
+    "WEAPON_CLAYMORE": "claymore",
+    "WEAPON_POLE": "polearm",
+    "WEAPON_CATALYST": "catalyst",
+    "WEAPON_BOW": "bow",
+}
 
 
 def load(name: str, base: str = STORE) -> Any:
@@ -190,6 +197,8 @@ def main() -> None:
             key: {
                 "name": names[str(avatar["NameTextMapHash"])],
                 "element": ELEMENTS[avatar["Element"]],
+                # A catalyst's Normal Attack deals its element; a few entries name no weapon.
+                "weapon_type": WEAPON_TYPES.get(avatar.get("WeaponType", "")),
                 # SideIconName is "/ui/UI_AvatarIcon_Side_Ambor.png"; the portrait has no "Side_".
                 "icon": avatar["SideIconName"]
                 .removeprefix("/ui/")

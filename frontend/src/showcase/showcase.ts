@@ -56,6 +56,8 @@ export const SLOTS = {
   circlet: 'Circlet',
 } as const satisfies Record<Schemas['Slot'], Message>
 
+const WEAPON_TYPES = { sword: '', claymore: '', polearm: '', catalyst: '', bow: '' } as const
+
 export const ELEMENTS = {
   pyro: 'Pyro',
   hydro: 'Hydro',
@@ -115,6 +117,7 @@ const isCharacter = (value: unknown): value is Character =>
   isNumber(value.id) &&
   isString(value.name) &&
   (value.element === null || isKeyOf(ELEMENTS, value.element)) &&
+  (value.weapon_type === null || isKeyOf(WEAPON_TYPES, value.weapon_type)) &&
   isNumber(value.level) &&
   isNumber(value.constellation) &&
   isArrayOf(value.talents, isNumber) &&

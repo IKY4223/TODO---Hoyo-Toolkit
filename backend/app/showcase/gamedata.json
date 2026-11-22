@@ -17,7 +17,8 @@
      10019,
      239
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000003": {
    "element": "anemo",
@@ -36,7 +37,8 @@
      10034,
      339
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000005": {
    "element": null,
@@ -55,7 +57,8 @@
      10068,
      739
     ]
-   ]
+   ],
+   "weapon_type": null
   },
   "10000005-501": {
    "element": null,
@@ -74,7 +77,8 @@
      10068,
      739
     ]
-   ]
+   ],
+   "weapon_type": null
   },
   "10000005-502": {
    "element": "pyro",
@@ -93,7 +97,8 @@
      10098,
      539
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000005-503": {
    "element": "hydro",
@@ -112,7 +117,8 @@
      10088,
      639
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000005-504": {
    "element": "anemo",
@@ -131,7 +137,8 @@
      10068,
      739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000005-505": {
    "element": "cryo",
@@ -150,7 +157,8 @@
      10128,
      839
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000005-506": {
    "element": "geo",
@@ -169,7 +177,8 @@
      10078,
      939
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000005-507": {
    "element": "electro",
@@ -188,7 +197,8 @@
      10605,
      1039
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000005-508": {
    "element": "dendro",
@@ -207,7 +217,8 @@
      10118,
      1139
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000006": {
    "element": "electro",
@@ -226,7 +237,8 @@
      10062,
      439
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000007": {
    "element": null,
@@ -245,7 +257,8 @@
      10068,
      739
     ]
-   ]
+   ],
+   "weapon_type": null
   },
   "10000007-701": {
    "element": null,
@@ -264,7 +277,8 @@
      10068,
      739
     ]
-   ]
+   ],
+   "weapon_type": null
   },
   "10000007-702": {
    "element": "pyro",
@@ -283,7 +297,8 @@
      10098,
      539
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000007-703": {
    "element": "hydro",
@@ -302,7 +317,8 @@
      10088,
      639
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000007-704": {
    "element": "anemo",
@@ -321,7 +337,8 @@
      10068,
      739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000007-705": {
    "element": "cryo",
@@ -340,7 +357,8 @@
      10128,
      839
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000007-706": {
    "element": "geo",
@@ -359,7 +377,8 @@
      10078,
      939
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000007-707": {
    "element": "electro",
@@ -378,7 +397,8 @@
      10605,
      1039
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000007-708": {
    "element": "dendro",
@@ -397,7 +417,8 @@
      10118,
      1139
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000014": {
    "element": "hydro",
@@ -416,7 +437,8 @@
      10072,
      1439
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000015": {
    "element": "cryo",
@@ -435,7 +457,8 @@
      10075,
      1539
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000016": {
    "element": "pyro",
@@ -454,7 +477,8 @@
      10165,
      1639
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000020": {
    "element": "electro",
@@ -473,7 +497,8 @@
      10203,
      2039
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000021": {
    "element": "pyro",
@@ -492,7 +517,8 @@
      10017,
      2139
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000022": {
    "element": "anemo",
@@ -511,7 +537,8 @@
      10225,
      2239
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000023": {
    "element": "pyro",
@@ -530,7 +557,8 @@
      10235,
      2339
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000024": {
    "element": "electro",
@@ -549,7 +577,8 @@
      10245,
      2439
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000025": {
    "element": "hydro",
@@ -568,7 +597,8 @@
      10385,
      2539
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000026": {
    "element": "anemo",
@@ -587,7 +617,8 @@
      10265,
      2639
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000027": {
    "element": "geo",
@@ -606,7 +637,8 @@
      10274,
      2739
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000029": {
    "element": "pyro",
@@ -625,7 +657,8 @@
      10295,
      2939
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000030": {
    "element": "geo",
@@ -644,7 +677,8 @@
      10303,
      3039
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000031": {
    "element": "electro",
@@ -663,7 +697,8 @@
      10313,
      3139
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000032": {
    "element": "pyro",
@@ -682,7 +717,8 @@
      10323,
      3239
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000033": {
    "element": "hydro",
@@ -701,7 +737,8 @@
      10333,
      3339
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000034": {
    "element": "geo",
@@ -720,7 +757,8 @@
      10343,
      3439
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000035": {
    "element": "cryo",
@@ -739,7 +777,8 @@
      10353,
      3539
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000036": {
    "element": "cryo",
@@ -758,7 +797,8 @@
      10403,
      3639
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000037": {
    "element": "cryo",
@@ -777,7 +817,8 @@
      10373,
      3739
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000038": {
    "element": "geo",
@@ -796,7 +837,8 @@
      10388,
      3839
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000039": {
    "element": "cryo",
@@ -815,7 +857,8 @@
      10395,
      3939
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000041": {
    "element": "hydro",
@@ -834,7 +877,8 @@
      10415,
      4139
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000042": {
    "element": "electro",
@@ -853,7 +897,8 @@
      10425,
      4239
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000043": {
    "element": "anemo",
@@ -872,7 +917,8 @@
      10435,
      4339
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000044": {
    "element": "pyro",
@@ -891,7 +937,8 @@
      10443,
      4439
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000045": {
    "element": "cryo",
@@ -910,7 +957,8 @@
      10453,
      4539
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000046": {
    "element": "pyro",
@@ -929,7 +977,8 @@
      10463,
      4639
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000047": {
    "element": "anemo",
@@ -948,7 +997,8 @@
      10475,
      4739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000048": {
    "element": "pyro",
@@ -967,7 +1017,8 @@
      10485,
      4839
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000049": {
    "element": "pyro",
@@ -986,7 +1037,8 @@
      10495,
      4939
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000050": {
    "element": "pyro",
@@ -1005,7 +1057,8 @@
      10505,
      5039
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000051": {
    "element": "cryo",
@@ -1024,7 +1077,8 @@
      10515,
      5139
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000052": {
    "element": "electro",
@@ -1043,7 +1097,8 @@
      10525,
      5239
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000053": {
    "element": "anemo",
@@ -1062,7 +1117,8 @@
      10535,
      5339
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000054": {
    "element": "hydro",
@@ -1081,7 +1137,8 @@
      10545,
      5439
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000055": {
    "element": "geo",
@@ -1100,7 +1157,8 @@
      10555,
      5539
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000056": {
    "element": "electro",
@@ -1119,7 +1177,8 @@
      10565,
      5639
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000057": {
    "element": "geo",
@@ -1138,7 +1197,8 @@
      10575,
      5739
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000058": {
    "element": "electro",
@@ -1157,7 +1217,8 @@
      10585,
      5839
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000059": {
    "element": "anemo",
@@ -1176,7 +1237,8 @@
      10595,
      5939
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000060": {
    "element": "hydro",
@@ -1195,7 +1257,8 @@
      10610,
      6039
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000061": {
    "element": "dendro",
@@ -1214,7 +1277,8 @@
      10615,
      6139
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000062": {
    "element": "cryo",
@@ -1233,7 +1297,8 @@
      10625,
      6239
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000063": {
    "element": "cryo",
@@ -1252,7 +1317,8 @@
      10635,
      6339
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000064": {
    "element": "geo",
@@ -1271,7 +1337,8 @@
      10643,
      6439
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000065": {
    "element": "electro",
@@ -1290,7 +1357,8 @@
      10655,
      6539
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000066": {
    "element": "hydro",
@@ -1309,7 +1377,8 @@
      10665,
      6639
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000067": {
    "element": "dendro",
@@ -1328,7 +1397,8 @@
      10675,
      6739
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000068": {
    "element": "electro",
@@ -1347,7 +1417,8 @@
      10685,
      6839
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000069": {
    "element": "dendro",
@@ -1366,7 +1437,8 @@
      10695,
      6939
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000070": {
    "element": "hydro",
@@ -1385,7 +1457,8 @@
      10705,
      7039
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000071": {
    "element": "electro",
@@ -1404,7 +1477,8 @@
      10715,
      7139
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000072": {
    "element": "hydro",
@@ -1423,7 +1497,8 @@
      10725,
      7239
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000073": {
    "element": "dendro",
@@ -1442,7 +1517,8 @@
      10735,
      7339
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000074": {
    "element": "cryo",
@@ -1461,7 +1537,8 @@
      10745,
      7439
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000075": {
    "element": "anemo",
@@ -1480,7 +1557,8 @@
      10755,
      7539
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000076": {
    "element": "anemo",
@@ -1499,7 +1577,8 @@
      10765,
      7639
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000077": {
    "element": "dendro",
@@ -1518,7 +1597,8 @@
      10775,
      7739
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000078": {
    "element": "dendro",
@@ -1537,7 +1617,8 @@
      10785,
      7839
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000079": {
    "element": "pyro",
@@ -1556,7 +1637,8 @@
      10795,
      7939
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000080": {
    "element": "cryo",
@@ -1575,7 +1657,8 @@
      10805,
      8039
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000081": {
    "element": "dendro",
@@ -1594,7 +1677,8 @@
      10815,
      8139
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000082": {
    "element": "dendro",
@@ -1613,7 +1697,8 @@
      10825,
      8239
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000083": {
    "element": "anemo",
@@ -1632,7 +1717,8 @@
      10835,
      8339
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000084": {
    "element": "pyro",
@@ -1651,7 +1737,8 @@
      10845,
      8439
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000085": {
    "element": "cryo",
@@ -1670,7 +1757,8 @@
      10855,
      8539
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000086": {
    "element": "cryo",
@@ -1689,7 +1777,8 @@
      10865,
      8639
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000087": {
    "element": "hydro",
@@ -1708,7 +1797,8 @@
      10875,
      8739
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000088": {
    "element": "cryo",
@@ -1727,7 +1817,8 @@
      10885,
      8839
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000089": {
    "element": "hydro",
@@ -1746,7 +1837,8 @@
      10895,
      8939
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000090": {
    "element": "pyro",
@@ -1765,7 +1857,8 @@
      10905,
      9039
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000091": {
    "element": "geo",
@@ -1784,7 +1877,8 @@
      10915,
      9139
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000092": {
    "element": "pyro",
@@ -1803,7 +1897,8 @@
      10925,
      9239
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000093": {
    "element": "anemo",
@@ -1822,7 +1917,8 @@
      10935,
      9339
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000094": {
    "element": "geo",
@@ -1841,7 +1937,8 @@
      10945,
      9439
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000095": {
    "element": "hydro",
@@ -1860,7 +1957,8 @@
      10955,
      9539
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000096": {
    "element": "pyro",
@@ -1879,7 +1977,8 @@
      10965,
      9639
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000097": {
    "element": "electro",
@@ -1898,7 +1997,8 @@
      10975,
      9739
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000098": {
    "element": "electro",
@@ -1917,7 +2017,8 @@
      10985,
      9839
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000099": {
    "element": "dendro",
@@ -1936,7 +2037,8 @@
      10995,
      9939
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000100": {
    "element": "geo",
@@ -1955,7 +2057,8 @@
      11005,
      10039
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000101": {
    "element": "dendro",
@@ -1974,7 +2077,8 @@
      11015,
      10139
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000102": {
    "element": "hydro",
@@ -1993,7 +2097,8 @@
      30007,
      10239
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000103": {
    "element": "geo",
@@ -2012,7 +2117,8 @@
      11035,
      10339
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000104": {
    "element": "anemo",
@@ -2031,7 +2137,8 @@
      11045,
      10439
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000105": {
    "element": "electro",
@@ -2050,7 +2157,8 @@
      30505,
      10539
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000106": {
    "element": "pyro",
@@ -2069,7 +2177,8 @@
      11065,
      10639
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000107": {
    "element": "cryo",
@@ -2088,7 +2197,8 @@
      11075,
      10739
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000108": {
    "element": "anemo",
@@ -2107,7 +2217,8 @@
      11085,
      10839
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000109": {
    "element": "anemo",
@@ -2126,7 +2237,8 @@
      11095,
      10939
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000110": {
    "element": "electro",
@@ -2145,7 +2257,8 @@
      11105,
      11039
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000111": {
    "element": "electro",
@@ -2164,7 +2277,8 @@
      11115,
      11139
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000112": {
    "element": "cryo",
@@ -2183,7 +2297,8 @@
      11125,
      11239
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000113": {
    "element": "anemo",
@@ -2202,7 +2317,8 @@
      11135,
      11339
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000114": {
    "element": "cryo",
@@ -2221,7 +2337,8 @@
      11145,
      11439
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000115": {
    "element": "hydro",
@@ -2240,7 +2357,8 @@
      11155,
      11539
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000116": {
    "element": "electro",
@@ -2259,7 +2377,8 @@
      11165,
      11639
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000117-11701": {
    "element": null,
@@ -2278,7 +2397,8 @@
      111751,
      11739
     ]
-   ]
+   ],
+   "weapon_type": null
   },
   "10000117-11702": {
    "element": "pyro",
@@ -2297,7 +2417,8 @@
      111751,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000117-11703": {
    "element": "hydro",
@@ -2316,7 +2437,8 @@
      111752,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000117-11704": {
    "element": "electro",
@@ -2335,7 +2457,8 @@
      111753,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000117-11705": {
    "element": "cryo",
@@ -2354,7 +2477,8 @@
      111754,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000117-11706": {
    "element": "anemo",
@@ -2373,7 +2497,8 @@
      111755,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000117-11707": {
    "element": "geo",
@@ -2392,7 +2517,8 @@
      111756,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000117-11708": {
    "element": "dendro",
@@ -2411,7 +2537,8 @@
      111757,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000118-11801": {
    "element": null,
@@ -2430,7 +2557,8 @@
      111751,
      11739
     ]
-   ]
+   ],
+   "weapon_type": null
   },
   "10000118-11802": {
    "element": "pyro",
@@ -2449,7 +2577,8 @@
      111751,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000118-11803": {
    "element": "hydro",
@@ -2468,7 +2597,8 @@
      111752,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000118-11804": {
    "element": "electro",
@@ -2487,7 +2617,8 @@
      111753,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000118-11805": {
    "element": "cryo",
@@ -2506,7 +2637,8 @@
      111754,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000118-11806": {
    "element": "anemo",
@@ -2525,7 +2657,8 @@
      111755,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000118-11807": {
    "element": "geo",
@@ -2544,7 +2677,8 @@
      111756,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000118-11808": {
    "element": "dendro",
@@ -2563,7 +2697,8 @@
      111757,
      11739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000119": {
    "element": "dendro",
@@ -2582,7 +2717,8 @@
      11195,
      11939
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000120": {
    "element": "electro",
@@ -2601,7 +2737,8 @@
      11205,
      12039
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000121": {
    "element": "hydro",
@@ -2620,7 +2757,8 @@
      11215,
      12139
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000122": {
    "element": "dendro",
@@ -2639,7 +2777,8 @@
      11225,
      12239
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000123": {
    "element": "pyro",
@@ -2658,7 +2797,8 @@
      11235,
      12339
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000124": {
    "element": "anemo",
@@ -2677,7 +2817,8 @@
      11245,
      12439
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000125": {
    "element": "hydro",
@@ -2696,7 +2837,8 @@
      11255,
      12539
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000126": {
    "element": "geo",
@@ -2715,7 +2857,8 @@
      11265,
      12639
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000127": {
    "element": "geo",
@@ -2734,7 +2877,8 @@
      11275,
      12739
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000128": {
    "element": "anemo",
@@ -2753,7 +2897,8 @@
      11285,
      12839
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000129": {
    "element": "cryo",
@@ -2772,7 +2917,8 @@
      11295,
      12939
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000130": {
    "element": "geo",
@@ -2791,7 +2937,8 @@
      11305,
      13039
     ]
-   ]
+   ],
+   "weapon_type": "bow"
   },
   "10000131": {
    "element": "pyro",
@@ -2810,7 +2957,8 @@
      11315,
      13139
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000132": {
    "element": "anemo",
@@ -2829,7 +2977,8 @@
      11325,
      13239
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000133": {
    "element": "cryo",
@@ -2848,7 +2997,8 @@
      11335,
      13339
     ]
-   ]
+   ],
+   "weapon_type": "claymore"
   },
   "10000136": {
    "element": "electro",
@@ -2867,7 +3017,8 @@
      11364,
      13639
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000137": {
    "element": "electro",
@@ -2886,7 +3037,8 @@
      30605,
      13739
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000140": {
    "element": "hydro",
@@ -2905,7 +3057,8 @@
      11405,
      14039
     ]
-   ]
+   ],
+   "weapon_type": "catalyst"
   },
   "10000143": {
    "element": "anemo",
@@ -2924,7 +3077,8 @@
      11435,
      14339
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   },
   "10000148": {
    "element": "electro",
@@ -2943,7 +3097,8 @@
      11485,
      14839
     ]
-   ]
+   ],
+   "weapon_type": "polearm"
   },
   "10000150": {
    "element": "cryo",
@@ -2962,7 +3117,8 @@
      11505,
      15039
     ]
-   ]
+   ],
+   "weapon_type": "sword"
   }
  },
  "sets": {

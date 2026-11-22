@@ -146,8 +146,8 @@ Planned, in order:
      hit's reaction and the transformative one (Thundering Fury gives 20% to Aggravate, 40% to
      Hyperbloom);
    - set and passive effects (a reaction damage bonus is typed in by hand);
-   - the damage bonus of a Normal Attack by a catalyst or an infused attack (the form guesses
-     Physical); talent lines told apart from buffs by words of their English name;
+   - the damage bonus of an infused attack (the form guesses Physical for a Normal Attack, the
+     element for a catalyst's); talent lines told apart from buffs by words of their English name;
    - the newest characters (Sandrone, Mitya, Valeriy, Vodyanitsa, Vesna, Alyosha, Odette and two
      of the Traveler's elements): the game's tables published so far (June 2026) do not hold
      their talents, so their hits wait for the next sync;
@@ -169,10 +169,6 @@ Planned, in order:
 
 The Telegram bot is out of the plan, by the owner's choice (November 2026): no host, no Mini
 App. Its code stays as it is; see "Telegram bot" below.
-
-Found by the site review of November 2026 and left for later, small:
-
-- "3 action(s)" and "2 stack(s)" in the Speed tool's effect texts want proper plurals.
 
 Reference implementations to check game mechanics against (read, never copied):
 [StarRailRes](https://github.com/Mar-7th/StarRailRes) for game data and texts, and the open source

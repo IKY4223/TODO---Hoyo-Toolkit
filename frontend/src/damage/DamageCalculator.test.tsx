@@ -7,6 +7,7 @@ const AMBER: Character = {
   id: 10000021,
   name: 'Amber',
   element: 'pyro',
+  weapon_type: 'bow',
   level: 90,
   constellation: 6,
   talents: [10, 13, 13],
@@ -124,6 +125,12 @@ test('a hit from the talent tables fills in its multiplier and a likely bonus', 
   calculate()
   await screen.findByText('13,501')
   expect(sentBody(fetchMock)).toMatchObject({ scalings: [{ stat: 'atk', multiplier: 0.8 }] })
+})
+
+test("a catalyst's Normal Attack takes the character's element", () => {
+  open({ ...AMBER, weapon_type: 'catalyst' }, async () => Response.json(DAMAGE))
+  change('Hit', '0')
+  expect(screen.getByLabelText<HTMLSelectElement>('Damage bonus').value).toBe('pyro_dmg')
 })
 
 test('a hit that scales with two stats sends both', async () => {
