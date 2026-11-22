@@ -275,7 +275,8 @@ against the real backend with Enka.Network replaced by a recorded response.
 Each client gets 10 showcase requests, 150 wish history pages and 60 forecast or damage requests
 a minute; past that the API answers
 429 with a `Retry-After` header. Clients are told apart by address, so behind a reverse proxy
-every visitor would share one allowance. Behind Cloudflare, as on SnapDeploy, set
+every visitor would share one allowance. On Vercel set `CLIENT_IP_HEADER=x-real-ip`: Vercel
+writes that header itself, so a visitor cannot pick it. Behind Cloudflare set
 `CLIENT_IP_HEADER=CF-Connecting-IP`: the app then counts the visitor's address that Cloudflare
 sends. Elsewhere set `FORWARDED_ALLOW_IPS` to the proxy's own address. Never set it to `*`: uvicorn
 would then trust an `X-Forwarded-For` the visitor wrote.
@@ -296,7 +297,7 @@ One image serves both the API and the built frontend on http://localhost:8000:
 docker compose up --build
 ```
 
-The image listens on the port in `PORT` (8000 without it), as hosts such as SnapDeploy expect.
+The image listens on the port in `PORT` (8000 without it), as container hosts expect.
 
 ## A private test deploy
 
@@ -306,14 +307,15 @@ ask for that password (any user name); only `/api/health` stays open for the hos
 A client gets 10 wrong passwords a minute, then waits. Use a random password of 20 characters
 or more: it is the only lock.
 
-On [SnapDeploy](https://snapdeploy.dev), from its phone app or the site: Deploy from GitHub,
-pick this repository and `main`, and it builds the `Dockerfile` as it is. Add the environment
-variable `SITE_PASSWORD` with a password of your own before the first deploy, and
-`CLIENT_IP_HEADER` set to `CF-Connecting-IP` (see Request limits). The free tier
-sleeps after 15 idle minutes and wakes in about a minute on the next visit.
+The site runs on [Vercel](https://vercel.com) (Hobby plan, which is for non-commercial use, as
+HoYoverse's fan guide asks). `vercel.json` makes two services of one project: the built
+frontend on Vercel's CDN, and the FastAPI app as a Python function for `/api`. The CDN pages get
+the same security headers as the API from `vercel.json`; a backend test keeps the two equal.
+Set `CLIENT_IP_HEADER=x-real-ip` in the project's environment variables (see Request limits).
+`SITE_PASSWORD` there locks only `/api`, since the CDN serves the pages: lock the whole site
+with Vercel's Deployment Protection instead.
 
-The Telegram bot does not run there: a sleeping container cannot poll, and SnapDeploy's
-acceptable use policy names Telegram bot frameworks among what it refuses. It needs another host.
+Vercel runs no long-lived process, so the Telegram bot does not run there. It needs another host.
 
 ## Licence
 

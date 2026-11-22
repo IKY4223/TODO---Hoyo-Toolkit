@@ -1,0 +1,5 @@
+# Local builds and installs; Vercel makes its own.
+**/node_modules
+**/.venv
+frontend/dist
+**/__pycache__
