@@ -610,6 +610,12 @@ test("the tools' signs are drawn by the site, which ships no game art", async ({
     .evaluateAll((icons) => [...new Set(icons.map((icon) => icon.getAttribute('data-icon')))])
   // The theme button's icon is among them; the start page's sits in the menu, closed here.
   expect(signs.toSorted()).toEqual(['auto', 'builds', 'history', 'relics', 'speed', 'warps'])
+  await page.goto('/#genshin/builds')
+  await expect(page.locator('.tabs svg[data-icon]')).toHaveCount(3)
+  const genshin = await page
+    .locator('.tabs svg[data-icon]')
+    .evaluateAll((icons) => icons.map((icon) => icon.getAttribute('data-icon')))
+  expect(genshin).toEqual(['gi-builds', 'gi-wishes', 'gi-history'])
   // The game's own signs used to be served from /icons: a missing file comes back as the page.
   const old = await page.request.get('/icons/warps.png')
   expect(old.headers()['content-type']).not.toBe('image/png')
