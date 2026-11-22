@@ -5,7 +5,8 @@ becomes a page in English and Russian once the owner fills the blanks and a lawy
 them. Blanks:
 
 - `[NAME]`: who is responsible for the site (a name or a nickname, as the owner decides).
-- `[EMAIL]`: the contact address. It will be public on the page.
+- No email: the contact is the repository's issues page,
+  https://github.com/IKY4223/TODO---Hoyo-Toolkit/issues (the owner's choice, 18 November 2026). Issues are public, so the texts tell people to post nothing private.
 - `[HOST]`: the hosting provider, and the country its servers are in.
 - `[LOG DAYS]`: how long the host keeps server logs.
 
@@ -17,8 +18,9 @@ Written for what the code does in November 2026. Change these texts with the cod
 
 Last updated: [DATE]
 
-HoYo Toolkit is a fan project run by [NAME]. Write to [EMAIL] with any question about your data,
-or to have it deleted.
+HoYo Toolkit is a fan project run by [NAME]. Ask any question about your data, or have it
+deleted, by opening an issue at https://github.com/IKY4223/TODO---Hoyo-Toolkit/issues.
+Issues are public: post nothing you want kept private. A UID is enough.
 
 ### What the site handles, and for how long
 
@@ -67,12 +69,13 @@ answer and keeps nothing.
 If you use the bot, Telegram passes this site your Telegram user id, your chat id and your
 messages. The bot uses them to answer and does not keep them. A UID you send it reaches
 Enka.Network. If you choose a language with /lang, the bot remembers your chat id and the
-language; where the bot is set to keep a state file, they are written to disk. Write to [EMAIL]
-to have them deleted.
+language; where the bot is set to keep a state file, they are written to disk. Open an issue
+(see above) to have them deleted.
 
 ### Your rights
 
-You can ask what data about you the site holds, and have it deleted, at [EMAIL]. The site holds
+You can ask what data about you the site holds, and have it deleted, through an issue
+(see above). The site holds
 almost nothing: logs expire after [LOG DAYS] days, and what is on your device is yours to delete.
 
 ---
@@ -91,7 +94,8 @@ Last updated: [DATE]
    You use the history import at your own risk.
 4. Do not use the site to look up UIDs in bulk or to collect data about players.
 5. The site's own code is under the MIT licence. Third-party notices are in `/notices.txt`.
-6. These terms may change; the date above says when they last did. Questions: [EMAIL].
+6. These terms may change; the date above says when they last did. Questions: an issue at
+   https://github.com/IKY4223/TODO---Hoyo-Toolkit/issues.
 
 ---
 

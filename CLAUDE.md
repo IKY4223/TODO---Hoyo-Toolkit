@@ -100,7 +100,7 @@ have a lawyer read the texts before launch.
   checked the deployed site by hand on 16 November 2026 (CORS, validation, traversal, the history
   host, the limits, headers) and fixed what it found: HSTS, http moved to https before the
   password, request bodies capped at 64 kB, no docs pages, `CLIENT_IP_HEADER` for the limits.
-  Run strix before launch if a key becomes available. Owner's part: protect `main` from pushes by the Actions token. Run the scan from the main session with the Workflow
+  strix is off the plan: the owner has no credits for it (18 November 2026). Owner's part: protect `main` from pushes by the Actions token. Run the scan from the main session with the Workflow
   tool (`/config workflows=true`): a subagent has no Workflow tool and stops at once.
 - Telegram: the bot's token is a secret (environment variable, never in the repository or logs);
   the privacy policy covers the Telegram user ids and messages the bot receives, how long they
@@ -111,15 +111,15 @@ have a lawyer read the texts before launch.
 - Operations: HTTPS only, `CLIENT_IP_HEADER=x-real-ip` on Vercel (Vercel writes it; behind
   Cloudflare `CF-Connecting-IP`, elsewhere `FORWARDED_ALLOW_IPS` set to the proxy, never `*`),
   rate limits and cache moved out of process once traffic needs more than a few function
-  instances, a contact address for abuse reports. Never set `CF-Connecting-IP` on Vercel: it
-  passes that header through as the visitor wrote it.
+  instances, abuse reports through the repository's issues (no email, the owner's choice). Never
+  set `CF-Connecting-IP` on Vercel: it passes that header through as the visitor wrote it.
 
 ## Owner checks still open
 
 Remind the owner of these until they confirm them.
 
 - Install the Vercel GitHub app on this repository, so pushes to `main` deploy and each pull
-  request gets a preview; then a session runs `vercel git connect`. Then shut SnapDeploy down.
+  request gets a preview; then a session runs `vercel git connect`.
 - How long Vercel keeps the runtime logs on the Hobby plan (the dashboard shows it): the
   `[LOG DAYS]` of `LEGAL-DRAFTS.md`. The function runs in the US (`iad1`): the `[HOST]` country.
 - Confirmed so far: Secret scanning and Push protection are on; Star Rail final stats
@@ -133,13 +133,12 @@ For a session picking the work up again.
 - State: PRs #1 to #24 are merged; stage 21, part A (licences and notices, HoYoverse's legal
   statement, Enka's newer errors, the site's own icons, `LEGAL-DRAFTS.md`, `HOYOVERSE-LETTER.md`,
   the security fixes) is in `main`. The by-hand check of the deployed site and its fixes are on
-  `claude/security-hardening`. Stage 21 next steps, in order: (1) once the owner gives the name and the contact email,
+  `claude/security-hardening`. Stage 21 next steps, in order: (1) once the owner gives the name (the contact is the repository's issues, no email),
   fill `LEGAL-DRAFTS.md`, translate it to Russian and make the privacy policy and terms pages
   (EN and RU, linked from the footer, driven in `app.spec.ts`); a lawyer reads them first;
-  (2) strix against the deployed site, once a key is available; (3) operations: the host's
-  HTTPS setting, an abuse
-  contact, the site's address in Enka's User-Agent, `noindex` off only on launch day.
-  Waiting on the owner: name and email (Outlook was down), the lawyer (StarRailRes is AGPL-3.0),
+  (2) operations: the host's
+  HTTPS setting, the site's address in Enka's User-Agent, `noindex` off only on launch day.
+  Waiting on the owner: the name, the lawyer (StarRailRes is AGPL-3.0),
   sending `HOYOVERSE-LETTER.md`. Donations stay out until HoYoverse says yes in writing. `HANDOFF.md` holds the owner's task list and the plan of
   stages 17 to 22; `README.md` and this file win where they differ.
 - PR #19 is merged: the owner's November 2026 choices. Tool icons were the games' own menu
@@ -184,8 +183,9 @@ For a session picking the work up again.
   `professional-skibidists/hoyo-toolkit` (Hobby), https://hoyo-toolkit.vercel.app: `vercel.json`
   makes the Vite build a CDN service and the FastAPI app a Python function for `/api`. Deploy with
   `vercel deploy` from the repo root (CLI logged in as the owner) until Git is connected. It
-  replaced SnapDeploy; the Dockerfile stays for self-hosting and the CI `docker` job. Open
-  without a password by the owner's choice (November 2026: only two people use it); on Vercel
-  `SITE_PASSWORD` would lock only `/api`. Do not ask for a password again. The Telegram bot
-  needs another host: Vercel runs no long-lived process. The owner gave an email for the privacy policy's contact: use it only
-  in that page, when it is written, and remind them it will be public there.
+  replaced SnapDeploy, whose account the owner deleted; the Dockerfile stays for self-hosting and
+  the CI `docker` job. Open without a password by the owner's choice (November 2026: only two
+  people use it); on Vercel `SITE_PASSWORD` would lock only `/api`. Do not ask for a password
+  again. The Telegram bot needs another host: Vercel runs no long-lived process. The site shows no
+  email anywhere: questions, data requests and abuse reports go to the repository's issues (the
+  owner's choice, 18 November 2026).

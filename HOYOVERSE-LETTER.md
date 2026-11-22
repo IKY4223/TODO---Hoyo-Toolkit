@@ -5,8 +5,9 @@ Rail Fan Creations Guide v2.0 names for authorisation requests (read November 20
 describes requests about fan-made merchandise, so HoYoverse may answer that a website is another
 matter, or not answer at all. No reply is not a yes.
 
-Blanks: `[NAME]` (name or nickname), `[SITE ADDRESS]`, `[CONTACT EMAIL]`, and the platform.
-Send it from the contact address, once the site has an address to show.
+Blanks: `[NAME]` (name or nickname), `[SITE ADDRESS]`, and the platform. The owner sends it from
+an address of their own choosing, once the site has an address to show; the site itself lists
+no email, only the repository.
 
 ---
 
@@ -51,4 +52,4 @@ detail you need.
 Thank you for your time, and for the games.
 
 [NAME]
-[CONTACT EMAIL]
+https://github.com/IKY4223/TODO---Hoyo-Toolkit
