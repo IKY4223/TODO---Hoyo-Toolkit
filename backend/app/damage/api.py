@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field, field_validator
 
 from app.damage.artifacts import swap
-from app.damage.engine import Damage, Enemy, Hit, Reaction, damage
+from app.damage.engine import Damage, Enemy, Hit, Reaction, Transformative, damage
 from app.ratelimit import RateLimiter, limited
 from app.showcase.models import Scaling, Slot, Stat, StatKey
 
@@ -57,6 +57,16 @@ class DamageRequest(BaseModel):
     scalings: list[TalentScaling] = Field(min_length=1, max_length=MAX_SCALINGS)
     bonus: DamageBonus | None = Field(description="The damage bonus that applies to the hit")
     reaction: Reaction
+    transformative: Transformative | None = Field(
+        default=None, description="A reaction the hit also sets off, which deals its own damage"
+    )
+    reaction_bonus: float = Field(
+        default=0,
+        ge=0,
+        le=MAX_RESISTANCE,
+        allow_inf_nan=False,
+        description="Reaction damage bonus, such as Crimson Witch's: 0.15 is 15%",
+    )
     flat: float = Field(
         default=0, ge=0, le=MAX_FLAT, allow_inf_nan=False, description="Damage added to the base"
     )
@@ -112,6 +122,8 @@ def _hit(request: DamageRequest) -> Hit:
         bonus=request.bonus,
         reaction=request.reaction,
         flat=request.flat,
+        transformative=request.transformative,
+        reaction_bonus=request.reaction_bonus,
     )
 
 

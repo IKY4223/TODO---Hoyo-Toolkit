@@ -7,7 +7,11 @@ export type DamageRequest = components['schemas']['DamageRequest']
 const DAMAGE_URL = '/api/damage'
 
 const isDamage = (value: unknown): value is Damage =>
-  isRecord(value) && isNumber(value.non_crit) && isNumber(value.crit) && isNumber(value.average)
+  isRecord(value) &&
+  isNumber(value.non_crit) &&
+  isNumber(value.crit) &&
+  isNumber(value.average) &&
+  isNumber(value.reaction)
 
 export async function fetchDamage(request: DamageRequest): Promise<Damage> {
   return postJson(DAMAGE_URL, request, isDamage)

@@ -239,6 +239,14 @@ export interface components {
              */
             bonus: ("physical_dmg" | "pyro_dmg" | "hydro_dmg" | "electro_dmg" | "cryo_dmg" | "anemo_dmg" | "geo_dmg" | "dendro_dmg") | null;
             reaction: components["schemas"]["Reaction"];
+            /** @description A reaction the hit also sets off, which deals its own damage */
+            transformative?: components["schemas"]["Transformative"] | null;
+            /**
+             * Reaction Bonus
+             * @description Reaction damage bonus, such as Crimson Witch's: 0.15 is 15%
+             * @default 0
+             */
+            reaction_bonus: number;
             /**
              * Flat
              * @description Damage added to the base
@@ -354,6 +362,11 @@ export interface components {
             crit: number;
             /** Average */
             average: number;
+            /**
+             * Reaction
+             * @default 0
+             */
+            reaction: number;
         };
         /** DamageRequest */
         DamageRequest: {
@@ -375,6 +388,14 @@ export interface components {
              */
             bonus: ("physical_dmg" | "pyro_dmg" | "hydro_dmg" | "electro_dmg" | "cryo_dmg" | "anemo_dmg" | "geo_dmg" | "dendro_dmg") | null;
             reaction: components["schemas"]["Reaction"];
+            /** @description A reaction the hit also sets off, which deals its own damage */
+            transformative?: components["schemas"]["Transformative"] | null;
+            /**
+             * Reaction Bonus
+             * @description Reaction damage bonus, such as Crimson Witch's: 0.15 is 15%
+             * @default 0
+             */
+            reaction_bonus: number;
             /**
              * Flat
              * @description Damage added to the base
@@ -779,6 +800,12 @@ export interface components {
             /** Level */
             level: number;
         };
+        /**
+         * Transformative
+         * @description A reaction that deals damage of its own, beside the hit that set it off.
+         * @enum {string}
+         */
+        Transformative: "burning" | "superconduct" | "swirl" | "electro_charged" | "shattered" | "overloaded" | "bloom" | "hyperbloom" | "burgeon";
         /** ValidationError */
         ValidationError: {
             /** Location */

@@ -74,11 +74,15 @@ The app opens on Honkai: Star Rail; Genshin Impact is one tap away.
   with two stats keeps both) or type a multiplier in, then the damage bonus, reaction and enemy,
   and get average, crit and non-crit damage. Folded under "Team buffs and debuffs": flat damage
   added to the base (Shenhe, Yun Jin, Zhongli), DEF reduction (counted up to 90%) and DEF
-  ignore, RES reduction. Reactions: Vaporize and Melt, Aggravate and Spread. The damage bonus a
-  hit gets is a guess (Physical for a Normal Attack, the element otherwise) the player can
-  change. "Try artifacts from the showcase" puts each artifact the showcase's other characters
-  wear in its slot and shows, per slot, the one that would add most to that hit and by how much
-  (set bonuses are not recounted).
+  ignore, RES reduction. Reactions: Vaporize and Melt, Aggravate and Spread, with a reaction
+  damage bonus typed in (Crimson Witch, Thundering Fury); a transformative reaction the hit sets
+  off (Overloaded, Superconduct, Electro-Charged, Shattered, Swirl, Burning, Bloom, Hyperbloom,
+  Burgeon) shows its own damage, from level and Elemental Mastery, without DEF or crit. The
+  damage bonus a hit gets is a guess (Physical for a Normal Attack, the element otherwise) the
+  player can change. "Try artifacts from the showcase" puts each artifact the showcase's other
+  characters wear in its slot and shows, per slot, the one that would add most to that hit (and
+  to its transformative reaction, if one is chosen) and by how much (set bonuses are not
+  recounted).
 - **Wish history** — import the whole wish history straight from a phone: on Android, copy the
   text of the error page the game's history shows offline and paste it in. Shows every banner's
   pity and each 5★ with the pulls it took, and on the character event wishes the 50/50s won and
@@ -136,9 +140,12 @@ Planned, in order:
      Will spent on Netherwing's first two turns.
 2. Genshin, what stage 20 left out. Of the damage calculator and the artifact trial, each with
    a `shortcut:` comment:
-   - transformative reactions (Overloaded, Superconduct, Bloom and the rest) and Lunar reactions
-     (6.0 and later), which follow formulas of their own: their lines stay out of the hit list;
-   - reaction damage bonuses (Crimson Witch, Thundering Fury) and set and passive effects;
+   - Lunar reactions (6.0 and later), which follow a formula of their own that no source read
+     so far gives: their lines stay out of the hit list. Electro-Charged is counted as one tick,
+     a transformative reaction takes the hit's resistance, and one reaction bonus serves both the
+     hit's reaction and the transformative one (Thundering Fury gives 20% to Aggravate, 40% to
+     Hyperbloom);
+   - set and passive effects (a reaction damage bonus is typed in by hand);
    - the damage bonus of a Normal Attack by a catalyst or an infused attack (the form guesses
      Physical); talent lines told apart from buffs by words of their English name;
    - the newest characters (Sandrone, Mitya, Valeriy, Vodyanitsa, Vesna, Alyosha, Odette and two

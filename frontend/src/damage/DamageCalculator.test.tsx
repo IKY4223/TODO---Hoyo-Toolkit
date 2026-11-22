@@ -49,7 +49,7 @@ const AMBER: Character = {
     },
   ],
 }
-const DAMAGE = { non_crit: 9000.4, crit: 18000.8, average: 13500.6 }
+const DAMAGE = { non_crit: 9000.4, crit: 18000.8, average: 13500.6, reaction: 0 }
 
 afterEach(() => {
   cleanup()
@@ -96,6 +96,8 @@ test('sends the character and the hit, with percents as fractions', async () => 
     scalings: [{ stat: 'atk', multiplier: 3.92 }],
     bonus: 'pyro_dmg',
     reaction: 'strong',
+    transformative: null,
+    reaction_bonus: 0,
     flat: 0,
     enemy_level: 100,
     enemy_resistance: 0.1,
@@ -161,6 +163,23 @@ test("the team's help goes in as fractions", async () => {
   })
 })
 
+test('a transformative reaction and a reaction bonus go in, and its damage shows apart', async () => {
+  const fetchMock = open(AMBER, async () => Response.json({ ...DAMAGE, reaction: 12345.6 }))
+  change('Transformative reaction', 'overloaded')
+  change('Reaction bonus, %', '40')
+  calculate()
+  await screen.findByText('13,501')
+  expect(sentBody(fetchMock)).toMatchObject({ transformative: 'overloaded', reaction_bonus: 0.4 })
+  expect(value('Reaction damage')).toBe('12,346')
+})
+
+test('shows no reaction damage when no transformative reaction is chosen', async () => {
+  open(AMBER, async () => Response.json(DAMAGE))
+  calculate()
+  await screen.findByText('13,501')
+  expect(screen.queryByText('Reaction damage')).toBeNull()
+})
+
 test('hit names follow the language', async () => {
   const { setLanguage } = await import('../i18n')
   setLanguage('ru')
@@ -224,6 +243,21 @@ test('tries the artifacts others in the showcase wear, in place of the own one',
     })),
     scalings: [{ stat: 'atk', multiplier: 1 }],
   })
+})
+
+test('with a transformative reaction, artifacts are weighed by the hit and the reaction together', async () => {
+  const amber = { ...AMBER, artifacts: [sands('Gladiator', 0.4)] }
+  const comparison = {
+    current: DAMAGE,
+    // Less from the hit, far more from the reaction: an Elemental Mastery sands.
+    candidates: [{ ...DAMAGE, average: 13000, reaction: 5000 }, DAMAGE, DAMAGE],
+  }
+  vi.stubGlobal('fetch', vi.fn(async () => Response.json(comparison)))
+  render(<DamageCalculator character={amber} others={CANDIDATES} />)
+  change('Transformative reaction', 'bloom')
+  fireEvent.click(screen.getByRole('button', { name: 'Try artifacts from the showcase' }))
+  expect(await screen.findByText(/Ganyu · Blizzard Strayer/)).toBeDefined()
+  expect(screen.getByText(/18,000 \(\+33\.3%\)/)).toBeDefined()
 })
 
 test('offers no comparison without other artifacts in the showcase', () => {

@@ -107,6 +107,11 @@ test('calculates damage for an imported character', async ({ page }) => {
   await expect(trials).toContainText('Amber · Noblesse Oblige · ATK 46.6% — 8,141 (+6.6%)')
   await expect(trials).toContainText('Amber · Bloodstained Chivalry · HP 4,780 — 7,731 (+1.3%)')
   await expect(trials.getByText('no artifact here does better')).toHaveCount(3)
+
+  // A Superconduct her hit sets off: its damage shows apart, from her level and mastery alone.
+  await ganyu.getByLabel('Transformative reaction').selectOption('superconduct')
+  await ganyu.getByRole('button', { name: 'Calculate damage' }).click()
+  await expect(ganyu.getByText('Reaction damage')).toBeVisible()
   expect((await measureLayout(page)).overflows).toBe(false)
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
   expect(problems).toEqual([])
