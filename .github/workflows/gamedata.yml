@@ -89,6 +89,7 @@ jobs:
     if: needs.sync.outputs.changed == 'true'
     runs-on: ubuntu-latest
     permissions:
+      actions: write # to start CI on the pushed branch
       contents: write
       pull-requests: write
     steps:
@@ -130,6 +131,9 @@ jobs:
           else
             gh pr create --base main --head "$BRANCH" --title "Game data update" --body "$body"
           fi
+          # The push above starts no workflow (Actions token); a dispatch does, and its checks are
+          # the ones main requires before the merge.
+          gh workflow run ci.yml --ref "$BRANCH"
       - name: Fail the run when a check failed
         if: needs.sync.outputs.check == 'failure'
         run: exit 1

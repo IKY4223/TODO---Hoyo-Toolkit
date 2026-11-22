@@ -119,7 +119,7 @@ have a lawyer read the texts before launch.
 Remind the owner of these until they confirm them.
 
 - Install the Vercel GitHub app on this repository, so pushes to `main` deploy and each pull
-  request gets a preview; then a session runs `vercel git connect`. Then shut SnapDeploy down.
+  request gets a preview; then a session runs `vercel git connect`.
 - How long Vercel keeps the runtime logs on the Hobby plan (the dashboard shows it): the
   `[LOG DAYS]` of `LEGAL-DRAFTS.md`. The function runs in the US (`iad1`): the `[HOST]` country.
 - Confirmed so far: Secret scanning and Push protection are on; Star Rail final stats
