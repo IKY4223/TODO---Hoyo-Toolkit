@@ -1,6 +1,10 @@
 name: CI
 
-on: push
+on:
+  push:
+  # The game data workflow starts this for its pull request: pushes made with the Actions token
+  # start no workflow, so the checks the main branch requires would never run.
+  workflow_dispatch:
 
 # Read-only token: no job here writes to the repository.
 permissions:
