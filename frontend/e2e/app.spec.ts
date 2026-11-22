@@ -242,6 +242,9 @@ test("plans Aglaea's Supreme Stance and says each debuff's base chance", async (
     tool.getByText('Every turn · Enemies: SPD −10% · lasts 2 turns · lands at a base chance of 75%'),
   ).toBeVisible()
   await expect(tool.getByText('On Ultimate · Own countdown: comes in with 1 action')).toBeVisible()
+  // Against an enemy with 40% Effect RES, Welt (no Effect Hit Rate here) lands it 45% of the time.
+  await tool.getByLabel('Enemy Effect RES, %').fill('40')
+  await expect(tool.getByText(/lands at a base chance of 75%, 45% against this enemy/)).toBeVisible()
   await tool.getByLabel('Ultimate every N turns').first().selectOption('4')
   await expect(tool.locator('.timeline')).toContainText('Countdown of Aglaea')
   await expect(tool.locator('.timeline')).toContainText('Memosprite of Aglaea')

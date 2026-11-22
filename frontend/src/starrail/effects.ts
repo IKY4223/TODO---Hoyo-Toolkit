@@ -543,8 +543,8 @@ export const TURN_EFFECTS: readonly TurnEffect[] = [
     byElation: true,
   },
   // On enemies. A debuff with a base chance has its box ticked as landed; the player unticks it.
-  // shortcut: the chance is shown, not weighed against the enemy's Effect RES and the source's
-  // Effect Hit Rate; the player decides whether it landed.
+  // With the enemy's Effect RES typed in, the chance weighed by the source's Effect Hit Rate is
+  // shown too (realChance); the player still decides whether it landed.
   {
     id: 'welt-skill',
     source: { character: 1004 },
@@ -1176,6 +1176,15 @@ export function turnValue(
  * how soon it comes depends on the battle. */
 export const syzygyBonus = (character: StarRailCharacter): number =>
   Number(kitOf(character) === 'later') + Number(character.eidolon >= SYZYGY.bonusFrom)
+
+/**
+ * A debuff's chance to land on an enemy: base × (1 + Effect Hit Rate) × (1 − Effect RES), at most
+ * 100%. The game prints only the base chance; this formula is a community estimate (the guides
+ * agree on it). shortcut: the enemy's RES to the debuff itself (Crowd Control RES and the like) is
+ * left out.
+ */
+export const realChance = (base: number, hitRate: number, effectRes: number): number =>
+  Math.min(1, Math.max(0, base * (1 + hitRate) * (1 - effectRes)))
 
 export const statOf = (character: StarRailCharacter, key: string): number =>
   character.stats.find((stat) => stat.key === key)?.value ?? 0

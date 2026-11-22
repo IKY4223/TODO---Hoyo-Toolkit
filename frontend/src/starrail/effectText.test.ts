@@ -119,6 +119,9 @@ test('describes turn effects', () => {
     'Every turn · Enemies: SPD −10% · lasts 2 turns',
   )
   expect(turnEffectText(turn('jingliu-technique'), 1, t)).toBe('At battle start · Self: 1 stack')
+  expect(turnEffectText(turn('welt-skill'), 0.1, t, 0.75, 0.54)).toBe(
+    'Every turn · Enemies: SPD −10% · lasts 2 turns · lands at a base chance of 75%, 54% against this enemy',
+  )
   expect(turnEffectText(turn('jingliu-talent'), 1, t)).toBe(
     'On entering its state · Self: action advance +100%',
   )
